@@ -7,9 +7,8 @@ interface control {
   void get(int address, size_t payload_size, uint8_t payload[]);
 };
 
-#include "usb_std_requests.h"
-
-void control_handle_message_usb(const USB_SetupPacket_t &setup_packet,
+void control_handle_message_usb(unsigned char request_direction,
+  unsigned short windex, unsigned short wvalue, unsigned short wlength,
   const uint8_t request_data[], size_t received_request_data_size, size_t &return_request_data_size,
   client interface control modules[num_modules], size_t num_modules);
 

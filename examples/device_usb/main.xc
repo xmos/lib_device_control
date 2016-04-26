@@ -105,7 +105,8 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
 	  request_data_length = 0; /* length not required by XUD API coming in */
 	  res = XUD_GetBuffer(ep0_out, request_data, request_data_length);
 	  if (res == XUD_RES_OKAY) {
-            control_handle_message_usb(sp, request_data, request_data_length, return_size, i_module, 1);
+            control_handle_message_usb(sp.bmRequestType.Direction, sp.wIndex, sp.wValue, sp.wLength,
+              request_data, request_data_length, return_size, i_module, 1);
 	    res = XUD_DoSetRequestStatus(ep0_in);
 	  }
 	  break;
@@ -114,7 +115,8 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
 	  /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          control_handle_message_usb(sp, request_data, request_data_length, return_size, i_module, 1);
+          control_handle_message_usb(sp.bmRequestType.Direction, sp.wIndex, sp.wValue, sp.wLength,
+            request_data, request_data_length, return_size, i_module, 1);
 	  res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, return_size, return_size);
 	  break;
       }
