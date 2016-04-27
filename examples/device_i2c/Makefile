@@ -1,5 +1,5 @@
 TARGET = mic_array_ref.xn
-XCC_FLAGS =
+XCC_FLAGS = -report
 USED_MODULES = lib_control lib_i2c lib_logging
 XMOS_MAKE_PATH ?= ../..
 include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common

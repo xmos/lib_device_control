@@ -24,8 +24,8 @@ out port p_eth_phy_reset = on tile[1]: XS1_PORT_4F;
 
 const char device_addr = 123;
 
-/* TODO [[combinable]] */
-void i2c_server(server i2c_slave_callback_if i_i2c, client interface control i_module[])
+[[combinable]]
+void i2c_server(server i2c_slave_callback_if i_i2c, client interface control i_module[1])
 {
   uint8_t bytes[256];
   size_t num_bytes_write;
@@ -94,7 +94,8 @@ void i2c_server(server i2c_slave_callback_if i_i2c, client interface control i_m
 	}
 	break;
       case pending => tmr when timerafter(tmr_t) :> void:
-        control_handle_message_i2c(bytes, num_bytes_write, return_size, i_module, 1);
+        control_handle_message_i2c(bytes, return_size, i_module, 1);
+        num_bytes_write = 0;
 	pending = 0;
         break;
     }
@@ -112,23 +113,23 @@ void app(server interface control i_module)
 
   while (1) {
     select {
-      case i_module.set(int address, size_t payload_size, const uint8_t payload[]):
-        printf("%u: received SET: 0x%06x %d,", num_commands, address, payload_size);
-        for (i = 0; i < payload_size; i++) {
+      case i_module.set(int address, size_t payload_length, const uint8_t payload[]):
+        printf("%u: received SET: 0x%06x %d,", num_commands, address, payload_length);
+        for (i = 0; i < payload_length; i++) {
           printf(" %02x", payload[i]);
         }
         printf("\n");
         num_commands++;
         break;
 
-      case i_module.get(int address, size_t payload_size, uint8_t payload[]):
-        assert(payload_size == 4);
+      case i_module.get(int address, size_t payload_length, uint8_t payload[]):
+        assert(payload_length == 4);
         payload[0] = 0x12;
         payload[1] = 0x34;
         payload[2] = 0x56;
         payload[3] = 0x78;
-        printf("%u: received GET: 0x%06x %d,", num_commands, address, payload_size);
-        printf(" returned %d bytes", payload_size);
+        printf("%u: received GET: 0x%06x %d,", num_commands, address, payload_length);
+        printf(" returned %d bytes", payload_length);
         printf("\n");
         num_commands++;
         break;
@@ -142,10 +143,13 @@ int main(void)
   interface control i_module[1];
   par {
     on tile[0]: app(i_module[0]);
-    on tile[0]: i2c_server(i_i2c, i_module);
     on tile[1]: {
       p_eth_phy_reset <: 0;
-      i2c_slave(i_i2c, p_scl, p_sda, device_addr);
+      /* bug 17317 - [[combine]] */
+      par {
+        i2c_server(i_i2c, i_module);
+        i2c_slave(i_i2c, p_scl, p_sda, device_addr);
+      }
     }
   }
   return 0;

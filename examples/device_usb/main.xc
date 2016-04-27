@@ -22,23 +22,23 @@ void app(server interface control i_module)
 
   while (1) {
     select {
-      case i_module.set(int address, size_t payload_size, const uint8_t payload[]):
-        printf("%u: received SET: 0x%06x %d,", num_commands, address, payload_size);
-        for (i = 0; i < payload_size; i++) {
+      case i_module.set(int address, size_t payload_length, const uint8_t payload[]):
+        printf("%u: received SET: 0x%06x %d,", num_commands, address, payload_length);
+        for (i = 0; i < payload_length; i++) {
           printf(" %02x", payload[i]);
         }
         printf("\n");
         num_commands++;
         break;
 
-      case i_module.get(int address, size_t payload_size, uint8_t payload[]):
-        assert(payload_size == 4);
+      case i_module.get(int address, size_t payload_length, uint8_t payload[]):
+        assert(payload_length == 4);
         payload[0] = 0x12;
         payload[1] = 0x34;
         payload[2] = 0x56;
         payload[3] = 0x78;
-        printf("%u: received GET: 0x%06x %d,", num_commands, address, payload_size);
-        printf(" returned %d bytes", payload_size);
+        printf("%u: received GET: 0x%06x %d,", num_commands, address, payload_length);
+        printf(" returned %d bytes", payload_length);
         printf("\n");
         num_commands++;
         break;
@@ -55,8 +55,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
   unsigned short descriptor_type;
   unsigned char zero_hid_report[] = {0, 0, 0, 0};
   unsigned char request_data[EP0_MAX_PACKET_SIZE];
-  unsigned request_data_length;
-  size_t return_size;
+  size_t len;
 
   ep0_out = XUD_InitEp(c_ep0_out);
   ep0_in = XUD_InitEp(c_ep0_in);
@@ -102,11 +101,10 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
 	  break;
 	
 	case USB_BMREQ_H2D_VENDOR_DEV:
-	  request_data_length = 0; /* length not required by XUD API coming in */
-	  res = XUD_GetBuffer(ep0_out, request_data, request_data_length);
+	  res = XUD_GetBuffer(ep0_out, request_data, len);
 	  if (res == XUD_RES_OKAY) {
-            control_handle_message_usb(sp.bmRequestType.Direction, sp.wIndex, sp.wValue, sp.wLength,
-              request_data, request_data_length, return_size, i_module, 1);
+            control_handle_message_usb(CONTROL_USB_H2D, sp.wIndex, sp.wValue, sp.wLength,
+              request_data, null, i_module, 1);
 	    res = XUD_DoSetRequestStatus(ep0_in);
 	  }
 	  break;
@@ -115,9 +113,9 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
 	  /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          control_handle_message_usb(sp.bmRequestType.Direction, sp.wIndex, sp.wValue, sp.wLength,
-            request_data, request_data_length, return_size, i_module, 1);
-	  res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, return_size, return_size);
+          control_handle_message_usb(CONTROL_USB_D2H, sp.wIndex, sp.wValue, sp.wLength,
+            request_data, len, i_module, 1);
+	  res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
 	  break;
       }
     }
@@ -169,7 +167,6 @@ int main(void)
       app(i_module[0]);
       hid_endpoint(c_ep_in[1]);
       endpoint0(c_ep_out[0], c_ep_in[0], i_module);
-
       { ep_out[EP_OUT_ZERO] = XUD_EPTYPE_CTL | XUD_STATUS_ENABLE;
         ep_in[EP_OUT_ZERO] = XUD_EPTYPE_CTL | XUD_STATUS_ENABLE;
 	ep_in[EP_IN_HID] = XUD_EPTYPE_BUL;
