@@ -10,41 +10,7 @@
 #include "hid.h"
 #include "descriptors.h"
 #include "control.h"
-
-void app(server interface control i_module)
-{
-  unsigned num_commands;
-  int i;
-
-  printf("started\n");
-
-  num_commands = 0;
-
-  while (1) {
-    select {
-      case i_module.set(int address, size_t payload_length, const uint8_t payload[]):
-        printf("%u: received SET: 0x%06x %d,", num_commands, address, payload_length);
-        for (i = 0; i < payload_length; i++) {
-          printf(" %02x", payload[i]);
-        }
-        printf("\n");
-        num_commands++;
-        break;
-
-      case i_module.get(int address, size_t payload_length, uint8_t payload[]):
-        assert(payload_length == 4);
-        payload[0] = 0x12;
-        payload[1] = 0x34;
-        payload[2] = 0x56;
-        payload[3] = 0x78;
-        printf("%u: received GET: 0x%06x %d,", num_commands, address, payload_length);
-        printf(" returned %d bytes", payload_length);
-        printf("\n");
-        num_commands++;
-        break;
-    }
-  }
-}
+#include "app.h"
 
 void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_module[1])
 {
@@ -103,7 +69,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
 	case USB_BMREQ_H2D_VENDOR_DEV:
 	  res = XUD_GetBuffer(ep0_out, request_data, len);
 	  if (res == XUD_RES_OKAY) {
-            control_handle_message_usb(CONTROL_USB_H2D, sp.wIndex, sp.wValue, sp.wLength,
+            control_handle_message_usb(sp.bmRequestType.Direction, sp.wIndex, sp.wValue, sp.wLength,
               request_data, null, i_module, 1);
 	    res = XUD_DoSetRequestStatus(ep0_in);
 	  }
@@ -113,7 +79,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
 	  /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          control_handle_message_usb(CONTROL_USB_D2H, sp.wIndex, sp.wValue, sp.wLength,
+          control_handle_message_usb(sp.bmRequestType.Direction, sp.wIndex, sp.wValue, sp.wLength,
             request_data, len, i_module, 1);
 	  res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
 	  break;

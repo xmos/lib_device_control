@@ -14,8 +14,8 @@ interface control {
  *  Host-to-device or device-to-host (see USB 2.0 spec 9.3)
  */
 enum usb_request_direction {
-  CONTROL_USB_H2D = 1,
-  CONTROL_USB_D2H = 2
+  CONTROL_USB_H2D = 0,
+  CONTROL_USB_D2H = 1
 };
 
 /** Handle message, USB device request transport
