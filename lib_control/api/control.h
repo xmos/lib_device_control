@@ -28,17 +28,17 @@ void control_handle_message_usb(enum usb_request_direction direction,
   unsigned short wlength,
   uint8_t data[],
   size_t &?return_size,
-  client interface control modules[num_modules],
+  client interface control i_modules[num_modules],
   size_t num_modules);
 
 void control_handle_message_i2c(uint8_t data[],
   size_t &?return_size,
-  client interface control modules[num_modules],
+  client interface control i_modules[num_modules],
   size_t num_modules);
 
 void control_handle_message_xscope(uint8_t data[],
   size_t &?return_size,
-  client interface control modules[num_modules],
+  client interface control i_modules[num_modules],
   size_t num_modules);
 
 #endif // __control_h__

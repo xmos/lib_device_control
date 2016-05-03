@@ -5,7 +5,7 @@
 
 void control_handle_message_usb(enum usb_request_direction direction,
   unsigned short windex, unsigned short wvalue, unsigned short wlength,
-  uint8_t data[], size_t &?return_size, client interface control modules[num_modules], size_t num_modules)
+  uint8_t data[], size_t &?return_size, client interface control i_modules[num_modules], size_t num_modules)
 {
   int entity;
   int address;
@@ -17,13 +17,13 @@ void control_handle_message_usb(enum usb_request_direction direction,
     if (!isnull(return_size)) {
       return_size = 0;
     }
-    modules[entity].set(address, wlength, data);
+    i_modules[entity].set(address, wlength, data);
   }
   else if (direction == CONTROL_USB_D2H) {
     if (!isnull(return_size)) {
       return_size = wlength;
     }
-    modules[entity].get(address, wlength, data);
+    i_modules[entity].get(address, wlength, data);
   }
 }
 
@@ -42,7 +42,7 @@ struct message {
 
 void control_handle_message_i2c(uint8_t data[],
   size_t &?return_size,
-  client interface control modules[num_modules],
+  client interface control i_modules[num_modules],
   size_t num_modules)
 {
   struct message *m;
@@ -55,20 +55,20 @@ void control_handle_message_i2c(uint8_t data[],
     if (!isnull(return_size)) {
       return_size = 0;
     }
-    modules[m->entity].set(address, m->payload_length, m->payload);
+    i_modules[m->entity].set(address, m->payload_length, m->payload);
   }
   else if (m->direction == CONTROL_GET) {
     if (!isnull(return_size)) {
       return_size = m->payload_length;
     }
-    modules[m->entity].get(address, m->payload_length, data);
+    i_modules[m->entity].get(address, m->payload_length, data);
   }
 }
 
 void control_handle_message_xscope(uint8_t data[],
   size_t &?return_size,
-  client interface control modules[num_modules],
+  client interface control i_modules[num_modules],
   size_t num_modules)
 {
-  control_handle_message_i2c(data, return_size, modules, num_modules);
+  control_handle_message_i2c(data, return_size, i_modules, num_modules);
 }
