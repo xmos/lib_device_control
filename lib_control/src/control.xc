@@ -37,7 +37,7 @@ struct message {
   uint8_t entity;
   uint8_t address[3]; /* big endian convention */
   uint8_t payload_length;
-  uint8_t payload[64]; /* USB control request maximum, xSCOPE is probably 256 */
+  uint8_t payload[MAX_XSCOPE_PAYLOAD]; /* USB control request maximum, xSCOPE is probably 256 */
 };
 
 void control_handle_message_i2c(uint8_t data[],

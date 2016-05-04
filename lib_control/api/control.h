@@ -5,6 +5,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/** Maximum payload size in bytes for each transport type */
+#define     MAX_USB_PAYLOAD     64                  /*Fixed by XUD*/
+#define     MAX_XSCOPE_PAYLOAD  256                 /*Fixed by xscope*/
+#define     MAX_I2C_PAYLOAD     MAX_XSCOPE_PAYLOAD  /*Arbitrary*/
+
 interface control {
   void set(int address, size_t payload_size, const uint8_t payload[]);
   void get(int address, size_t payload_size, uint8_t payload[]);
