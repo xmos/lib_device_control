@@ -4,7 +4,7 @@
 #include "control.h"
 #include "app.h"
 
-void app(server interface control i_module)
+void app(server interface control i_control)
 {
   unsigned num_commands;
   int i;
@@ -15,27 +15,33 @@ void app(server interface control i_module)
 
   while (1) {
     select {
-      case i_module.set(int address, size_t payload_length, const uint8_t payload[]):
-        printf("%u: received SET: 0x%06x %d,", num_commands, address, payload_length);
-        for (i = 0; i < payload_length; i++) {
-          printf(" %02x", payload[i]);
+      case i_control.register_resources(resource_id resources[MAX_RESOURCES_PER_INTERFACE],
+                                        unsigned &num_resources):
+        resources[0] = RESOURCE_ID;
+        num_resources = 1;
+        break;
+
+      case i_control.write_command(resource_id r, command_code c, const uint8_t data[n], unsigned n):
+        assert(r == RESOURCE_ID);
+        printf("%u: W 0x%08x %d %d,", num_commands, r, c, n);
+        for (i = 0; i < n; i++) {
+          printf(" %02x", data[i]);
         }
         printf("\n");
         num_commands++;
         break;
 
-      case i_module.get(int address, size_t payload_length, uint8_t payload[]):
-        assert(payload_length == 4);
-        payload[0] = 0x12;
-        payload[1] = 0x34;
-        payload[2] = 0x56;
-        payload[3] = 0x78;
-        printf("%u: received GET: 0x%06x %d,", num_commands, address, payload_length);
-        printf(" returned %d bytes", payload_length);
+      case i_control.read_command(resource_id r, command_code c, uint8_t data[n], unsigned n):
+        assert(r == RESOURCE_ID);
+        printf("%u: R 0x%08x %d %d,", num_commands, r, c, n);
+        assert(n == 4);
+        data[0] = 0x12;
+        data[1] = 0x34;
+        data[2] = 0x56;
+        data[3] = 0x78;
         printf("\n");
         num_commands++;
         break;
     }
   }
 }
-

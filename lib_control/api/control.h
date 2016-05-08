@@ -5,45 +5,37 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/** Maximum payload size in bytes for each transport type */
-#define     MAX_USB_PAYLOAD     64                  /*Fixed by XUD*/
-#define     MAX_XSCOPE_PAYLOAD  256                 /*Fixed by xscope*/
-#define     MAX_I2C_PAYLOAD     MAX_XSCOPE_PAYLOAD  /*Arbitrary*/
+typedef uint32_t resource_id;
+typedef uint8_t command_code;
+
+#define MAX_RESOURCES_PER_INTERFACE 64
 
 interface control {
-  void set(int address, size_t payload_size, const uint8_t payload[]);
-  void get(int address, size_t payload_size, uint8_t payload[]);
+  void register_resources(resource_id resources[MAX_RESOURCES_PER_INTERFACE],
+                          unsigned &num_resources);
+
+  void write_command(resource_id r, command_code c, const uint8_t data[n], unsigned n);
+
+  void read_command(resource_id r, command_code c, uint8_t data[n], unsigned n);
 };
 
-/** Values for USB device request direction
- *  Host-to-device or device-to-host (see USB 2.0 spec 9.3)
- */
-enum usb_request_direction {
-  CONTROL_USB_H2D = 0,
-  CONTROL_USB_D2H = 1
-};
+void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
+                                          client interface control i[n], unsigned n);
 
-/** Handle message, USB device request transport
- *
- *  \param direction       USB device request direction
- */
-void control_handle_message_usb(enum usb_request_direction direction,
-  unsigned short windex,
-  unsigned short wvalue,
-  unsigned short wlength,
-  uint8_t data[],
-  size_t &?return_size,
-  client interface control i_modules[num_modules],
-  size_t num_modules);
+void control_process_i2c_read_transaction(uint8_t reg, uint8_t &val,
+                                         client interface control i[n], unsigned n);
 
-void control_handle_message_i2c(uint8_t data[],
-  size_t &?return_size,
-  client interface control i_modules[num_modules],
-  size_t num_modules);
+void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                     const uint8_t request_data[],
+                                     client interface control i[n], unsigned n);
 
-void control_handle_message_xscope(uint8_t data[],
-  size_t &?return_size,
-  client interface control i_modules[num_modules],
-  size_t num_modules);
+void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                     uint8_t request_data[],
+                                     client interface control i[n], unsigned n);
+
+/* data return is device (control library) initiated */
+void control_process_xscope_upload(uint8_t data_in_and_out[],
+                                   unsigned length_in, unsigned &length_out,
+                                   client interface control i[n], unsigned n);
 
 #endif // __control_h__

@@ -12,7 +12,7 @@
 #include "control.h"
 #include "app.h"
 
-void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_module[1])
+void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_control[1])
 {
   USB_SetupPacket_t sp;
   XUD_Result_t res;
@@ -69,8 +69,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
 	case USB_BMREQ_H2D_VENDOR_DEV:
 	  res = XUD_GetBuffer(ep0_out, request_data, len);
 	  if (res == XUD_RES_OKAY) {
-            control_handle_message_usb(sp.bmRequestType.Direction, sp.wIndex, sp.wValue, sp.wLength,
-              request_data, null, i_module, 1);
+            control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
 	    res = XUD_DoSetRequestStatus(ep0_in);
 	  }
 	  break;
@@ -79,8 +78,8 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_m
 	  /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          control_handle_message_usb(sp.bmRequestType.Direction, sp.wIndex, sp.wValue, sp.wLength,
-            request_data, len, i_module, 1);
+          control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
+          len = sp.wLength;
 	  res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
 	  break;
       }
@@ -127,12 +126,12 @@ XUD_EpType ep_in[NUM_EP_IN];
 int main(void)
 {
   chan c_ep_out[NUM_EP_OUT], c_ep_in[NUM_EP_IN];
-  interface control i_module[1];
+  interface control i_control[1];
   par {
     on USB_TILE: par {
-      app(i_module[0]);
+      app(i_control[0]);
       hid_endpoint(c_ep_in[1]);
-      endpoint0(c_ep_out[0], c_ep_in[0], i_module);
+      endpoint0(c_ep_out[0], c_ep_in[0], i_control);
       { ep_out[EP_OUT_ZERO] = XUD_EPTYPE_CTL | XUD_STATUS_ENABLE;
         ep_in[EP_OUT_ZERO] = XUD_EPTYPE_CTL | XUD_STATUS_ENABLE;
 	ep_in[EP_IN_HID] = XUD_EPTYPE_BUL;

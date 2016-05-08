@@ -20,11 +20,11 @@ void xscope_user_init(void)
 }
 
 [[combinable]]
-void xscope_server(chanend c_xscope, client interface control i_module[1])
+void xscope_client(chanend c_xscope, client interface control i_control[1])
 {
   uint8_t bytes[256];
   int num_bytes_read;
-  size_t return_size;
+  unsigned return_size;
 
   xscope_connect_data_from_host(c_xscope);
 
@@ -35,7 +35,7 @@ void xscope_server(chanend c_xscope, client interface control i_module[1])
       /* tools_xtrace/xscope_api/xcore_shared/xscope_shared_xc.xc */
       case xscope_data_from_host(c_xscope, bytes, num_bytes_read):
         assert(num_bytes_read <= sizeof(bytes));
-	control_handle_message_xscope(bytes, return_size, i_module, 1);
+	control_process_xscope_upload(bytes, num_bytes_read, return_size, i_control, 1);
 	if (return_size > 0) {
           xscope_core_bytes(0, return_size, bytes);
         }
@@ -48,12 +48,12 @@ void xscope_server(chanend c_xscope, client interface control i_module[1])
 int main(void)
 {
   chan c_xscope;
-  interface control i_module[1];
+  interface control i_control[1];
   par {
     /* xgdb -ex 'conn --xscope-realtime --xscope-port 127.0.0.1:10101' */
     xscope_host_data(c_xscope);
-    on tile[0]: xscope_server(c_xscope, i_module);
-    on tile[0]: app(i_module[0]);
+    on tile[0]: xscope_client(c_xscope, i_control);
+    on tile[0]: app(i_control[0]);
   }
   return 0;
 }

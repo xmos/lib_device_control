@@ -22,82 +22,62 @@ port p_scl = on tile[1]: XS1_PORT_1A;
 port p_sda = on tile[1]: XS1_PORT_1B;
 out port p_eth_phy_reset = on tile[1]: XS1_PORT_4F;
 
-const char device_addr = 123;
+const char i2c_device_addr = 123;
 
 [[combinable]]
-void i2c_server(server i2c_slave_callback_if i_i2c, client interface control i_module[1])
+void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_control[1])
 {
-  uint8_t bytes[256];
-  size_t num_bytes_write;
-  size_t num_bytes_read;
-  size_t return_size;
-  int pending;
-  timer tmr;
-  int tmr_t;
+  /* I2C slave code based on app note AN00157, "How to use the I2C slave library" */
+  unsigned regnum;
 
-  num_bytes_write = 0;
-  num_bytes_read = 0;
-  pending = 0;
+  regnum = -1;
 
   while (1) {
     select {
-      case i_i2c.start_read_request(void):
-        num_bytes_read = 0;
-        break;
-      case i_i2c.ack_read_request(void) -> i2c_slave_ack_t resp:
-	if (pending) {
-	  resp = I2C_SLAVE_NACK;
-	}
-	else {
-	  resp = I2C_SLAVE_ACK;
-	}
-        break;
-      case i_i2c.start_write_request(void):
-        num_bytes_write = 0;
-        break;
       case i_i2c.ack_write_request(void) -> i2c_slave_ack_t resp:
-	if (pending) {
+        /* always accept a write */
+        resp = I2C_SLAVE_ACK;
+        break;
+
+      case i_i2c.ack_read_request(void) -> i2c_slave_ack_t resp:
+        /* only accept a read if it follows a write to select register */
+	if (regnum != -1) {
 	  resp = I2C_SLAVE_NACK;
 	}
 	else {
 	  resp = I2C_SLAVE_ACK;
 	}
         break;
-      case i_i2c.start_master_write(void):
-        break;
+
       case i_i2c.master_sent_data(uint8_t data) -> i2c_slave_ack_t resp:
-	if (num_bytes_write < sizeof(bytes)) {
-	  bytes[num_bytes_write] = data;
-	  resp = I2C_SLAVE_ACK;
+        /* first write selects a register, further writes write to the selected register */
+	if (regnum == -1) {
+          regnum = data;
+	  resp = I2C_SLAVE_ACK; /* was NACK in AN00157 */
 	}
 	else {
-	  resp = I2C_SLAVE_NACK;
+          control_process_i2c_write_transaction(regnum, data, i_control, 1);
+          regnum = -1;
+	  resp = I2C_SLAVE_ACK;
 	}
-	num_bytes_write++;
         break;
-      case i_i2c.start_master_read(void):
-        break;
-      case i_i2c.master_requires_data() -> uint8_t data:
-	if (num_bytes_read < return_size) {
-	  data = bytes[num_bytes_read];
+
+      case i_i2c.master_requires_data(void) -> uint8_t data:
+        /* register should be selected at this point */
+	if (regnum != -1) {
+          control_process_i2c_read_transaction(regnum, data, i_control, 1);
 	}
-	num_bytes_read++;
-        break;
-      case i_i2c.stop_bit():
-	if (num_bytes_read > 0) {
-	  num_bytes_read = 0;
+	else {
+	  data = 0;
 	}
-	if (num_bytes_write > 0) {
-	  num_bytes_write = 0;
-	  pending = 1;
-	  tmr :> tmr_t;
-	}
-	break;
-      case pending => tmr when timerafter(tmr_t) :> void:
-        control_handle_message_i2c(bytes, return_size, i_module, 1);
-        num_bytes_write = 0;
-	pending = 0;
         break;
+
+      /* no use for these callbacks, ignore them */
+      case i_i2c.start_read_request(void): break;
+      case i_i2c.start_write_request(void): break;
+      case i_i2c.start_master_write(void): break;
+      case i_i2c.start_master_read(void): break;
+      case i_i2c.stop_bit(void): break;
     }
   }
 }
@@ -105,15 +85,15 @@ void i2c_server(server i2c_slave_callback_if i_i2c, client interface control i_m
 int main(void)
 {
   i2c_slave_callback_if i_i2c;
-  interface control i_module[1];
+  interface control i_control[1];
   par {
-    on tile[0]: app(i_module[0]);
+    on tile[0]: app(i_control[0]);
     on tile[1]: {
       p_eth_phy_reset <: 0;
       /* bug 17317 - [[combine]] */
       par {
-        i2c_server(i_i2c, i_module);
-        i2c_slave(i_i2c, p_scl, p_sda, device_addr);
+        i2c_client(i_i2c, i_control);
+        i2c_slave(i_i2c, p_scl, p_sda, i2c_device_addr);
       }
     }
   }

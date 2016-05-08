@@ -3,9 +3,44 @@
 #include <stddef.h>
 #include "control.h"
 
+void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
+                                          client interface control i[n], unsigned n)
+{
+  // TODO
+}
+
+void control_process_i2c_read_transaction(uint8_t reg, uint8_t &val,
+                                         client interface control i[n], unsigned n)
+{
+  // TODO
+}
+
+void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                     const uint8_t request_data[],
+                                     client interface control i[n], unsigned n)
+{
+  // TODO
+}
+
+void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                     uint8_t request_data[],
+                                     client interface control i[n], unsigned n)
+{
+  // TODO
+}
+
+void control_process_xscope_upload(uint8_t data_in_and_out[],
+                                   unsigned length_in, unsigned &length_out,
+                                   client interface control i[n], unsigned n)
+{
+  // TODO
+}
+
+#if 0
 void control_handle_message_usb(enum usb_request_direction direction,
   unsigned short windex, unsigned short wvalue, unsigned short wlength,
-  uint8_t data[], size_t &?return_size, client interface control i_modules[num_modules], size_t num_modules)
+  uint8_t data[MAX_USB_PAYLOAD], size_t &?return_size,
+  client interface control i_modules[num_modules], size_t num_modules)
 {
   int entity;
   int address;
@@ -40,7 +75,7 @@ struct message {
   uint8_t payload[MAX_XSCOPE_PAYLOAD]; /* USB control request maximum, xSCOPE is probably 256 */
 };
 
-void control_handle_message_i2c(uint8_t data[],
+void control_handle_message_i2c(uint8_t data[MAX_I2C_PAYLOAD],
   size_t &?return_size,
   client interface control i_modules[num_modules],
   size_t num_modules)
@@ -65,10 +100,11 @@ void control_handle_message_i2c(uint8_t data[],
   }
 }
 
-void control_handle_message_xscope(uint8_t data[],
+void control_handle_message_xscope(uint8_t data[MAX_XSCOPE_PAYLOAD],
   size_t &?return_size,
   client interface control i_modules[num_modules],
   size_t num_modules)
 {
   control_handle_message_i2c(data, return_size, i_modules, num_modules);
 }
+#endif
