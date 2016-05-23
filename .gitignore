@@ -4,3 +4,4 @@ bin
 .build
 org.eclipse.cdt.core.prefs
 run_xdoc.log
+test_results.csv

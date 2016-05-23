@@ -26,6 +26,8 @@ void xscope_client(chanend c_xscope, client interface control i_control[1])
   int num_bytes_read;
   unsigned return_size;
 
+  control_init(i_control, 1);
+
   xscope_connect_data_from_host(c_xscope);
 
   printf("xSCOPE server connected\n");

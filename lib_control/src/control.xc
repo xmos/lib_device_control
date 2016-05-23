@@ -1,7 +1,58 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
+#include "xassert.h"
 #include "control.h"
+
+/* 256 entries, 8B per entry -> 2KB */
+static struct resource_table_entry_t {
+  control_resid_t resid;
+  unsigned ifnum;
+} resource_table[MAX_RESOURCES];
+static unsigned resource_table_size = 0;
+
+static void register_resources(const control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
+                               unsigned num_resources, unsigned ifnum)
+{
+  struct resource_table_entry_t *e;
+  control_resid_t resid;
+  unsigned i, j;
+
+  for (i = 0; i < num_resources; i++) {
+    resid = resources[i];
+
+    for (j = 0; j < resource_table_size; j++) {
+      e = &resource_table[j];
+      if (e->resid == resid) {
+        printf("resource 0x%X already registered on interface %d\n", resid, ifnum);
+        xassert(0);
+      }
+    }
+
+    if (resource_table_size >= MAX_RESOURCES) {
+      printf("cannot register more than %d resources\n", resource_table_size);
+      xassert(0);
+    }
+
+    e = &resource_table[resource_table_size];
+    e->resid = resid;
+    e->ifnum = ifnum;
+    resource_table_size++;
+  }
+}
+
+void control_init(client interface control i[n], unsigned n)
+{
+  control_resid_t r[MAX_RESOURCES_PER_INTERFACE];
+  unsigned n0;
+  unsigned j;
+
+  for (j = 0; j < n; j++) {
+    i[j].register_resources(r, n0);
+    register_resources(r, n0, j);
+  }
+}
 
 void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
                                           client interface control i[n], unsigned n)

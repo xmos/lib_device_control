@@ -5,19 +5,26 @@
 #include <stdint.h>
 #include <stddef.h>
 
-typedef uint32_t resource_id;
-typedef uint8_t command_code;
+typedef uint32_t control_resid_t;
+typedef uint8_t control_cmd_t;
+typedef enum {
+  CONTROL_SUCCESS,
+  CONTROL_ERROR
+} control_res_t;
 
 #define MAX_RESOURCES_PER_INTERFACE 64
+#define MAX_RESOURCES 256
 
 interface control {
-  void register_resources(resource_id resources[MAX_RESOURCES_PER_INTERFACE],
+  void register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
                           unsigned &num_resources);
 
-  void write_command(resource_id r, command_code c, const uint8_t data[n], unsigned n);
+  control_res_t write_command(control_resid_t r, control_cmd_t c, const uint8_t data[n], unsigned n);
 
-  void read_command(resource_id r, command_code c, uint8_t data[n], unsigned n);
+  control_res_t read_command(control_resid_t r, control_cmd_t c, uint8_t data[n], unsigned n);
 };
+
+void control_init(client interface control i[n], unsigned n);
 
 void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
                                           client interface control i[n], unsigned n);
