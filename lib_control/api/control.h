@@ -15,6 +15,7 @@ typedef enum {
 #define MAX_RESOURCES_PER_INTERFACE 64
 #define MAX_RESOURCES 256
 #define XSCOPE_UPLOAD_MAX_WORDS 64
+#define XSCOPE_PROBE_NAME "Upstream Data"
 
 #ifdef __XC__
 

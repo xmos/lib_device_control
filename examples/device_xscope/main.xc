@@ -8,8 +8,6 @@
 #include "control.h"
 #include "app.h"
 
-#define PROBE_NAME "Upstream Data"
-
 void xscope_user_init(void)
 {
   /* use JTAG for console I/O
@@ -17,7 +15,7 @@ void xscope_user_init(void)
    * see bug 17287
   */
 
-  xscope_register(1, XSCOPE_CONTINUOUS, PROBE_NAME, XSCOPE_INT, "byte");
+  xscope_register(1, XSCOPE_CONTINUOUS, XSCOPE_PROBE_NAME, XSCOPE_INT, "byte");
 }
 
 [[combinable]]

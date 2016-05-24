@@ -11,8 +11,6 @@
 #include "signals.h"
 #include "resource.h"
 
-#define PROBE_NAME "Upstream Data"
-
 int probe_id = -1;
 int record_count = 0;
 
@@ -21,7 +19,7 @@ void register_callback(unsigned int id, unsigned int type,
   unsigned char *name, unsigned char *unit,
   unsigned int data_type, unsigned char *data_name)
 {
-  if (strcmp((char*)name, PROBE_NAME) == 0) {
+  if (strcmp((char*)name, XSCOPE_PROBE_NAME) == 0) {
     probe_id = id;
     printf("registered probe %d\n", id);
   }
