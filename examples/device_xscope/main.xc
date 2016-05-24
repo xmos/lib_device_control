@@ -8,8 +8,6 @@
 #include "control.h"
 #include "app.h"
 
-#define PROBE_NAME "Upstream Data"
-
 void xscope_user_init(void)
 {
   /* use JTAG for console I/O
@@ -17,7 +15,7 @@ void xscope_user_init(void)
    * see bug 17287
   */
 
-  xscope_register(1, XSCOPE_CONTINUOUS, PROBE_NAME, XSCOPE_INT, "byte");
+  xscope_register(1, XSCOPE_CONTINUOUS, XSCOPE_CONTROL_PROBE, XSCOPE_INT, "byte");
 }
 
 [[combinable]]
@@ -53,7 +51,7 @@ int main(void)
   chan c_xscope;
   interface control i_control[1];
   par {
-    /* xgdb -ex 'conn --xscope-realtime --xscope-port 127.0.0.1:10101' */
+    /* xgdb -ex 'conn --xscope-port localhost:10101' */
     xscope_host_data(c_xscope);
     on tile[0]: xscope_client(c_xscope, i_control);
     on tile[0]: app(i_control[0]);

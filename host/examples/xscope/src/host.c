@@ -11,8 +11,6 @@
 #include "signals.h"
 #include "resource.h"
 
-#define PROBE_NAME "Upstream Data"
-
 int probe_id = -1;
 int record_count = 0;
 
@@ -21,7 +19,7 @@ void register_callback(unsigned int id, unsigned int type,
   unsigned char *name, unsigned char *unit,
   unsigned int data_type, unsigned char *data_name)
 {
-  if (strcmp((char*)name, PROBE_NAME) == 0) {
+  if (strcmp((char*)name, XSCOPE_CONTROL_PROBE) == 0) {
     probe_id = id;
     printf("registered probe %d\n", id);
   }
@@ -30,9 +28,15 @@ void register_callback(unsigned int id, unsigned int type,
 void record_callback(unsigned int id, unsigned long long timestamp,
   unsigned int length, unsigned long long dataval, unsigned char *databytes)
 {
+  struct control_xscope_probe *p;
+
   if (id == probe_id) {
+    p = (struct control_xscope_probe*)databytes;
+    /* no parsing, just print raw bytes */
+
     printf("GET data returned: ");
     print_bytes(databytes, length);
+
     record_count++;
   }
 }
@@ -69,20 +73,20 @@ unsigned num_commands = 0;
 
 void do_write_command(void)
 {
-  struct control_xscope_upload c;
-  unsigned *cb;
+  struct control_xscope_packet p;
+  unsigned *b;
   unsigned char payload[1];
   size_t len;
 
-  cb = (void*)&c;
+  b = (void*)&p;
   payload[0] = 1;
-  len = control_create_xscope_upload_buffer(cb,
+  len = control_create_xscope_upload_buffer(b,
     CONTROL_CMD_SET_WRITE(0), RESOURCE_ID, payload, 1);
 
   printf("%u: send write command: ", num_commands);
-  print_bytes((unsigned char*)cb, len);
+  print_bytes((unsigned char*)b, len);
 
-  if (xscope_ep_request_upload(len, (unsigned char*)cb) != XSCOPE_EP_SUCCESS)
+  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS)
     printf("xscope_ep_request_upload failed\n");
 
   num_commands++;
@@ -90,20 +94,20 @@ void do_write_command(void)
 
 void do_read_command(void)
 {
-  struct control_xscope_upload c;
-  unsigned *cb;
+  struct control_xscope_packet p;
+  unsigned *b;
   size_t len;
 
-  cb = (void*)&c;
-  len = control_create_xscope_upload_buffer(cb,
+  b = (void*)&p;
+  len = control_create_xscope_upload_buffer(b,
     CONTROL_CMD_SET_READ(0), RESOURCE_ID, NULL, 4);
 
   printf("%d: send read command: ", num_commands);
-  print_bytes((unsigned char*)cb, len);
+  print_bytes((unsigned char*)b, len);
 
   record_count = 0;
 
-  if (xscope_ep_request_upload(len, (unsigned char*)cb) != XSCOPE_EP_SUCCESS)
+  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS)
     printf("xscope_ep_request_upload failed\n");
 
   /* wait for response on xSCOPE probe */

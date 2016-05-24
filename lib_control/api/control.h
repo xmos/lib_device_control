@@ -14,7 +14,9 @@ typedef enum {
 
 #define MAX_RESOURCES_PER_INTERFACE 64
 #define MAX_RESOURCES 256
+
 #define XSCOPE_UPLOAD_MAX_WORDS 64
+#define XSCOPE_CONTROL_PROBE "Control Probe"
 
 #ifdef __XC__
 

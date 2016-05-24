@@ -15,27 +15,21 @@
 #define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * sizeof(uint32_t))
 
 /* xCORE is little endian */
-struct control_xscope_upload
+
+/* host to device xSCOPE data packet
+ * same format for device to host data returned over xSCOPE probe
+ */
+struct control_xscope_packet
 {
+#define XSCOPE_HEADER_BYTES 8
   control_resid_t resid;
   control_cmd_t cmd;
-
-#define XSCOPE_HEADER_BYTES (sizeof(control_resid_t) + sizeof(control_cmd_t))
-
-  /* can be changed if bug 17364 resolved:
-   * union {
-   *    uint8_t write_bytes[];
-   *    unsigned read_nbytes;
-   * } data;
-   */
-  uint8_t data[XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES];
-};
-
-struct control_xscope_probe
-{
-  control_resid_t resid;
-  control_cmd_t cmd;
-  uint8_t data[XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES];
+  uint8_t pad;
+  union {
+     uint8_t write_bytes[XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES];
+     uint8_t read_bytes[XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES];
+     unsigned read_nbytes;
+  } data;
 };
 
 static inline size_t control_create_xscope_upload_buffer(
@@ -43,19 +37,16 @@ static inline size_t control_create_xscope_upload_buffer(
   control_cmd_t c, control_res_t r,
   const uint8_t *data, unsigned n)
 {
-  struct control_xscope_upload *s;
-  s = (struct control_xscope_upload*)buffer;
+  struct control_xscope_packet *p;
+  p = (struct control_xscope_packet*)buffer;
 
-  s->resid = r;
-  s->cmd = c;
+  p->resid = r;
+  p->cmd = c;
   if (IS_CONTROL_CMD_READ(c)) {
-    s->data[0] = n;
-    s->data[1] = n >> 8;
-    s->data[2] = n >> 16;
-    s->data[3] = n >> 24;
+    p->data.read_nbytes = n;
   }
   else if (data != NULL) {
-    memcpy(s->data, data, n);
+    memcpy(p->data.write_bytes, data, n);
   }
 
   return XSCOPE_HEADER_BYTES + n;
