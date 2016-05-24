@@ -101,8 +101,9 @@ void do_read_command(void)
 
   record_count = 0;
 
-  if (xscope_ep_request_upload(len, (unsigned char*)cb) != XSCOPE_EP_SUCCESS)
+  if (xscope_ep_request_upload(len, (unsigned char*)cb) != XSCOPE_EP_SUCCESS) {
     printf("xscope_ep_request_upload failed\n");
+  }
 
   /* wait for response on xSCOPE probe */
   while (record_count == 0) {
