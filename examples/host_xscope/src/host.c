@@ -34,7 +34,7 @@ void record_callback(unsigned int id, unsigned long long timestamp,
     p = (struct control_xscope_probe*)databytes;
     /* no parsing, just print raw bytes */
 
-    printf("GET data returned: ");
+    printf("read data returned: ");
     print_bytes(databytes, length);
 
     record_count++;
@@ -80,8 +80,8 @@ void do_write_command(void)
 
   b = (void*)&p;
   payload[0] = 1;
-  len = control_create_xscope_upload_buffer(b,
-    CONTROL_CMD_SET_WRITE(0), RESOURCE_ID, payload, 1);
+  len = control_xscope_create_upload_buffer(b,
+    CONTROL_CMD_SET_WRITE(0), RESOURCE_ID, payload, sizeof(payload));
 
   printf("%u: send write command: ", num_commands);
   print_bytes((unsigned char*)b, len);
@@ -100,7 +100,7 @@ void do_read_command(void)
   size_t len;
 
   b = (void*)&p;
-  len = control_create_xscope_upload_buffer(b,
+  len = control_xscope_create_upload_buffer(b,
     CONTROL_CMD_SET_READ(0), RESOURCE_ID, NULL, 4);
 
   printf("%d: send read command: ", num_commands);

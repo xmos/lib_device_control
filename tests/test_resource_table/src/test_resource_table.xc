@@ -39,10 +39,10 @@ void test_client(client interface control i[2], chanend c[2])
         resid1 = RESID(ifnum1, k);
         cmd1 = CONTROL_CMD_SET_WRITE(0);
 
-        if (bad)
+        if (bad) /* test wrong ID */
           resid1 = ~resid1;
 
-        lenin = control_create_xscope_upload_buffer(buf, cmd1, resid1, NULL, 0);
+        lenin = control_xscope_create_upload_buffer(buf, cmd1, resid1, NULL, 0);
 
         tmr :> t;
         timeout = 0;

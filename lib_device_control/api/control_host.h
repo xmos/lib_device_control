@@ -9,17 +9,17 @@
 #include "control.h"
 #include "control_transport.h"
 
-static inline size_t control_create_xscope_upload_buffer(
+static inline size_t control_xscope_create_upload_buffer(
   uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
-  control_cmd_t c, control_res_t r,
+  control_cmd_t cmd, control_res_t resid,
   const uint8_t *data, unsigned n)
 {
   struct control_xscope_packet *p;
   p = (struct control_xscope_packet*)buffer;
 
-  p->resid = r;
-  p->cmd = c;
-  if (IS_CONTROL_CMD_READ(c)) {
+  p->resid = resid;
+  p->cmd = cmd;
+  if (IS_CONTROL_CMD_READ(cmd)) {
     p->data.read_nbytes = n;
   }
   else if (data != NULL) {
@@ -27,6 +27,15 @@ static inline size_t control_create_xscope_upload_buffer(
   }
 
   return XSCOPE_HEADER_BYTES + n;
+}
+
+static inline void control_usb_ep0_fill_header(
+  uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
+  control_resid_hash_t hash, control_cmd_t cmd, unsigned num_data_bytes)
+{
+  *windex = hash;
+  *wvalue = cmd;
+  *wlength = num_data_bytes;
 }
 
 #endif // __control_host_h__

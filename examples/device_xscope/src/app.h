@@ -1,3 +1,7 @@
+// Copyright (c) 2016, XMOS Ltd, All rights reserved
+#ifndef __app_h__
+#define __app_h__
+
 #include "control.h"
 
 /* 31..27 supplier      31 (unassigned)
@@ -9,3 +13,5 @@
 #define RESOURCE_ID 0xFCC30207
 
 void app(server interface control i_control);
+
+#endif // __app_h__

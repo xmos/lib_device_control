@@ -4,9 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "debug_print.h"
-#include "xud.h"
-#include "usb_std_requests.h"
-#include "usb_device.h"
+#include "usb.h"
 #include "hid.h"
 #include "descriptors.h"
 #include "control.h"
@@ -23,8 +21,10 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   unsigned char request_data[EP0_MAX_PACKET_SIZE];
   size_t len;
 
-  ep0_out = XUD_InitEp(c_ep0_out);
-  ep0_in = XUD_InitEp(c_ep0_in);
+  ep0_out = XUD_InitEp(c_ep0_out, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
+  ep0_in = XUD_InitEp(c_ep0_in, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
+
+  control_init(i_control, 1);
 
   while (1) {
     res = USB_GetSetupPacket(ep0_out, ep0_in, sp);
@@ -34,54 +34,54 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
       res = XUD_RES_ERR;
 
       switch ((sp.bmRequestType.Direction << 7) | (sp.bmRequestType.Type << 5) | (sp.bmRequestType.Recipient)) {
-	case USB_BMREQ_H2D_STANDARD_DEV:
-	  if (sp.bRequest == USB_SET_ADDRESS) {
-	    debug_printf("enumerated (address %d)\n", sp.wValue);
-	  }
-	  break;
+        case USB_BMREQ_H2D_STANDARD_DEV:
+        if (sp.bRequest == USB_SET_ADDRESS) {
+          debug_printf("enumerated (address %d)\n", sp.wValue);
+        }
+        break;
 
         case USB_BMREQ_D2H_STANDARD_INT:
-	  if (sp.bRequest == USB_GET_DESCRIPTOR) {
-	    if (sp.wIndex == HID_INTERFACE_NUM) {
-	      descriptor_type = sp.wValue & 0xFF00;
-	      switch (descriptor_type) {
-		case HID_HID:
-		  res = XUD_DoGetRequest(ep0_out, ep0_in, hid_descriptor, sizeof(hid_descriptor), sp.wLength);
-		  break;
+          if (sp.bRequest == USB_GET_DESCRIPTOR) {
+          if (sp.wIndex == HID_INTERFACE_NUM) {
+            descriptor_type = sp.wValue & 0xFF00;
+            switch (descriptor_type) {
+            case HID_HID:
+              res = XUD_DoGetRequest(ep0_out, ep0_in, hid_descriptor, sizeof(hid_descriptor), sp.wLength);
+              break;
 
-		case HID_REPORT:
-		  res = XUD_DoGetRequest(ep0_out, ep0_in, hid_report_descriptor, sizeof(hid_report_descriptor), sp.wLength);
-		  break;
-	      }
-	    }
-	  }
-	  break;
+            case HID_REPORT:
+              res = XUD_DoGetRequest(ep0_out, ep0_in, hid_report_descriptor, sizeof(hid_report_descriptor), sp.wLength);
+              break;
+            }
+          }
+        }
+        break;
 
-	case USB_BMREQ_H2D_CLASS_INT:
-	case USB_BMREQ_D2H_CLASS_INT:
-	  if (sp.wIndex == HID_INTERFACE_NUM) {
-	    if (sp.bRequest == HID_GET_REPORT) { /* ok to stall all other HID class requests */
+        case USB_BMREQ_H2D_CLASS_INT:
+        case USB_BMREQ_D2H_CLASS_INT:
+          if (sp.wIndex == HID_INTERFACE_NUM) {
+            if (sp.bRequest == HID_GET_REPORT) { /* ok to stall all other HID class requests */
               res = XUD_DoGetRequest(ep0_out, ep0_in, zero_hid_report, 4, sp.wLength);
-	    }
-	  }
-	  break;
-	
-	case USB_BMREQ_H2D_VENDOR_DEV:
-	  res = XUD_GetBuffer(ep0_out, request_data, len);
-	  if (res == XUD_RES_OKAY) {
-            control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
-	    res = XUD_DoSetRequestStatus(ep0_in);
-	  }
-	  break;
+            }
+          }
+          break;
+        
+        case USB_BMREQ_H2D_VENDOR_DEV:
+          res = XUD_GetBuffer(ep0_out, request_data, len);
+          if (res == XUD_RES_OKAY) {
+            control_process_usb_ep0_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
+            res = XUD_DoSetRequestStatus(ep0_in);
+          }
+          break;
 
-	case USB_BMREQ_D2H_VENDOR_DEV:
-	  /* application retrieval latency inside the control library call
+        case USB_BMREQ_D2H_VENDOR_DEV:
+          /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
+          control_process_usb_ep0_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
           len = sp.wLength;
-	  res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
-	  break;
+          res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
+          break;
       }
     }
 
@@ -91,7 +91,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
         res = USB_StandardRequests(ep0_out, ep0_in, device_descriptor,
           sizeof(device_descriptor), configuration_descriptor, sizeof(configuration_descriptor),
           null, 0, null, 0,
-	  string_descriptors, sizeof(string_descriptors) / sizeof(string_descriptors[0]),
+          string_descriptors, sizeof(string_descriptors) / sizeof(string_descriptors[0]),
           sp, bus_speed);
       }
     }
@@ -105,7 +105,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
 void hid_endpoint(chanend c_ep_hid)
 {
   unsigned char zero_hid_report[] = {0, 0, 0, 0};
-  XUD_ep ep = XUD_InitEp(c_ep_hid);
+  XUD_ep ep = XUD_InitEp(c_ep_hid, XUD_EPTYPE_BUL);
   XUD_SetBuffer(ep, zero_hid_report, 4);
 }
 
@@ -120,9 +120,6 @@ enum {
   NUM_EP_IN
 };
 
-XUD_EpType ep_out[NUM_EP_OUT];
-XUD_EpType ep_in[NUM_EP_IN];
-
 int main(void)
 {
   chan c_ep_out[NUM_EP_OUT], c_ep_in[NUM_EP_IN];
@@ -132,11 +129,7 @@ int main(void)
       app(i_control[0]);
       hid_endpoint(c_ep_in[1]);
       endpoint0(c_ep_out[0], c_ep_in[0], i_control);
-      { ep_out[EP_OUT_ZERO] = XUD_EPTYPE_CTL | XUD_STATUS_ENABLE;
-        ep_in[EP_OUT_ZERO] = XUD_EPTYPE_CTL | XUD_STATUS_ENABLE;
-	ep_in[EP_IN_HID] = XUD_EPTYPE_BUL;
-        XUD_Manager(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, ep_out, ep_in, null, null, -1, XUD_SPEED_HS, XUD_PWR_SELF);
-      }
+      xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
     }
   }
   return 0;

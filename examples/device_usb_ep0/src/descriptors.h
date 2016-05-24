@@ -1,6 +1,4 @@
-#include "usb_std_requests.h"
-#include "usb_std_descriptors.h"
-#include "hid.h"
+#include "usb.h"
 
 #define VENDOR_ID 0x20B1
 #define PRODUCT_ID 0x1010
