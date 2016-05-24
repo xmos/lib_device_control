@@ -86,8 +86,9 @@ void do_write_command(void)
   printf("%u: send write command: ", num_commands);
   print_bytes((unsigned char*)b, len);
 
-  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS)
+  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
     printf("xscope_ep_request_upload failed\n");
+  }
 
   num_commands++;
 }
