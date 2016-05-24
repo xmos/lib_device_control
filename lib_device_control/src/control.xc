@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "control.h"
-#include "control_host.h"
+#include "control_transport.h"
 #include "resource_table.h"
 
 #define DEBUG 0

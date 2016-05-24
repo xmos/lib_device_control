@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "control.h"
+#include "control_transport.h"
 #include "control_host.h"
 
 #define RESID(if_num, res_num_in_if) (0xCAFEBD00 | ((if_num) << 4) | ((res_num_in_if) + 1))
