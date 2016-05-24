@@ -1,0 +1,6 @@
+all:
+	mkdir -p bin
+	cd src ; gcc -Wall -g -o ../bin/a.out -I ../../../../lib_control/api -I ../../../../lib_control/host -I ${XMOS_TOOL_PATH}/include ${XMOS_TOOL_PATH}/lib/xscope_endpoint.so signals.c util.c host.c
+
+clean:
+	rm -rf bin

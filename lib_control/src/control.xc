@@ -2,45 +2,11 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdio.h>
-#include "xassert.h"
 #include "control.h"
+#include "control_host.h"
+#include "resource_table.h"
 
-/* 256 entries, 8B per entry -> 2KB */
-static struct resource_table_entry_t {
-  control_resid_t resid;
-  unsigned ifnum;
-} resource_table[MAX_RESOURCES];
-static unsigned resource_table_size = 0;
-
-static void register_resources(const control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
-                               unsigned num_resources, unsigned ifnum)
-{
-  struct resource_table_entry_t *e;
-  control_resid_t resid;
-  unsigned i, j;
-
-  for (i = 0; i < num_resources; i++) {
-    resid = resources[i];
-
-    for (j = 0; j < resource_table_size; j++) {
-      e = &resource_table[j];
-      if (e->resid == resid) {
-        printf("resource 0x%X already registered on interface %d\n", resid, ifnum);
-        xassert(0);
-      }
-    }
-
-    if (resource_table_size >= MAX_RESOURCES) {
-      printf("cannot register more than %d resources\n", resource_table_size);
-      xassert(0);
-    }
-
-    e = &resource_table[resource_table_size];
-    e->resid = resid;
-    e->ifnum = ifnum;
-    resource_table_size++;
-  }
-}
+#define DEBUG 0
 
 void control_init(client interface control i[n], unsigned n)
 {
@@ -50,7 +16,7 @@ void control_init(client interface control i[n], unsigned n)
 
   for (j = 0; j < n; j++) {
     i[j].register_resources(r, n0);
-    register_resources(r, n0, j);
+    resource_table_register(r, n0, j);
   }
 }
 
@@ -80,11 +46,39 @@ void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t 
   // TODO
 }
 
-void control_process_xscope_upload(uint8_t data_in_and_out[],
+void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
                                    unsigned length_in, unsigned &length_out,
                                    client interface control i[n], unsigned n)
 {
-  // TODO
+  struct control_xscope_upload *s;
+  unsigned ifnum;
+
+  s = (struct control_xscope_upload*)data_in_and_out;
+  ifnum = resource_table_lookup(s->resid);
+  if (ifnum == ~0) {
+#if DEBUG
+    printf("xscope: resource 0x%X not found\n", s->resid);
+#endif
+    return;
+  }
+
+  if (IS_CONTROL_CMD_READ(s->cmd)) {
+    length_out = s->data[0] + ((unsigned)s->data[1] << 8) +
+      ((unsigned)s->data[2] << 16) + ((unsigned)s->data[3] << 24);
+#if DEBUG
+    printf("xscope: 0x%X(%d) %d(read) %d bytes\n",
+      s->resid, ifnum, s->cmd, length_out);
+#endif
+    i[ifnum].read_command(s->resid, s->cmd, (data_in_and_out, uint8_t[]), length_out);
+  }
+  else {
+    length_out = 0;
+#if DEBUG
+    printf("xscope: 0x%X(%d) %d(write) %d bytes\n",
+      s->resid, ifnum, s->cmd, length_in - XSCOPE_HEADER_BYTES);
+#endif
+    i[ifnum].write_command(s->resid, s->cmd, s->data, length_in - XSCOPE_HEADER_BYTES);
+  }
 }
 
 #if 0
@@ -149,13 +143,5 @@ void control_handle_message_i2c(uint8_t data[MAX_I2C_PAYLOAD],
     }
     i_modules[m->entity].get(address, m->payload_length, data);
   }
-}
-
-void control_handle_message_xscope(uint8_t data[MAX_XSCOPE_PAYLOAD],
-  size_t &?return_size,
-  client interface control i_modules[num_modules],
-  size_t num_modules)
-{
-  control_handle_message_i2c(data, return_size, i_modules, num_modules);
 }
 #endif

@@ -1,3 +1,4 @@
+// Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
@@ -29,6 +30,7 @@ void app(server interface control i_control)
         }
         printf("\n");
         if (r != RESOURCE_ID) {
+          printf("unrecognised resource ID 0x%08x\n", r);
           res = CONTROL_ERROR;
           break;
         }
@@ -39,7 +41,13 @@ void app(server interface control i_control)
       case i_control.read_command(control_resid_t r, control_cmd_t c,
                                   uint8_t data[n], unsigned n) -> control_res_t res:
         printf("%u: R 0x%08x %d %d\n", num_commands, r, c, n);
-        if (r != RESOURCE_ID || n == 4) {
+        if (r != RESOURCE_ID) {
+          printf("unrecognised resource ID 0x%08x\n", r);
+          res = CONTROL_ERROR;
+          break;
+        }
+        if (n != 4) {
+          printf("expecting 4 read bytes, not %d\n", n);
           res = CONTROL_ERROR;
           break;
         }

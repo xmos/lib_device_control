@@ -21,9 +21,9 @@ Typical Resource Usage
 Specification
 .............
 
-*Host* controls *resources* on a *device* by sending *commands* to over a *transport* protocol.
-Resources are identified by a unique 32bit ID and live in tasks that run on logical cores of
-the device. There can be multiple resources in a task.
+*Host* controls *resources* on a *device* by sending *commands* to it over a *transport*
+protocol. Resources are identified by a unique 32bit ID and exist in tasks that run on logical
+cores of the device. There can be multiple resources in a task.
 
       "Send command c to resource R"
 
@@ -49,7 +49,7 @@ Transport task calls a function on its natural unit of data, such as I2C transac
 request, passing in the whole array of interfaces. Library's functionality happens inside the
 function and once a command is complete, an interface call is made to pass the command over.
 
-Over I2C slave, command is split into multiple I2C transactions:
+Over I2C slave, command is split into multiple I2C transactions::
 
       handle_i2c_write_transaction(addr, val)
       handle_i2c_write_transaction(addr, val)

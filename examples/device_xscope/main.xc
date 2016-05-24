@@ -1,3 +1,4 @@
+// Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <platform.h>
 #include <stdio.h>
 #include <assert.h>
@@ -22,7 +23,7 @@ void xscope_user_init(void)
 [[combinable]]
 void xscope_client(chanend c_xscope, client interface control i_control[1])
 {
-  uint8_t bytes[256];
+  uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS];
   int num_bytes_read;
   unsigned return_size;
 
@@ -35,11 +36,11 @@ void xscope_client(chanend c_xscope, client interface control i_control[1])
   while (1) {
     select {
       /* tools_xtrace/xscope_api/xcore_shared/xscope_shared_xc.xc */
-      case xscope_data_from_host(c_xscope, bytes, num_bytes_read):
-        assert(num_bytes_read <= sizeof(bytes));
-	control_process_xscope_upload(bytes, num_bytes_read, return_size, i_control, 1);
+      case xscope_data_from_host(c_xscope, (buffer, unsigned char[]), num_bytes_read):
+        assert(num_bytes_read <= sizeof(buffer));
+	control_process_xscope_upload(buffer, num_bytes_read, return_size, i_control, 1);
 	if (return_size > 0) {
-          xscope_core_bytes(0, return_size, bytes);
+          xscope_core_bytes(0, return_size, (buffer, unsigned char[]));
         }
 	/* xTAG adapter should defer further calls by NAKing USB transactions */
         break;

@@ -14,6 +14,9 @@ typedef enum {
 
 #define MAX_RESOURCES_PER_INTERFACE 64
 #define MAX_RESOURCES 256
+#define XSCOPE_UPLOAD_MAX_WORDS 64
+
+#ifdef __XC__
 
 interface control {
   void register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
@@ -40,9 +43,13 @@ void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t 
                                      uint8_t request_data[],
                                      client interface control i[n], unsigned n);
 
-/* data return is device (control library) initiated */
-void control_process_xscope_upload(uint8_t data_in_and_out[],
+/* data return is device (control library) initiated
+ * require word alignment so we can cast to struct
+ */
+void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
                                    unsigned length_in, unsigned &length_out,
                                    client interface control i[n], unsigned n);
+
+#endif
 
 #endif // __control_h__

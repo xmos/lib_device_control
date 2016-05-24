@@ -1,8 +1,6 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
-#ifndef __app_h__
-#define __app_h__
-
-#include "control.h"
+#ifndef __resource_h__
+#define __resource_h__
 
 /* 31..27 supplier      31 (unassigned)
  * 26..24 library       4
@@ -12,6 +10,4 @@
  */
 #define RESOURCE_ID 0xFCC30207
 
-void app(server interface control i_control);
-
-#endif // __app_h__
+#endif // __resource_h__
