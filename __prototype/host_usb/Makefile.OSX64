@@ -1,6 +1,0 @@
-all:
-	mkdir -p bin
-	cd src ; gcc -Wall -g -I ../libusb/OSX64 -o ../bin/a.out ../libusb/OSX64/libusb-1.0.0.dylib host.c command.c util.c signals.c
-
-clean:
-	rm -rf bin
