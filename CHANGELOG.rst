@@ -1,15 +1,12 @@
-Control library change log
-==========================
+Device control library change log
+=================================
 
-0.0.1
+1.0.0
 -----
 
-  * Initial development
+  * Initial version.
 
   * Changes to dependencies:
 
-    - lib_gpio: Added dependency 1.0.1
-
-    - lib_logging: Added dependency 2.0.1
-
     - lib_xassert: Added dependency 2.0.1
+

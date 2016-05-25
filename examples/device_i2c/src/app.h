@@ -1,3 +1,4 @@
+// Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include "control.h"
 
 /* 31..27 supplier      31 (unassigned)

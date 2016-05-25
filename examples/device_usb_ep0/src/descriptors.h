@@ -1,3 +1,4 @@
+// Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include "usb.h"
 
 #define VENDOR_ID 0x20B1
