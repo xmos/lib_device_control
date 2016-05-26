@@ -1,9 +1,28 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
+
+#include "signals.h"
+
+#ifdef _WIN32
+
+#define UNUSED_PARAMETER(x) (void)(x)
+
+void signals_setup_int(sigint_handler_t handler)
+{
+  // Not required on Windows
+  UNUSED_PARAMETER(handler);
+}
+
+void signals_init(void)
+{
+  // Not required on Windows
+}
+
+#else
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
 #include <signal.h>
-#include "signals.h"
 
 static sigint_handler_t sigint_handler = NULL;
 static sigset_t prev_sigmask = 0;
@@ -35,3 +54,5 @@ void signals_init(void)
   sigaddset(&ss, SIGINT);
   pthread_sigmask(SIG_BLOCK, &ss, &prev_sigmask);
 }
+
+#endif // _WIN32
