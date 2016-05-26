@@ -1,7 +1,11 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <stdio.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 #include <signal.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -11,14 +15,50 @@
 #include "signals.h"
 #include "resource.h"
 
-int probe_id = -1;
-int record_count = 0;
+#define UNUSED_PARAMETER(x) (void)(x)
+
+#ifdef _WIN32
+
+static void pause_short()
+{
+  Sleep(1);
+}
+
+static void pause_long()
+{
+  Sleep(1000);
+}
+
+#else
+
+static void pause_short()
+{
+  usleep(100000);
+}
+
+static void pause_long()
+{
+  sleep(1);
+}
+
+#endif // _WIN32
+
+static unsigned int probe_id = 0xffffffff;
+static int record_count = 0;
 
 void register_callback(unsigned int id, unsigned int type,
   unsigned int r, unsigned int g, unsigned int b,
   unsigned char *name, unsigned char *unit,
   unsigned int data_type, unsigned char *data_name)
 {
+  UNUSED_PARAMETER(type);
+  UNUSED_PARAMETER(r);
+  UNUSED_PARAMETER(g);
+  UNUSED_PARAMETER(b);
+  UNUSED_PARAMETER(unit);
+  UNUSED_PARAMETER(data_type);
+  UNUSED_PARAMETER(data_name);
+
   if (strcmp((char*)name, XSCOPE_CONTROL_PROBE) == 0) {
     probe_id = id;
     printf("registered probe %d\n", id);
@@ -28,6 +68,9 @@ void register_callback(unsigned int id, unsigned int type,
 void record_callback(unsigned int id, unsigned long long timestamp,
   unsigned int length, unsigned long long dataval, unsigned char *databytes)
 {
+  UNUSED_PARAMETER(timestamp);
+  UNUSED_PARAMETER(dataval);
+
   struct control_xscope_probe *p;
 
   if (id == probe_id) {
@@ -65,7 +108,7 @@ void init_xscope(int port)
 
   /* wait for xSCOPE probe registration */
   while (probe_id == -1) {
-    usleep(100);
+    pause_short();
   }
 }
 
@@ -78,10 +121,10 @@ void do_write_command(void)
   unsigned char payload[1];
   size_t len;
 
-  b = (void*)&p;
+  b = (unsigned*)&p;
   payload[0] = 1;
   len = control_xscope_create_upload_buffer(b,
-    CONTROL_CMD_SET_WRITE(0), RESOURCE_ID, payload, sizeof(payload));
+    CONTROL_CMD_SET_WRITE(0), resource_id, payload, sizeof(payload));
 
   printf("%u: send write command: ", num_commands);
   print_bytes((unsigned char*)b, len);
@@ -99,21 +142,22 @@ void do_read_command(void)
   unsigned *b;
   size_t len;
 
-  b = (void*)&p;
+  b = (unsigned*)&p;
   len = control_xscope_create_upload_buffer(b,
-    CONTROL_CMD_SET_READ(0), RESOURCE_ID, NULL, 4);
+    CONTROL_CMD_SET_READ(0), resource_id, NULL, 4);
 
   printf("%d: send read command: ", num_commands);
   print_bytes((unsigned char*)b, len);
 
   record_count = 0;
 
-  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS)
+  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
     printf("xscope_ep_request_upload failed\n");
+  }
 
   /* wait for response on xSCOPE probe */
   while (record_count == 0) {
-    usleep(100);
+    pause_short();
   }
 
   num_commands++;
@@ -136,9 +180,9 @@ int main(void)
   while (1) {
     for (i = 0; i < 4; i++) {
       do_write_command();
-      usleep(100000);
+      pause_short();
       do_read_command();
-      sleep(1);
+      pause_long();
     }
   }
 

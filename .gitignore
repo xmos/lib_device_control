@@ -1,5 +1,6 @@
 .*.swp
 *.pyc
+*.obj
 bin
 .build
 org.eclipse.cdt.core.prefs
