@@ -16,8 +16,6 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   XUD_Result_t res;
   XUD_BusSpeed_t bus_speed;
   XUD_ep ep0_out, ep0_in;
-  unsigned short descriptor_type;
-  unsigned char zero_hid_report[] = {0, 0, 0, 0};
   unsigned char request_data[EP0_MAX_PACKET_SIZE];
   size_t len;
 
@@ -34,38 +32,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
       res = XUD_RES_ERR;
 
       switch ((sp.bmRequestType.Direction << 7) | (sp.bmRequestType.Type << 5) | (sp.bmRequestType.Recipient)) {
-        case USB_BMREQ_H2D_STANDARD_DEV:
-        if (sp.bRequest == USB_SET_ADDRESS) {
-          debug_printf("enumerated (address %d)\n", sp.wValue);
-        }
-        break;
 
-        case USB_BMREQ_D2H_STANDARD_INT:
-          if (sp.bRequest == USB_GET_DESCRIPTOR) {
-          if (sp.wIndex == HID_INTERFACE_NUM) {
-            descriptor_type = sp.wValue & 0xFF00;
-            switch (descriptor_type) {
-            case HID_HID:
-              res = XUD_DoGetRequest(ep0_out, ep0_in, hid_descriptor, sizeof(hid_descriptor), sp.wLength);
-              break;
-
-            case HID_REPORT:
-              res = XUD_DoGetRequest(ep0_out, ep0_in, hid_report_descriptor, sizeof(hid_report_descriptor), sp.wLength);
-              break;
-            }
-          }
-        }
-        break;
-
-        case USB_BMREQ_H2D_CLASS_INT:
-        case USB_BMREQ_D2H_CLASS_INT:
-          if (sp.wIndex == HID_INTERFACE_NUM) {
-            if (sp.bRequest == HID_GET_REPORT) { /* ok to stall all other HID class requests */
-              res = XUD_DoGetRequest(ep0_out, ep0_in, zero_hid_report, 4, sp.wLength);
-            }
-          }
-          break;
-        
         case USB_BMREQ_H2D_VENDOR_DEV:
           res = XUD_GetBuffer(ep0_out, request_data, len);
           if (res == XUD_RES_OKAY) {
@@ -88,10 +55,10 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
     if (res == XUD_RES_ERR) {
       /* if we haven't handled the request about then do standard enumeration requests */
       unsafe {
-        res = USB_StandardRequests(ep0_out, ep0_in, device_descriptor,
-          sizeof(device_descriptor), configuration_descriptor, sizeof(configuration_descriptor),
+        res = USB_StandardRequests(ep0_out, ep0_in, devDesc,
+          sizeof(devDesc), cfgDesc, sizeof(cfgDesc),
           null, 0, null, 0,
-          string_descriptors, sizeof(string_descriptors) / sizeof(string_descriptors[0]),
+          stringDescriptors, sizeof(stringDescriptors) / sizeof(stringDescriptors[0]),
           sp, bus_speed);
       }
     }
@@ -102,13 +69,6 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   }
 }
 
-void hid_endpoint(chanend c_ep_hid)
-{
-  unsigned char zero_hid_report[] = {0, 0, 0, 0};
-  XUD_ep ep = XUD_InitEp(c_ep_hid, XUD_EPTYPE_BUL);
-  XUD_SetBuffer(ep, zero_hid_report, 4);
-}
-
 enum {
   EP_OUT_ZERO,
   NUM_EP_OUT
@@ -116,7 +76,6 @@ enum {
 
 enum {
   EP_IN_ZERO,
-  EP_IN_HID,
   NUM_EP_IN
 };
 
@@ -127,7 +86,6 @@ int main(void)
   par {
     on USB_TILE: par {
       app(i_control[0]);
-      hid_endpoint(c_ep_in[1]);
       endpoint0(c_ep_out[0], c_ep_in[0], i_control);
       xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
     }

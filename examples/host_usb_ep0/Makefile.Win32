@@ -1,0 +1,6 @@
+all:
+	if not exist bin mkdir bin
+	CL.exe /Ilibusb/Win32 /I..\..\lib_device_control\api /nologo /W4 /WX- /O2 /EHa /Fe"bin\a.exe" /TP src\host.c src\signals.c src\util.c /link libusb\Win32\libusb.lib
+
+clean:
+	rm -rf bin
