@@ -36,19 +36,19 @@ void control_process_usb_ep0_set_request(uint16_t windex, uint16_t wvalue, uint1
                                          const uint8_t request_data[],
                                          client interface control i[n], unsigned n)
 {
-  control_resid_hash_t hash;
+  control_idx_t idx;
   unsigned num_data_bytes;
   control_resid_t resid;
   control_cmd_t cmd;
   unsigned ifnum;
 
-  hash = windex;
+  idx = windex;
   cmd = wvalue;
   num_data_bytes = wlength;
 
-  if (!resource_table_find_resid_hash(hash, resid, ifnum)) {
+  if (!resource_table_find_index(idx, resid, ifnum)) {
 #if DEBUG
-    printf("usb_ep0: resource hash 0x%X not found\n", hash);
+    printf("usb_ep0: resource index 0x%X not found\n", idx);
 #endif
     return;
   }
@@ -71,19 +71,19 @@ void control_process_usb_ep0_get_request(uint16_t windex, uint16_t wvalue, uint1
                                          uint8_t request_data[],
                                          client interface control i[n], unsigned n)
 {
-  control_resid_hash_t hash;
+  control_idx_t idx;
   unsigned num_data_bytes;
   control_resid_t resid;
   control_cmd_t cmd;
   unsigned ifnum;
 
-  hash = windex;
+  idx = windex;
   cmd = wvalue;
   num_data_bytes = wlength;
 
-  if (!resource_table_find_resid_hash(hash, resid, ifnum)) {
+  if (!resource_table_find_index(idx, resid, ifnum)) {
 #if DEBUG
-    printf("usb_ep0: resource hash 0x%X not found\n", hash);
+    printf("usb_ep0: resource index 0x%X not found\n", idx);
 #endif
     return;
   }

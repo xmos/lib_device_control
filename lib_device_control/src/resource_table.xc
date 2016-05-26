@@ -48,19 +48,19 @@ void resource_table_add(const control_resid_t resources[MAX_RESOURCES_PER_INTERF
   }
 }
 
-int resource_table_find_resid_hash(control_resid_hash_t hash, control_resid_t &resid, unsigned &ifnum)
+int resource_table_find_index(control_idx_t idx, control_resid_t &resid, unsigned &ifnum)
 {
   struct resource_table_entry *e;
 
-  if (hash <= resource_table_size && hash > 0) {
-    e = &resource_table[hash - 1];
+  if (idx <= resource_table_size && idx > 0) {
+    e = &resource_table[idx - 1];
     resid = e->resid;
     ifnum = e->ifnum;
     return 1;
   }
 
 #if DEBUG
-  printf("not found hash 0x%X (table size %d)\n", hash, resource_table_size);
+  printf("not found index 0x%X (table size %d)\n", idx, resource_table_size);
 #endif
 
   return 0;
