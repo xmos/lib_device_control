@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+#include <assert.h>
 
 #include "control.h"
 #include "control_transport.h"
@@ -35,7 +36,9 @@ static inline void control_usb_ep0_fill_header(
 {
   *windex = hash;
   *wvalue = cmd;
-  *wlength = num_data_bytes;
+
+  assert(num_data_bytes < (1<<16) && "num_data_bytes can't be represented as a uint16_t");
+  *wlength = (uint16_t)num_data_bytes;
 }
 
 #endif // __control_host_h__

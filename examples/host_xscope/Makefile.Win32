@@ -1,0 +1,6 @@
+all:
+	if not exist bin mkdir bin
+	CL.exe /I"${XMOS_TOOL_PATH}\include" /I..\..\lib_device_control\api /nologo /W4 /WX- /O2 /EHa /D _CRT_SECURE_NO_WARNINGS /Fe"bin\a.exe" /TP src\host.c src\signals.c src\util.c /link "${XMOS_TOOL_PATH}\lib\xscope_endpoint.lib"
+
+clean:
+	rmdir /s /q bin
