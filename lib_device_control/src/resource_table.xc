@@ -44,6 +44,10 @@ void resource_table_add(const control_resid_t resources[MAX_RESOURCES_PER_INTERF
     e = &resource_table[resource_table_size];
     e->resid = resid;
     e->ifnum = ifnum;
+
+#if DEBUG
+    printf("resource 0x%X registered with index %d\n", resid, resource_table_size);
+#endif
     resource_table_size++;
   }
 }
