@@ -204,7 +204,7 @@ void test_task(server interface control i, chanend c)
         c <: resid;
         c <: n;
         for (j = 0; j < n; j++) {
-          uint8_t x; /* BUG fails when written as "c :> data[j]" */
+          uint8_t x; /* must use temporary variable (bug 17370) */
           c :> x;
           data[j] = x;
         }
