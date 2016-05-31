@@ -29,4 +29,10 @@ struct control_xscope_packet {
   } data;
 };
 
+#define I2C_SPECIAL_REGISTER 0
+
+enum control_i2c_special {
+  I2C_START_COMMAND
+};
+
 #endif // __control_transport_h_

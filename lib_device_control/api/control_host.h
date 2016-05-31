@@ -41,4 +41,27 @@ static inline void control_usb_ep0_fill_header(
   *wlength = (uint16_t)num_data_bytes;
 }
 
+struct i2c_transaction {
+  uint8_t reg;
+  uint8_t val;
+};
+
+#define I2C_SEQUENCE_LENGTH 3
+
+static inline size_t control_build_i2c_transaction_sequence(
+  struct i2c_transaction seq[I2C_SEQUENCE_LENGTH],
+  control_idx_t idx, control_cmd_t cmd, unsigned num_data_bytes)
+{
+  seq[0].reg = I2C_SPECIAL_REGISTER;
+  seq[0].val = I2C_START_COMMAND;
+
+  seq[1].reg = idx;
+  seq[1].val = cmd;
+
+  seq[2].reg = idx;
+  seq[2].val = num_data_bytes;
+
+  return 3;
+}
+
 #endif // __control_host_h__
