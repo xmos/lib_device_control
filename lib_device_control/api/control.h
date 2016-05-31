@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-typedef uint32_t control_resid_t;
+typedef uint8_t control_resid_t;
 typedef uint8_t control_cmd_t;
 typedef enum {
   CONTROL_SUCCESS,
@@ -37,13 +37,13 @@ void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
 void control_process_i2c_read_transaction(uint8_t reg, uint8_t &val,
                                          client interface control i[n], unsigned n);
 
-void control_process_usb_ep0_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
-                                         const uint8_t request_data[],
-                                         client interface control i[n], unsigned n);
+void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                     const uint8_t request_data[],
+                                     client interface control i[n], unsigned n);
 
-void control_process_usb_ep0_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
-                                         uint8_t request_data[],
-                                         client interface control i[n], unsigned n);
+void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                     uint8_t request_data[],
+                                     client interface control i[n], unsigned n);
 
 /* data return is device (control library) initiated
  * require word alignment so we can cast to struct

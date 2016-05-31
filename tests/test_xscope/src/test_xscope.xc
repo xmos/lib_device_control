@@ -10,8 +10,8 @@
 /* resource ID that includes interface number of given test task
  * and which resource in given task it is, if the task has more than one
  */
-#define RESID(if_num, res_in_if) (0xCAFEBD00 | ((if_num) << 4) | ((res_in_if) + 1))
-#define BADID 0x55555555
+#define RESID(if_num, res_in_if) (0x80 | ((if_num) << 4) | ((res_in_if) + 1))
+#define BADID 0xFF
 
 struct options {
   int with_payload;

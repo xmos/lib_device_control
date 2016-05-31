@@ -4,8 +4,6 @@
 
 #include "control.h"
 
-typedef uint8_t control_idx_t;
-
 #define IS_CONTROL_CMD_READ(c) ((c) & 0x80)
 #define CONTROL_CMD_SET_READ(c) ((c) | 0x80)
 #define CONTROL_CMD_SET_WRITE(c) ((c) & ~0x80)

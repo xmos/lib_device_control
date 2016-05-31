@@ -14,6 +14,7 @@ void control_init(client interface control i[n], unsigned n)
   unsigned n0;
   unsigned j;
 
+  resource_table_init();
   for (j = 0; j < n; j++) {
     i[j].register_resources(r, n0);
     resource_table_add(r, n0, j);
@@ -32,71 +33,69 @@ void control_process_i2c_read_transaction(uint8_t reg, uint8_t &val,
   // TODO
 }
 
-void control_process_usb_ep0_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
-                                         const uint8_t request_data[],
-                                         client interface control i[n], unsigned n)
+void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                     const uint8_t request_data[],
+                                     client interface control i[n], unsigned n)
 {
-  control_idx_t idx;
   unsigned num_data_bytes;
   control_resid_t resid;
   control_cmd_t cmd;
-  unsigned ifnum;
+  unsigned char ifnum;
 
-  idx = windex;
+  resid = windex;
   cmd = wvalue;
   num_data_bytes = wlength;
 
-  if (!resource_table_find_index(idx, resid, ifnum)) {
+  if (!resource_table_search(resid, ifnum)) {
 #if DEBUG
-    printf("usb_ep0: resource index 0x%X not found\n", idx);
+    printf("usb: resource %d not found\n", resid);
 #endif
     return;
   }
 
   if (IS_CONTROL_CMD_READ(cmd)) {
 #if DEBUG
-    printf("usb_ep0: read command code %d not expected in a SET request\n", cmd);
+    printf("usb: read command code %d not expected in a SET request\n", cmd);
 #endif
     return;
   }
 
 #if DEBUG
-  printf("usb_ep0: 0x%X(%d) %d(write) %d bytes\n",
+  printf("usb: 0x%X(%d) %d(write) %d bytes\n",
     resid, ifnum, cmd, num_data_bytes);
 #endif
   i[ifnum].write_command(resid, cmd, request_data, num_data_bytes);
 }
 
-void control_process_usb_ep0_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
-                                         uint8_t request_data[],
-                                         client interface control i[n], unsigned n)
+void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                     uint8_t request_data[],
+                                     client interface control i[n], unsigned n)
 {
-  control_idx_t idx;
   unsigned num_data_bytes;
   control_resid_t resid;
   control_cmd_t cmd;
-  unsigned ifnum;
+  unsigned char ifnum;
 
-  idx = windex;
+  resid = windex;
   cmd = wvalue;
   num_data_bytes = wlength;
 
-  if (!resource_table_find_index(idx, resid, ifnum)) {
+  if (!resource_table_search(resid, ifnum)) {
 #if DEBUG
-    printf("usb_ep0: resource index 0x%X not found\n", idx);
+    printf("usb: resource %d not found\n", resid);
 #endif
     return;
   }
 
   if (!IS_CONTROL_CMD_READ(cmd)) {
 #if DEBUG
-    printf("usb_ep0: write command code %d not expected in a GET request\n", cmd);
+    printf("usb: write command code %d not expected in a GET request\n", cmd);
 #endif
     return;
   }
 
 #if DEBUG
-  printf("usb_ep0: 0x%X(%d) %d(read) %d bytes\n",
+  printf("usb: 0x%X(%d) %d(read) %d bytes\n",
     resid, ifnum, cmd, num_data_bytes);
 #endif
   i[ifnum].read_command(resid, cmd, request_data, num_data_bytes);
@@ -108,11 +107,11 @@ void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WO
 {
   struct control_xscope_packet *p;
   unsigned read_nbytes;
-  unsigned ifnum;
+  unsigned char ifnum;
 
   p = (struct control_xscope_packet*)data_in_and_out;
 
-  if (!resource_table_find_resid(p->resid, ifnum)) {
+  if (!resource_table_search(p->resid, ifnum)) {
 #if DEBUG
     printf("xscope: resource 0x%X not found\n", p->resid);
 #endif

@@ -10,10 +10,8 @@
 /* resource ID that includes interface number of given test task
  * and which resource in given task it is, if the task has more than one
  */
-#define RESID(if_num, res_in_if) (0xCAFEBD00 | ((if_num) << 4) | ((res_in_if) + 1))
-#define BADID 0x55555555
-#define IDX(if_num, res_in_if) ((if_num) * 2 + (res_in_if) + 1)
-#define BADIDX 0x55
+#define RESID(if_num, res_in_if) (0x80 | ((if_num) << 4) | ((res_in_if) + 1))
+#define BADID 0xFF
 
 struct options {
   int with_payload;
@@ -24,7 +22,6 @@ struct options {
 
 struct command {
   unsigned ifnum;
-  control_idx_t idx;
   control_resid_t resid;
   control_cmd_t cmd;
   uint8_t payload[8];
@@ -34,7 +31,6 @@ struct command {
 void make_command(struct command &c, const struct options &o)
 {
   c.resid = RESID(c.ifnum, o.res_in_if);
-  c.idx = IDX(c.ifnum, o.res_in_if);
 
   if (o.read_cmd)
     c.cmd = CONTROL_CMD_SET_READ(0);
@@ -43,9 +39,6 @@ void make_command(struct command &c, const struct options &o)
 
   if (o.bad_id)
     c.resid = BADID;
-
-  if (o.bad_id || c.ifnum > 1 || o.res_in_if > 1)
-    c.idx = BADIDX;
 
   if (o.with_payload)
     c.payload_size = sizeof(c.payload);
@@ -164,7 +157,7 @@ void test_client(client interface control i[2], chanend d[2])
           for (o.with_payload = 0; o.with_payload < 2; o.with_payload++) {
             make_command(c1, o);
 
-            control_usb_ep0_fill_header(&windex, &wvalue, &wlength, c1.idx, c1.cmd,
+            control_usb_fill_header(&windex, &wvalue, &wlength, c1.resid, c1.cmd,
               c1.payload_size);
 
             /* make a processing call, catch and record it, or timeout if none of the
@@ -176,7 +169,7 @@ void test_client(client interface control i[2], chanend d[2])
               unsafe {
                 payload_ptr = c2.payload;
                 par {
-                  control_process_usb_ep0_get_request(windex, wvalue, wlength,
+                  control_process_usb_get_request(windex, wvalue, wlength,
                     (uint8_t*)payload_ptr, i, 2);
                   select {
                     case receive_read_command(c2, c1, d);
@@ -191,7 +184,7 @@ void test_client(client interface control i[2], chanend d[2])
               unsafe {
                 payload_ptr = c1.payload;
                 par {
-                  control_process_usb_ep0_set_request(windex, wvalue, wlength,
+                  control_process_usb_set_request(windex, wvalue, wlength,
                     (uint8_t*)payload_ptr, i, 2);
                   select {
                     case receive_write_command(c2, c1, d);

@@ -30,11 +30,11 @@ static inline size_t control_xscope_create_upload_buffer(
   return XSCOPE_HEADER_BYTES + n;
 }
 
-static inline void control_usb_ep0_fill_header(
+static inline void control_usb_fill_header(
   uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
-  control_idx_t idx, control_cmd_t cmd, unsigned num_data_bytes)
+  control_resid_t resid, control_cmd_t cmd, unsigned num_data_bytes)
 {
-  *windex = idx;
+  *windex = resid;
   *wvalue = cmd;
 
   assert(num_data_bytes < (1<<16) && "num_data_bytes can't be represented as a uint16_t");
@@ -50,15 +50,15 @@ struct i2c_transaction {
 
 static inline size_t control_build_i2c_transaction_sequence(
   struct i2c_transaction seq[I2C_SEQUENCE_LENGTH],
-  control_idx_t idx, control_cmd_t cmd, unsigned num_data_bytes)
+  control_resid_t resid, control_cmd_t cmd, unsigned num_data_bytes)
 {
   seq[0].reg = I2C_SPECIAL_REGISTER;
   seq[0].val = I2C_START_COMMAND;
 
-  seq[1].reg = idx;
+  seq[1].reg = resid;
   seq[1].val = cmd;
 
-  seq[2].reg = idx;
+  seq[2].reg = resid;
   seq[2].val = num_data_bytes;
 
   return 3;
