@@ -36,19 +36,19 @@ void control_process_usb_ep0_set_request(uint16_t windex, uint16_t wvalue, uint1
                                          const uint8_t request_data[],
                                          client interface control i[n], unsigned n)
 {
-  control_resid_hash_t hash;
+  control_idx_t idx;
   unsigned num_data_bytes;
   control_resid_t resid;
   control_cmd_t cmd;
   unsigned ifnum;
 
-  hash = windex;
+  idx = windex;
   cmd = wvalue;
   num_data_bytes = wlength;
 
-  if (!resource_table_find_resid_hash(hash, resid, ifnum)) {
+  if (!resource_table_find_index(idx, resid, ifnum)) {
 #if DEBUG
-    printf("usb_ep0: resource hash 0x%X not found\n", hash);
+    printf("usb_ep0: resource index 0x%X not found\n", idx);
 #endif
     return;
   }
@@ -71,19 +71,19 @@ void control_process_usb_ep0_get_request(uint16_t windex, uint16_t wvalue, uint1
                                          uint8_t request_data[],
                                          client interface control i[n], unsigned n)
 {
-  control_resid_hash_t hash;
+  control_idx_t idx;
   unsigned num_data_bytes;
   control_resid_t resid;
   control_cmd_t cmd;
   unsigned ifnum;
 
-  hash = windex;
+  idx = windex;
   cmd = wvalue;
   num_data_bytes = wlength;
 
-  if (!resource_table_find_resid_hash(hash, resid, ifnum)) {
+  if (!resource_table_find_index(idx, resid, ifnum)) {
 #if DEBUG
-    printf("usb_ep0: resource hash 0x%X not found\n", hash);
+    printf("usb_ep0: resource index 0x%X not found\n", idx);
 #endif
     return;
   }
@@ -107,6 +107,7 @@ void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WO
                                    client interface control i[n], unsigned n)
 {
   struct control_xscope_packet *p;
+  unsigned read_nbytes;
   unsigned ifnum;
 
   p = (struct control_xscope_packet*)data_in_and_out;
@@ -119,12 +120,13 @@ void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WO
   }
 
   if (IS_CONTROL_CMD_READ(p->cmd)) {
-    length_out = XSCOPE_HEADER_BYTES + p->data.read_nbytes;
+    read_nbytes = p->data.read_nbytes;
+    length_out = XSCOPE_HEADER_BYTES + read_nbytes;
 #if DEBUG
     printf("xscope: 0x%X(%d) %d(read) %d bytes\n",
-      p->resid, ifnum, p->cmd, p->data.read_nbytes);
+      p->resid, ifnum, p->cmd, read_nbytes);
 #endif
-    i[ifnum].read_command(p->resid, p->cmd, p->data.read_bytes, p->data.read_nbytes);
+    i[ifnum].read_command(p->resid, p->cmd, p->data.read_bytes, read_nbytes);
   }
   else {
     length_out = 0;

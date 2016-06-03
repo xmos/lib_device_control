@@ -11,7 +11,7 @@ void resource_table_add(const control_resid_t resources[MAX_RESOURCES_PER_INTERF
                         unsigned num_resources, unsigned ifnum);
 
 /* direct table lookup */
-int resource_table_find_resid_hash(control_resid_hash_t hash, control_resid_t &resid, unsigned &ifnum);
+int resource_table_find_index(control_idx_t idx, control_resid_t &resid, unsigned &ifnum);
 
 /* linear search of table */
 int resource_table_find_resid(control_resid_t resid, unsigned &ifnum);

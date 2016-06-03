@@ -4,10 +4,7 @@
 
 #include "control.h"
 
-typedef uint8_t control_resid_hash_t;
-
-#define CONTROL_RESID_HASH_QUERY 0
-#define CONTROL_CMD_HASH_QUERY 0
+typedef uint8_t control_idx_t;
 
 #define IS_CONTROL_CMD_READ(c) ((c) & 0x80)
 #define CONTROL_CMD_SET_READ(c) ((c) | 0x80)

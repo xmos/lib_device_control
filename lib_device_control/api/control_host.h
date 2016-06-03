@@ -32,9 +32,9 @@ static inline size_t control_xscope_create_upload_buffer(
 
 static inline void control_usb_ep0_fill_header(
   uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
-  control_resid_hash_t hash, control_cmd_t cmd, unsigned num_data_bytes)
+  control_idx_t idx, control_cmd_t cmd, unsigned num_data_bytes)
 {
-  *windex = hash;
+  *windex = idx;
   *wvalue = cmd;
 
   assert(num_data_bytes < (1<<16) && "num_data_bytes can't be represented as a uint16_t");
