@@ -12,7 +12,7 @@
 
 static inline size_t control_xscope_create_upload_buffer(
   uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
-  control_cmd_t cmd, control_res_t resid,
+  control_cmd_t cmd, control_resid_t resid,
   const uint8_t *data, unsigned n)
 {
   struct control_xscope_packet *p;
