@@ -5,6 +5,6 @@
 #include <xs1.h>
 #include "control.h"
 
-void user_task(server interface control i, chanend c);
+void user_task(server interface control i, chanend d);
 
 #endif // __user_task_h__

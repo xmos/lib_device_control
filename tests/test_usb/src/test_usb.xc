@@ -88,12 +88,12 @@ void check(const struct options &o,
       printf("received ifnum %d cmd %d resid 0x%X payload %d\n",
         c2.ifnum, c2.cmd, c2.resid, c2.payload_size);
     }
-    printf("isssued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
+    printf("issued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
       c1.ifnum, c1.cmd, c1.resid, o.res_in_if, c1.payload_size);
   }
 }
 
-select receive_write_command(struct command &c2, const struct command &c1, chanend d[2])
+select receive_command(struct command &c2, const struct command &c1, chanend d[2], int read_cmd)
 {
   case d[int k] :> c2.cmd: {
     int j;
@@ -101,22 +101,10 @@ select receive_write_command(struct command &c2, const struct command &c1, chane
     d[k] :> c2.resid;
     d[k] :> c2.payload_size;
     for (j = 0; j < sizeof(c1.payload) && j < c2.payload_size; j++) {
-      d[k] :> c2.payload[j];
-    }
-    c2.ifnum = k;
-    break;
-  }
-}
-
-select receive_read_command(struct command &c2, const struct command &c1, chanend d[2])
-{
-  case d[int k] :> c2.cmd: {
-    int j;
-
-    d[k] :> c2.resid;
-    d[k] :> c2.payload_size;
-    for (j = 0; j < sizeof(c1.payload) && j < c2.payload_size; j++) {
-      d[k] <: c1.payload[j];
+      if (read_cmd)
+        d[k] <: c1.payload[j];
+      else
+        d[k] :> c2.payload[j];
     }
     c2.ifnum = k;
     break;
@@ -163,40 +151,32 @@ void test_client(client interface control i[2], chanend d[2])
             /* make a processing call, catch and record it, or timeout if none of the
              * test tasks actually receives a command (e.g. when resource ID not found)
              */
-            tmr :> t;
-            timeout = 0;
-            if (o.read_cmd) {
-              unsafe {
+            unsafe {
+              if (o.read_cmd)
                 payload_ptr = c2.payload;
-                par {
-                  control_process_usb_get_request(windex, wvalue, wlength,
-                    (uint8_t*)payload_ptr, i, 2);
-                  select {
-                    case receive_read_command(c2, c1, d);
-                    case tmr when timerafter(t + 3000) :> void:
-                      timeout = 1;
-                      break;
-                  }
-                }
-              }
-            }
-            else {
-              unsafe {
+              else
                 payload_ptr = c1.payload;
-                par {
-                  control_process_usb_set_request(windex, wvalue, wlength,
-                    (uint8_t*)payload_ptr, i, 2);
-                  select {
-                    case receive_write_command(c2, c1, d);
+
+              tmr :> t;
+              timeout = 0;
+              par {
+                { if (o.read_cmd)
+                    control_process_usb_get_request(windex, wvalue, wlength,
+                      (uint8_t*)payload_ptr, i, 2);
+                  else
+                    control_process_usb_set_request(windex, wvalue, wlength,
+                      (uint8_t*)payload_ptr, i, 2);
+                }
+                { select {
+                    case receive_command(c2, c1, d, o.read_cmd);
                     case tmr when timerafter(t + 3000) :> void:
                       timeout = 1;
                       break;
                   }
+                  check(o, c1, c2, timeout);
                 }
               }
             }
-
-            check(o, c1, c2, timeout);
           }
         }
       }

@@ -6,7 +6,7 @@
 #include "control.h"
 #include "resource_table.h"
 
-#define DEBUG 0
+#define DEBUG_CONTROL_RESOURCE_TABLE 0
 
 /* table entry is interface number, or 255 if not used */
 unsigned char resource_table[RESOURCE_TABLE_MAX];
@@ -34,7 +34,7 @@ void resource_table_add(const control_resid_t resources[MAX_RESOURCES_PER_INTERF
   for (i = 0; i < num_resources; i++) {
     resid = resources[i];
 
-#if DEBUG
+#if DEBUG_CONTROL_RESOURCE_TABLE
     printf("register resource %d on interface %d\n", resid, ifnum);
 #endif
 

@@ -88,27 +88,23 @@ void check(const struct options &o,
       printf("received ifnum %d cmd %d resid 0x%X payload %d\n",
         c2.ifnum, c2.cmd, c2.resid, c2.payload_size);
     }
-    printf("issued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
+    printf("isssued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
       c1.ifnum, c1.cmd, c1.resid, o.res_in_if, c1.payload_size);
   }
 }
 
-select receive_command(struct command &c2, const struct command &c1, chanend d[2])
+select receive_command(struct command &c2, struct command &c1, chanend d[2], int read_cmd)
 {
   case d[int k] :> c2.cmd: {
     int j;
 
     d[k] :> c2.resid;
     d[k] :> c2.payload_size;
-    if (IS_CONTROL_CMD_READ(c2.cmd)) {
-      for (j = 0; j < sizeof(c1.payload) && j < c2.payload_size; j++) {
+    for (j = 0; j < sizeof(c1.payload) && j < c2.payload_size; j++) {
+      if (read_cmd)
         d[k] <: c1.payload[j];
-      }
-    }
-    else {
-      for (j = 0; j < sizeof(c1.payload) && j < c2.payload_size; j++) {
+      else
         d[k] :> c2.payload[j];
-      }
     }
     c2.ifnum = k;
     break;
@@ -117,15 +113,16 @@ select receive_command(struct command &c2, const struct command &c1, chanend d[2
 
 void test_client(client interface control i[2], chanend d[2])
 {
-  uint32_t buf[XSCOPE_UPLOAD_MAX_WORDS];
+  struct i2c_transaction seq[I2C_SEQUENCE_LENGTH];
+  size_t num;
   struct command c1, c2;
   struct options o;
-  unsigned lenin;
-  unsigned lenout;
   int timeout;
   timer tmr;
   int t, j;
-  uint32_t *unsafe buf_ptr;
+  uint8_t *unsafe payload_ptr;
+  uint8_t reg;
+  unsigned payload_size;
 
   for (j = 0; j < 8; j++) {
     c1.payload[j] = j;
@@ -151,37 +148,37 @@ void test_client(client interface control i[2], chanend d[2])
           for (o.with_payload = 0; o.with_payload < 2; o.with_payload++) {
             make_command(c1, o);
 
-            if (c1.payload_size == 0)
-              lenin = control_xscope_create_upload_buffer(buf, c1.cmd, c1.resid,
-                                                          NULL, 0);
-            else
-              lenin = control_xscope_create_upload_buffer(buf, c1.cmd, c1.resid,
-                                                          c1.payload, c1.payload_size);
+            num = control_build_i2c_transaction_sequence(seq, c1.resid, c1.cmd, c1.payload_size);
 
-            /* make a processing call, catch and record it, or timeout if none of the
-             * test tasks actually receives a command (e.g. when resource ID not found)
-             */
+            /* make a sequence of processing calls, catch the result and record it */
             unsafe {
-              buf_ptr = buf;
+              reg = c1.resid;
+
+              if (o.read_cmd) {
+                payload_ptr = c2.payload;
+                payload_size = c2.payload_size;
+              }
+              else {
+                payload_ptr = c1.payload;
+                payload_size = c1.payload_size;
+              }
 
               tmr :> t;
               timeout = 0;
               par {
-                control_process_xscope_upload((uint32_t*)buf_ptr, lenin, lenout, i, 2);
+                { for (j = 0; j < num; j++) {
+                    control_process_i2c_write_transaction(seq[j].reg, seq[j].val, i, 2);
+                  }
+                  for (j = 0; j < payload_size; j++) {
+                    control_process_i2c_write_transaction(reg, payload_ptr[j], i, 2);
+                  }
+                }
                 { select {
-                    case receive_command(c2, c1, d);
-                    case tmr when timerafter(t + 3000) :> void:
+                    case receive_command(c2, c1, d, o.read_cmd);
+                    case tmr when timerafter(t + 50000) :> void:
                       timeout = 1;
                       break;
                   }
-
-                  /* retrieve received payload for a read command */
-                  if (!timeout && IS_CONTROL_CMD_READ(c2.cmd)) {
-                    for (j = 0; j < c2.payload_size; j++) {
-                      c2.payload[j] = ((struct control_xscope_packet*)buf)->data.read_bytes[j];
-                    }
-                  }
-
                   check(o, c1, c2, timeout);
                 }
               }

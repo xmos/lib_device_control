@@ -15,31 +15,36 @@ Features
 Typical resource usage
 ......................
 
-  .. resusage::
-     ...
+Only a small amount of code space is needed. Everything is in the form of function calls,
+so no additional logical cores are consumed. I/O requirements depend on which transport
+is used.
 
 Specification
 .............
 
-*Host* controls *resources* on a *device* by sending *commands* to it over a *transport*
-protocol. Resources are identified by an 8bit ID and exist in tasks that run on logical
-cores of the device. There can be multiple resources in a task.
+*Host* controls *resources* on an xCORE *device* by sending *commands* to it over a
+*transport* protocol. Resources are identified by an 8bit identifier and exist in
+tasks that run on logical cores of the device. There can be multiple resources in a task.
 
       **Send command c to resource r**
 
-Command code is 8 bits and can be a *write* command or *read* command. Bit 7 set means read
-command. Write commands can optionally include *data* bytes. Read commands always return data
-bytes.
+Command code is 8 bits and can be a *write* command when bit 7 is not set or a *read* command
+when bit 7 is set. Write commands can optionally include *data* bytes. Read commands always
+return data bytes.
 
       **Send write command c to resource r with n bytes of data d**
 
       **Send read command c to resource r and get n bytes of data d back**
 
-There is a transport task in the device (e.g. I2C slave or USB endpoint 0) and all other tasks
-that have resources connect to it over an xC interface.
+There is a transport task in the device (e.g. I2C slave or USB endpoint 0) that dispatches
+all commands. All other tasks that have resources connect to this transport task over xC
+interfaces.
 
-Tasks *register* their resources by tying them to an interface, so when a command is received,
-it can be sent on the right interface.
+Tasks *register* their resources and these get tied to the tasks' interface. Commands are
+then received in transport task and forwarded on the right interface.
+
+Commands have a result code to indicate success or failure. Result is propagated to host so
+host can indicate error to the user.  
 
 Usage
 .....
@@ -64,22 +69,14 @@ Over USB requests, command is sent over a single USB request::
 
 Same for xSCOPE, the XMOS debug protocol::
 
-      process_xscope_upload(data, len) ==> case i.write_command(R, c, n, d[])
+      process_xscope_upload(data, len) ==> case i.write_command(r, c, n, d[])
 
 When system starts, transport task does an init call, which asks all other tasks to register
 their resources::
 
       init() ==> i.register_resources(r[])
 
-Host
-....
-
-Hosts builds a transport unit of data, e.g. I2C transaction, and sends it. It can use own
-code or there is a cross platform C template provided as well::
-
-      control_xscope_create_upload_buffer(buffer, c, r, n, d[])
-
-      control_usb_fill_header(header, c, r, n)
+For compatibility, a special command is provided to query version of control interface.
 
 Software version and dependencies
 .................................

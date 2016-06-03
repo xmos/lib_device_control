@@ -1,6 +1,7 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <xs1.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "control.h"
 #include "user_task.h"
 
@@ -46,3 +47,4 @@ void user_task(server interface control i, chanend d)
     }
   }
 }
+

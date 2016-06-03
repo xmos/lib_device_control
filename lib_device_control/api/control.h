@@ -18,16 +18,18 @@ typedef enum {
 #define XSCOPE_UPLOAD_MAX_WORDS 64
 #define XSCOPE_CONTROL_PROBE "Control Probe"
 
+#define I2C_MAX_BYTES 256
+
 #ifdef __XC__
 
-interface control {
+typedef interface control {
   void register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
                           unsigned &num_resources);
 
   control_res_t write_command(control_resid_t r, control_cmd_t c, const uint8_t data[n], unsigned n);
 
   control_res_t read_command(control_resid_t r, control_cmd_t c, uint8_t data[n], unsigned n);
-};
+} control_if;
 
 void control_init(client interface control i[n], unsigned n);
 
