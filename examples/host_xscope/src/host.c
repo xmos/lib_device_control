@@ -71,10 +71,10 @@ void record_callback(unsigned int id, unsigned long long timestamp,
   UNUSED_PARAMETER(timestamp);
   UNUSED_PARAMETER(dataval);
 
-  struct control_xscope_probe *p;
+  struct control_xscope_packet *p;
 
   if (id == probe_id) {
-    p = (struct control_xscope_probe*)databytes;
+    p = (struct control_xscope_packet*)databytes;
     /* no parsing, just print raw bytes */
 
     printf("read data returned: ");
