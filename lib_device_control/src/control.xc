@@ -289,34 +289,35 @@ void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WO
                                    unsigned length_in, unsigned &length_out,
                                    client interface control i[n], unsigned n)
 {
+  struct control_xscope_header *h;
   struct control_xscope_packet *p;
-  unsigned read_nbytes;
   unsigned char ifnum;
 
+  // use the fact that header is at start of packet
+  h = (struct control_xscope_header*)data_in_and_out;
   p = (struct control_xscope_packet*)data_in_and_out;
 
-  if (!resource_table_search(p->resid, ifnum)) {
+  if (!resource_table_search(h->resid, ifnum)) {
 #if DEBUG_CONTROL
-    printf("xscope: resource %d not found\n", p->resid);
+    printf("xscope: resource %d not found\n", h->resid);
 #endif
     return;
   }
 
-  if (IS_CONTROL_CMD_READ(p->cmd)) {
-    read_nbytes = p->data.read_nbytes;
-    length_out = XSCOPE_HEADER_BYTES + read_nbytes;
+  if (IS_CONTROL_CMD_READ(h->cmd)) {
+    length_out = sizeof(struct control_xscope_header) + h->data_nbytes;
 #if DEBUG_CONTROL
     printf("xscope: %d(%d) %d(read) %d bytes\n",
-      p->resid, ifnum, p->cmd, read_nbytes);
+      h->resid, ifnum, h->cmd, h->data_nbytes);
 #endif
-    i[ifnum].read_command(p->resid, p->cmd, p->data.read_bytes, read_nbytes);
+    i[ifnum].read_command(h->resid, h->cmd, p->data, h->data_nbytes);
   }
   else {
     length_out = 0;
 #if DEBUG_CONTROL
     printf("xscope: %d(%d) %d(write) %d bytes\n",
-      p->resid, ifnum, p->cmd, length_in - XSCOPE_HEADER_BYTES);
+      h->resid, ifnum, h->cmd, h->data_nbytes);
 #endif
-    i[ifnum].write_command(p->resid, p->cmd, p->data.write_bytes, length_in - XSCOPE_HEADER_BYTES);
+    i[ifnum].write_command(h->resid, h->cmd, p->data, h->data_nbytes);
   }
 }

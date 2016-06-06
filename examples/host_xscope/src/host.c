@@ -71,10 +71,10 @@ void record_callback(unsigned int id, unsigned long long timestamp,
   UNUSED_PARAMETER(timestamp);
   UNUSED_PARAMETER(dataval);
 
-  struct control_xscope_probe *p;
+  struct control_xscope_packet *p;
 
   if (id == probe_id) {
-    p = (struct control_xscope_probe*)databytes;
+    p = (struct control_xscope_packet*)databytes;
     /* no parsing, just print raw bytes */
 
     printf("read data returned: ");
@@ -121,10 +121,12 @@ void do_write_command(void)
   unsigned char payload[1];
   size_t len;
 
+  memset(&p, 0, sizeof(struct control_xscope_packet));
+
   b = (unsigned*)&p;
   payload[0] = 1;
   len = control_xscope_create_upload_buffer(b,
-    CONTROL_CMD_SET_WRITE(0), resource_id, payload, sizeof(payload));
+    CONTROL_CMD_SET_WRITE(0), RESOURCE_ID, payload, sizeof(payload));
 
   printf("%u: send write command: ", num_commands);
   print_bytes((unsigned char*)b, len);
@@ -138,13 +140,15 @@ void do_write_command(void)
 
 void do_read_command(void)
 {
-  struct control_xscope_packet p;
+  struct control_xscope_header h;
   unsigned *b;
   size_t len;
 
-  b = (unsigned*)&p;
+  memset(&h, 0, sizeof(struct control_xscope_header));
+
+  b = (unsigned*)&h;
   len = control_xscope_create_upload_buffer(b,
-    CONTROL_CMD_SET_READ(0), resource_id, NULL, 4);
+    CONTROL_CMD_SET_READ(0), RESOURCE_ID, NULL, 4);
 
   printf("%d: send read command: ", num_commands);
   print_bytes((unsigned char*)b, len);

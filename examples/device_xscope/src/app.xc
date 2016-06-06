@@ -24,13 +24,13 @@ void app(server interface control i_control)
 
       case i_control.write_command(control_resid_t r, control_cmd_t c,
                                    const uint8_t data[n], unsigned n) -> control_res_t res:
-        printf("%u: W 0x%08x %d %d,", num_commands, r, c, n);
+        printf("%u: W %d %d %d,", num_commands, r, c, n);
         for (i = 0; i < n; i++) {
           printf(" %02x", data[i]);
         }
         printf("\n");
         if (r != RESOURCE_ID) {
-          printf("unrecognised resource ID 0x%08x\n", r);
+          printf("unrecognised resource ID %d\n", r);
           res = CONTROL_ERROR;
           break;
         }
@@ -40,9 +40,9 @@ void app(server interface control i_control)
 
       case i_control.read_command(control_resid_t r, control_cmd_t c,
                                   uint8_t data[n], unsigned n) -> control_res_t res:
-        printf("%u: R 0x%08x %d %d\n", num_commands, r, c, n);
+        printf("%u: R %d %d %d\n", num_commands, r, c, n);
         if (r != RESOURCE_ID) {
-          printf("unrecognised resource ID 0x%08x\n", r);
+          printf("unrecognised resource ID %d\n", r);
           res = CONTROL_ERROR;
           break;
         }

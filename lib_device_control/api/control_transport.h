@@ -9,22 +9,17 @@
 #define CONTROL_CMD_SET_WRITE(c) ((c) & ~0x80)
 
 #define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * sizeof(uint32_t))
+#define XSCOPE_DATA_MAX_BYTES (XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES)
 
-/* xCORE is little endian */
-
-/* host to device xSCOPE data packet
- * same format for device to host data returned over xSCOPE probe
- */
 struct control_xscope_packet {
-#define XSCOPE_HEADER_BYTES 8
-  control_resid_t resid;
-  control_cmd_t cmd;
-  uint8_t pad;
-  union {
-     uint8_t write_bytes[XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES];
-     uint8_t read_bytes[XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES];
-     unsigned read_nbytes;
-  } data;
+#define XSCOPE_HEADER_BYTES 4
+  struct control_xscope_header {
+    control_resid_t resid;
+    control_cmd_t cmd;
+    uint8_t data_nbytes;
+    uint8_t pad;
+  } header;
+  uint8_t data[XSCOPE_DATA_MAX_BYTES];
 };
 
 #define I2C_SPECIAL_REGISTER 0

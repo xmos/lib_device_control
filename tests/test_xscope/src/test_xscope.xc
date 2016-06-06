@@ -134,6 +134,8 @@ void test_client(client interface control i[2], chanend c_user_task[2])
   int t, j;
   uint32_t *unsafe buf_ptr;
 
+  memset(buf, 0, XSCOPE_UPLOAD_MAX_WORDS);
+
   for (j = 0; j < 8; j++) {
     c1.payload[j] = j;
   }
@@ -175,7 +177,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                 control_process_xscope_upload((uint32_t*)buf_ptr, lenin, lenout, i, 2);
                 { select {
                     case drive_user_task(c2, c1, c_user_task);
-                    case tmr when timerafter(t + 3000) :> void:
+                    case tmr when timerafter(t + 5000) :> void:
                       timeout = 1;
                       break;
                   }
@@ -183,7 +185,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                   /* retrieve received payload for a read command */
                   if (!timeout && IS_CONTROL_CMD_READ(c2.cmd)) {
                     for (j = 0; j < c2.payload_size; j++) {
-                      c2.payload[j] = ((struct control_xscope_packet*)buf)->data.read_bytes[j];
+                      c2.payload[j] = ((struct control_xscope_packet*)buf)->data[j];
                     }
                   }
 
