@@ -7,6 +7,8 @@
 #include "control_host.h"
 #include "user_task.h"
 
+#define PRINT_ALL 0
+
 /* resource ID that includes interface number of given test task
  * and which resource in given task it is, if the task has more than one
  */
@@ -88,30 +90,39 @@ void check(const struct options &o,
       printf("received ifnum %d cmd %d resid 0x%X payload %d\n",
         c2.ifnum, c2.cmd, c2.resid, c2.payload_size);
     }
-    printf("isssued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
+  }
+#if !PRINT_ALL
+  if (fail)
+#endif
+  {
+    printf("issued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
       c1.ifnum, c1.cmd, c1.resid, o.res_in_if, c1.payload_size);
   }
 }
 
-select receive_command(struct command &c2, struct command &c1, chanend d[2], int read_cmd)
+select drive_user_task(struct command &c2, struct command &c1, chanend d[2], int read_cmd)
 {
   case d[int k] :> c2.cmd: {
     int j;
 
     d[k] :> c2.resid;
     d[k] :> c2.payload_size;
-    for (j = 0; j < sizeof(c1.payload) && j < c2.payload_size; j++) {
-      if (read_cmd)
+    if (read_cmd) {
+      for (j = 0; j < sizeof(c1.payload) && j < c2.payload_size; j++) {
         d[k] <: c1.payload[j];
-      else
+      }
+    }
+    else {
+      for (j = 0; j < sizeof(c1.payload) && j < c2.payload_size; j++) {
         d[k] :> c2.payload[j];
+      }
     }
     c2.ifnum = k;
     break;
   }
 }
 
-void test_client(client interface control i[2], chanend d[2])
+void test_client(client interface control i[2], chanend c_user_task[2])
 {
   struct i2c_transaction seq[I2C_SEQUENCE_LENGTH];
   size_t num;
@@ -123,6 +134,7 @@ void test_client(client interface control i[2], chanend d[2])
   uint8_t *unsafe payload_ptr;
   uint8_t reg;
   unsigned payload_size;
+  chan d;
 
   for (j = 0; j < 8; j++) {
     c1.payload[j] = j;
@@ -130,15 +142,13 @@ void test_client(client interface control i[2], chanend d[2])
 
   /* trigger a registration call, catch it and supply resource IDs to register */
   par {
-    { d[0] <: 2;
-      d[0] <: RESID(0, 0);
-      d[0] <: RESID(0, 1);
-    }
-    { d[1] <: 2;
-      d[1] <: RESID(1, 0);
-      d[1] <: RESID(1, 1);
-    }
     control_init(i, 2);
+    par (int j = 0; j < 2; j++) {
+      { c_user_task[j] <: 2;
+        c_user_task[j] <: RESID(j, 0);
+        c_user_task[j] <: RESID(j, 1);
+      }
+    }
   }
 
   for (c1.ifnum = 0; c1.ifnum < 3; c1.ifnum++) {
@@ -154,14 +164,11 @@ void test_client(client interface control i[2], chanend d[2])
             unsafe {
               reg = c1.resid;
 
-              if (o.read_cmd) {
+              payload_size = c1.payload_size;
+              if (o.read_cmd)
                 payload_ptr = c2.payload;
-                payload_size = c2.payload_size;
-              }
-              else {
+              else
                 payload_ptr = c1.payload;
-                payload_size = c1.payload_size;
-              }
 
               tmr :> t;
               timeout = 0;
@@ -169,16 +176,27 @@ void test_client(client interface control i[2], chanend d[2])
                 { for (j = 0; j < num; j++) {
                     control_process_i2c_write_transaction(seq[j].reg, seq[j].val, i, 2);
                   }
-                  for (j = 0; j < payload_size; j++) {
-                    control_process_i2c_write_transaction(reg, payload_ptr[j], i, 2);
+                  if (o.read_cmd) {
+                    for (j = 0; j < payload_size; j++) {
+                      uint8_t x;
+                      control_process_i2c_read_transaction(reg, x, i, 2);
+                      payload_ptr[j] = x;
+                    }
                   }
+                  else {
+                    for (j = 0; j < payload_size; j++) {
+                      control_process_i2c_write_transaction(reg, payload_ptr[j], i, 2);
+                    }
+                  }
+                  d <: 0;
                 }
                 { select {
-                    case receive_command(c2, c1, d, o.read_cmd);
+                    case drive_user_task(c2, c1, c_user_task, o.read_cmd);
                     case tmr when timerafter(t + 50000) :> void:
                       timeout = 1;
                       break;
                   }
+                  d :> int;
                   check(o, c1, c2, timeout);
                 }
               }
@@ -196,11 +214,11 @@ void test_client(client interface control i[2], chanend d[2])
 int main(void)
 {
   interface control i[2];
-  chan d[2];
+  chan c_user_task[2];
   par {
-    test_client(i, d);
-    user_task(i[0], d[0]);
-    user_task(i[1], d[1]);
+    test_client(i, c_user_task);
+    user_task(i[0], c_user_task[0]);
+    user_task(i[1], c_user_task[1]);
   }
   return 0;
 }

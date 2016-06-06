@@ -29,8 +29,8 @@ tasks that run on logical cores of the device. There can be multiple resources i
       **Send command c to resource r**
 
 Command code is 8 bits and can be a *write* command when bit 7 is not set or a *read* command
-when bit 7 is set. Write commands can optionally include *data* bytes. Read commands always
-return data bytes.
+when bit 7 is set. Commands include *data* bytes that are optional, both write and read
+commands.
 
       **Send write command c to resource r with n bytes of data d**
 

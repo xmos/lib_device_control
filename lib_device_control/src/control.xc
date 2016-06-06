@@ -27,7 +27,8 @@ static struct {
     I2C_IDLE,
     I2C_COMMAND,
     I2C_SIZE,
-    I2C_DATA,
+    I2C_WRITE_DATA,
+    I2C_READ_DATA,
     I2C_ERROR,
   } state;
   unsigned data_so_far;
@@ -86,25 +87,50 @@ void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
             i2c.state = I2C_ERROR;
           }
           else {
-            if (val == 0) {
+            if (IS_CONTROL_CMD_READ(i2c.cmd)) {
+              if (val == 0) {
 #if DEBUG_CONTROL
-              printf("i2c: %d write_command(%d, %d, %d)\n",
-                i2c.ifnum, i2c.resid, i2c.cmd, 0);
+                printf("i2c: %d read_command(%d, %d, %d)\n",
+                  i2c.ifnum, i2c.resid, i2c.cmd, 0);
 #endif
-              i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, 0);
+                i[i2c.ifnum].read_command(i2c.resid, i2c.cmd, i2c.data, 0);
 #if DEBUG_CONTROL
-              printf("i2c: write command completed\n");
+                printf("i2c: read command completed\n");
 #endif
-              i2c.state = I2C_IDLE;
+                i2c.state = I2C_IDLE;
+              }
+              else {
+#if DEBUG_CONTROL
+                printf("i2c: %d read_command(%d, %d, %d)\n",
+                  i2c.ifnum, i2c.resid, i2c.cmd, val);
+#endif
+                i[i2c.ifnum].read_command(i2c.resid, i2c.cmd, i2c.data, val);
+                i2c.data_expected = val;
+                i2c.data_so_far = 0;
+                i2c.state = I2C_SIZE;
+              }
             }
             else {
-              i2c.data_expected = val;
-              i2c.data_so_far = 0;
-              i2c.state = I2C_SIZE;
+              if (val == 0) {
+#if DEBUG_CONTROL
+                printf("i2c: %d write_command(%d, %d, %d)\n",
+                  i2c.ifnum, i2c.resid, i2c.cmd, 0);
+#endif
+                i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, 0);
+#if DEBUG_CONTROL
+                printf("i2c: write command completed\n");
+#endif
+                i2c.state = I2C_IDLE;
+              }
+              else {
+                i2c.data_expected = val;
+                i2c.data_so_far = 0;
+                i2c.state = I2C_SIZE;
+              }
             }
           }
         }
-        else if (i2c.state == I2C_SIZE || i2c.state == I2C_DATA) {
+        else if (i2c.state == I2C_SIZE || i2c.state == I2C_WRITE_DATA) {
           if (IS_CONTROL_CMD_READ(i2c.cmd)) {
 #if DEBUG_CONTROL
             printf("i2c: transaction specifies data write, but a read command is in progress\n");
@@ -126,9 +152,17 @@ void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
               i2c.state = I2C_IDLE;
             }
             else {
-              i2c.state = I2C_DATA;
+              i2c.state = I2C_WRITE_DATA;
             }
           }
+        }
+        else if (i2c.state == I2C_READ_DATA) {
+#if DEBUG_CONTROL
+          printf("i2c: write transaction unexpected in read command\n");
+#endif
+        }
+        else if (i2c.state == I2C_ERROR) {
+          // silently discard transactions
         }
       }
     }
@@ -138,7 +172,49 @@ void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
 void control_process_i2c_read_transaction(uint8_t reg, uint8_t &val,
                                          client interface control i[n], unsigned n)
 {
-  // TODO
+#if DEBUG_CONTROL
+  printf("i2c: process read transaction %d %d\n", reg, val);
+#endif
+  if (reg == I2C_SPECIAL_REGISTER) {
+#if DEBUG_CONTROL
+    printf("i2c: unexpected read from special register\n:");
+#endif
+    i2c.state = I2C_ERROR;
+  }
+  else if (i2c.state == I2C_SIZE || i2c.state == I2C_READ_DATA) {
+    if (reg != i2c.resid) {
+#if DEBUG_CONTROL
+      printf("i2c: read transacition of resource %d in the middle of a command for resource %d\n",
+        reg, i2c.resid);
+#endif
+      i2c.state = I2C_ERROR;
+    }
+    else if (!IS_CONTROL_CMD_READ(i2c.cmd)) {
+#if DEBUG_CONTROL
+      printf("i2c: read transaction unexpected with command %d which is not read\n", i2c.cmd);
+#endif
+      i2c.state = I2C_ERROR;
+    }
+    else {
+      val = i2c.data[i2c.data_so_far];
+      i2c.data_so_far++;
+      if (i2c.data_so_far == i2c.data_expected) {
+#if DEBUG_CONTROL
+        printf("i2c: read command completed\n");
+#endif
+        i2c.state = I2C_IDLE;
+      }
+      else {
+        i2c.state = I2C_READ_DATA;
+      }
+    }
+  }
+  else {
+#if DEBUG_CONTROL
+    printf("i2c: read transaction unexpected\n");
+#endif
+    i2c.state = I2C_ERROR;
+  }
 }
 
 void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
