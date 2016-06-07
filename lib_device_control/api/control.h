@@ -7,9 +7,13 @@
 
 typedef uint8_t control_resid_t;
 typedef uint8_t control_cmd_t;
+
 typedef enum {
-  CONTROL_SUCCESS,
-  CONTROL_ERROR
+  CONTROL_SUCCESS = 0,
+  CONTROL_ERROR,
+  CONTROL_BAD_COMMAND,
+  CONTROL_DATA_LENGTH_ERROR,
+  CONTROL_OTHER_TRANSPORT_ERROR
 } control_res_t;
 
 #define MAX_RESOURCES_PER_INTERFACE 64
@@ -48,20 +52,23 @@ control_process_i2c_read_data(uint8_t &data,
 control_res_t
 control_process_i2c_stop(client interface control i[n], unsigned n);
 
-void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
-                                     const uint8_t request_data[],
-                                     client interface control i[n], unsigned n);
+control_res_t
+control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                const uint8_t request_data[],
+                                client interface control i[n], unsigned n);
 
-void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
-                                     uint8_t request_data[],
-                                     client interface control i[n], unsigned n);
+control_res_t
+control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                uint8_t request_data[],
+                                client interface control i[n], unsigned n);
 
 /* data return is device (control library) initiated
  * require word alignment so we can cast to struct
  */
-void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
-                                   unsigned length_in, unsigned &length_out,
-                                   client interface control i[n], unsigned n);
+control_res_t
+control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
+                              unsigned length_in, unsigned &length_out,
+                              client interface control i[n], unsigned n);
 
 #endif
 

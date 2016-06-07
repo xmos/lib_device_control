@@ -48,9 +48,9 @@ void make_command(struct command &c, const struct options &o)
     c.payload_size = 0;
 }
 
-void check(const struct options &o,
-           const struct command &c1, const struct command &c2,
-           int timeout)
+int check(const struct options &o,
+          const struct command &c1, const struct command &c2,
+          int timeout, control_res_t res)
 {
   int timeout_expected;
   int fail;
@@ -82,6 +82,10 @@ void check(const struct options &o,
           fail = 1;
         }
       }
+      if (res != CONTROL_SUCCESS) {
+        printf("processing function returned %d\n", res);
+        fail = 1;
+      }
     }
   }
 
@@ -98,6 +102,8 @@ void check(const struct options &o,
     printf("issued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
       c1.ifnum, c1.cmd, c1.resid, o.res_in_if, c1.payload_size);
   }
+
+  return fail;
 }
 
 select drive_user_task(struct command &c2, struct command &c1, chanend d[2], int read_cmd)
@@ -132,6 +138,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
   timer tmr;
   int t, j;
   uint8_t *unsafe payload_ptr;
+  int fails;
   unsigned payload_size;
   chan d;
 
@@ -149,6 +156,8 @@ void test_client(client interface control i[2], chanend c_user_task[2])
       }
     }
   }
+
+  fails = 0;
 
   for (c1.ifnum = 0; c1.ifnum < 3; c1.ifnum++) {
     for (o.read_cmd = 0; o.read_cmd < 2; o.read_cmd++) {
@@ -168,27 +177,30 @@ void test_client(client interface control i[2], chanend c_user_task[2])
               tmr :> t;
               timeout = 0;
               par {
-                { control_process_i2c_write_start(i, 2);
+                { control_res_t res;
+                  res = CONTROL_SUCCESS;
+                  res |= control_process_i2c_write_start(i, 2);
                   for (j = 0; j < buf_len; j++) {
-                    control_process_i2c_write_data(buf[j], i, 2);
+                    res |= control_process_i2c_write_data(buf[j], i, 2);
                   }
-                  if (o.read_cmd) {
-                    control_process_i2c_read_start(i, 2);
+                  if (o.read_cmd && payload_size > 0) {
+                    res |= control_process_i2c_read_start(i, 2);
                     for (j = 0; j < payload_size; j++) {
-                      control_process_i2c_read_data(payload_ptr[j], i, 2);
+                      res |= control_process_i2c_read_data(payload_ptr[j], i, 2);
                     }
                   }
-                  control_process_i2c_stop(i, 2);
-                  d <: 0;
+                  res |= control_process_i2c_stop(i, 2);
+                  d <: res;
                 }
-                { select {
+                { control_res_t res;
+                  select {
                     case drive_user_task(c2, c1, c_user_task, o.read_cmd);
                     case tmr when timerafter(t + 50000) :> void:
                       timeout = 1;
                       break;
                   }
-                  d :> int;
-                  check(o, c1, c2, timeout);
+                  d :> res;
+                  fails += check(o, c1, c2, timeout, res);
                 }
               }
             }
@@ -198,8 +210,13 @@ void test_client(client interface control i[2], chanend c_user_task[2])
     }
   }
 
-  printf("Success!\n");
-  exit(0);
+  if (fails == 0) {
+    printf("Success!\n");
+    exit(0);
+  }
+  else {
+    exit(1);
+  }
 }
 
 int main(void)

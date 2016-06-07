@@ -20,7 +20,7 @@ void control_init(client interface control i[n], unsigned n)
   }
 }
 
-// I2C state machine
+// I2C state
 static struct {
   enum {
     I2C_IDLE,
@@ -43,7 +43,8 @@ static struct {
   unsigned data_len_transmitted;
 } i2c = { I2C_IDLE, 0, 0, 0, 0 };
 
-control_res_t control_process_i2c_write_start(client interface control i[n], unsigned n)
+control_res_t
+control_process_i2c_write_start(client interface control i[n], unsigned n)
 {
   // always start a new command
   // that way a write start recovers us from errors
@@ -51,14 +52,15 @@ control_res_t control_process_i2c_write_start(client interface control i[n], uns
   return CONTROL_SUCCESS;
 }
 
-control_res_t control_process_i2c_write_data(const uint8_t data,
-                                             client interface control i[n], unsigned n)
+control_res_t
+control_process_i2c_write_data(const uint8_t data,
+                               client interface control i[n], unsigned n)
 {
   if (i2c.state == I2C_WRITE_START) {
     if (!resource_table_search(data, i2c.ifnum)) {
       debug_printf("i2c: resource %d not found\n", data);
       i2c.state = I2C_ERROR;
-      return CONTROL_ERROR;
+      return CONTROL_BAD_COMMAND;
     }
     else {
       i2c.resid = data;
@@ -75,7 +77,7 @@ control_res_t control_process_i2c_write_data(const uint8_t data,
     if (data > I2C_DATA_MAX_BYTES) {
       debug_printf("i2c: length %d exceeded limit %d\n", data, I2C_DATA_MAX_BYTES);
       i2c.state = I2C_ERROR;
-      return CONTROL_ERROR;
+      return CONTROL_BAD_COMMAND;
     }
     else {
       i2c.data_len_from_header = data;
@@ -88,7 +90,7 @@ control_res_t control_process_i2c_write_data(const uint8_t data,
     if (IS_CONTROL_CMD_READ(i2c.cmd)) {
       debug_printf("i2c: unexpected write data in a read command\n");
       i2c.state = I2C_ERROR;
-      return CONTROL_ERROR;
+      return CONTROL_OTHER_TRANSPORT_ERROR;
     }
     else {
       i2c.data[0] = data;
@@ -102,7 +104,7 @@ control_res_t control_process_i2c_write_data(const uint8_t data,
       debug_printf("i2c: exceeded expected write data length %d, discarding rest of data\n",
         i2c.data_len_from_header);
       i2c.state = I2C_WRITE_OVERFLOW;
-      return CONTROL_SUCCESS;
+      return CONTROL_DATA_LENGTH_ERROR;
     }
     else {
       i2c.data[i2c.data_len_transmitted] = data;
@@ -119,12 +121,15 @@ control_res_t control_process_i2c_write_data(const uint8_t data,
   }
 }
 
-control_res_t control_process_i2c_read_start(client interface control i[n], unsigned n)
+control_res_t
+control_process_i2c_read_start(client interface control i[n], unsigned n)
 {
+  control_res_t res;
+
   if (i2c.state != I2C_WRITE_SIZE) {
     debug_printf("i2c: unexpected read transaction, needs to follow a correctly formed write\n");
     i2c.state = I2C_ERROR;
-    return CONTROL_ERROR;
+    return CONTROL_OTHER_TRANSPORT_ERROR;
   }
   else {
     if (IS_CONTROL_CMD_READ(i2c.cmd)) {
@@ -132,21 +137,28 @@ control_res_t control_process_i2c_read_start(client interface control i[n], unsi
       debug_printf("i2c: %d read_command(%d, %d, %d)\n",
         i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_len_from_header);
 
-      i[i2c.ifnum].read_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_from_header);
-      i2c.data_len_transmitted = 0;
-      i2c.state = I2C_READ_START;
-      return CONTROL_SUCCESS;
+      res = i[i2c.ifnum].read_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_from_header);
+
+      if (res == CONTROL_SUCCESS) {
+        i2c.data_len_transmitted = 0;
+        i2c.state = I2C_READ_START;
+        return CONTROL_SUCCESS;
+      }
+      else {
+        return res;
+      }
     }
     else {
       debug_printf("i2c: unexpected read transaction in a write command\n");
       i2c.state = I2C_ERROR;
-      return CONTROL_ERROR;
+      return CONTROL_OTHER_TRANSPORT_ERROR;
     }
   }
 }
 
-control_res_t control_process_i2c_read_data(uint8_t &data,
-                                            client interface control i[n], unsigned n)
+control_res_t
+control_process_i2c_read_data(uint8_t &data,
+                              client interface control i[n], unsigned n)
 {
   if (i2c.state == I2C_READ_START) {
     data = i2c.data[0];
@@ -172,7 +184,8 @@ control_res_t control_process_i2c_read_data(uint8_t &data,
   }
 }
 
-control_res_t control_process_i2c_stop(client interface control i[n], unsigned n)
+control_res_t
+control_process_i2c_stop(client interface control i[n], unsigned n)
 {
   control_res_t res;
   int do_write;
@@ -183,7 +196,7 @@ control_res_t control_process_i2c_stop(client interface control i[n], unsigned n
   if (i2c.state == I2C_WRITE_SIZE) {
     if (i2c.data_len_from_header != 0) {
       debug_printf("i2c: no data written for a command with data length %d\n", i2c.data_len_from_header);
-      res = CONTROL_ERROR;
+      res = CONTROL_DATA_LENGTH_ERROR;
     }
     else {
       do_write = 1;
@@ -194,7 +207,7 @@ control_res_t control_process_i2c_stop(client interface control i[n], unsigned n
     if (i2c.data_len_transmitted < i2c.data_len_from_header) {
       debug_printf("i2c: incomplete write command, %d expected, %d actual\n",
         i2c.data_len_from_header, i2c.data_len_transmitted);
-      res = CONTROL_ERROR;
+      res = CONTROL_DATA_LENGTH_ERROR;
     }
     do_write = 1;
   }
@@ -204,13 +217,13 @@ control_res_t control_process_i2c_stop(client interface control i[n], unsigned n
   }
   else if (i2c.state == I2C_READ_START) {
     debug_printf("i2c: read command ended with no data transaction\n");
-    res = CONTROL_ERROR;
+    res = CONTROL_OTHER_TRANSPORT_ERROR;
   }
   else if (i2c.state == I2C_READ_DATA) {
     if (i2c.data_len_transmitted < i2c.data_len_from_header) {
       debug_printf("i2c: incompleted read command, %d expected, %d actual\n",
         i2c.data_len_from_header, i2c.data_len_transmitted);
-      res = CONTROL_ERROR;
+      res = CONTROL_DATA_LENGTH_ERROR;
     }
   }
   else if (i2c.state == I2C_READ_OVERFLOW) {
@@ -219,14 +232,14 @@ control_res_t control_process_i2c_stop(client interface control i[n], unsigned n
   else {
     i2c.state = I2C_IDLE;
     debug_printf("i2c: unexpected stop bit\n");
-    return CONTROL_ERROR;
+    return CONTROL_OTHER_TRANSPORT_ERROR;
   }
 
   if (do_write) {
     debug_printf("i2c: %d write_command(%d, %d, %d)\n",
       i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_len_transmitted);
 
-    i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_transmitted);
+    res = i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_transmitted);
   }
 
   // always transition to idle after a stop bit
@@ -235,167 +248,10 @@ control_res_t control_process_i2c_stop(client interface control i[n], unsigned n
   return res;
 }
 
-#if 0
-// I2C state machine
-static struct {
-  enum {
-    I2C_IDLE,
-    I2C_COMMAND,
-    I2C_SIZE,
-    I2C_WRITE_DATA,
-    I2C_READ_DATA,
-    I2C_ERROR,
-  } state;
-  unsigned data_so_far;
-  unsigned data_expected;
-  control_cmd_t cmd;
-  control_resid_t resid;
-  unsigned char ifnum;
-  uint8_t data[I2C_MAX_BYTES];
-} i2c = { I2C_IDLE, 0, 0, 0, 0, 0, {0} };
-
-void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
-                                          client interface control i[n], unsigned n)
-{
-  debug_printf("i2c: process write transaction %d %d\n", reg, val);
-  if (reg == I2C_SPECIAL_REGISTER) {
-    if (val == I2C_START_COMMAND) {
-      i2c.state = I2C_IDLE;
-    }
-    else {
-      debug_printf("i2c: unrecognised special command %d\n", val);
-      i2c.state = I2C_ERROR;
-    }
-  }
-  else {
-    if (i2c.state == I2C_IDLE) {
-      if (!resource_table_search(reg, i2c.ifnum)) {
-        debug_printf("i2c: resource %d not found\n", reg);
-        i2c.state = I2C_ERROR;
-      }
-      else {
-        i2c.resid = reg;
-        i2c.cmd = val;
-        i2c.state = I2C_COMMAND;
-      }
-    }
-    else if (i2c.state != I2C_ERROR) {
-      if (reg != i2c.resid) {
-        debug_printf("i2c: unexpected register %d, a command for resource %d in progress\n",
-          reg, i2c.resid);
-        i2c.state = I2C_ERROR;
-      }
-      else {
-        if (i2c.state == I2C_COMMAND) {
-          if (val > I2C_MAX_BYTES) {
-            debug_printf("i2c: length %d exceeded limit %d\n", val, I2C_MAX_BYTES);
-            i2c.state = I2C_ERROR;
-          }
-          else {
-            if (IS_CONTROL_CMD_READ(i2c.cmd)) {
-              if (val == 0) {
-                debug_printf("i2c: %d read_command(%d, %d, %d)\n",
-                  i2c.ifnum, i2c.resid, i2c.cmd, 0);
-                i[i2c.ifnum].read_command(i2c.resid, i2c.cmd, i2c.data, 0);
-                debug_printf("i2c: read command completed\n");
-                i2c.state = I2C_IDLE;
-              }
-              else {
-                debug_printf("i2c: %d read_command(%d, %d, %d)\n",
-                  i2c.ifnum, i2c.resid, i2c.cmd, val);
-                i[i2c.ifnum].read_command(i2c.resid, i2c.cmd, i2c.data, val);
-                i2c.data_expected = val;
-                i2c.data_so_far = 0;
-                i2c.state = I2C_SIZE;
-              }
-            }
-            else {
-              if (val == 0) {
-                debug_printf("i2c: %d write_command(%d, %d, %d)\n",
-                  i2c.ifnum, i2c.resid, i2c.cmd, 0);
-                i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, 0);
-                debug_printf("i2c: write command completed\n");
-                i2c.state = I2C_IDLE;
-              }
-              else {
-                i2c.data_expected = val;
-                i2c.data_so_far = 0;
-                i2c.state = I2C_SIZE;
-              }
-            }
-          }
-        }
-        else if (i2c.state == I2C_SIZE || i2c.state == I2C_WRITE_DATA) {
-          if (IS_CONTROL_CMD_READ(i2c.cmd)) {
-            debug_printf("i2c: transaction specifies data write, but a read command is in progress\n");
-            i2c.state = I2C_ERROR;
-          }
-          else {
-            i2c.data[i2c.data_so_far] = val;
-            i2c.data_so_far++;
-            if (i2c.data_so_far == i2c.data_expected) {
-              debug_printf("i2c: %d write_command(%d, %d, %d)\n",
-                i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_so_far);
-              i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_so_far);
-              debug_printf("i2c: write command completed\n");
-              i2c.state = I2C_IDLE;
-            }
-            else {
-              i2c.state = I2C_WRITE_DATA;
-            }
-          }
-        }
-        else if (i2c.state == I2C_READ_DATA) {
-          debug_printf("i2c: write transaction unexpected in read command\n");
-        }
-        else if (i2c.state == I2C_ERROR) {
-          // silently discard transactions
-        }
-      }
-    }
-  }
-}
-
-void control_process_i2c_read_transaction(uint8_t reg, uint8_t &val,
-                                         client interface control i[n], unsigned n)
-{
-  debug_printf("i2c: process read transaction %d %d\n", reg, val);
-  if (reg == I2C_SPECIAL_REGISTER) {
-    debug_printf("i2c: unexpected read from special register\n:");
-    i2c.state = I2C_ERROR;
-  }
-  else if (i2c.state == I2C_SIZE || i2c.state == I2C_READ_DATA) {
-    if (reg != i2c.resid) {
-      debug_printf("i2c: read transacition of resource %d in the middle of a command for resource %d\n",
-        reg, i2c.resid);
-      i2c.state = I2C_ERROR;
-    }
-    else if (!IS_CONTROL_CMD_READ(i2c.cmd)) {
-      debug_printf("i2c: read transaction unexpected with command %d which is not read\n", i2c.cmd);
-      i2c.state = I2C_ERROR;
-    }
-    else {
-      val = i2c.data[i2c.data_so_far];
-      i2c.data_so_far++;
-      if (i2c.data_so_far == i2c.data_expected) {
-        debug_printf("i2c: read command completed\n");
-        i2c.state = I2C_IDLE;
-      }
-      else {
-        i2c.state = I2C_READ_DATA;
-      }
-    }
-  }
-  else {
-    debug_printf("i2c: read transaction unexpected\n");
-    i2c.state = I2C_ERROR;
-  }
-}
-#endif
-
-void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
-                                     const uint8_t request_data[],
-                                     client interface control i[n], unsigned n)
+control_res_t
+control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                const uint8_t request_data[],
+                                client interface control i[n], unsigned n)
 {
   unsigned num_data_bytes;
   control_resid_t resid;
@@ -408,22 +264,24 @@ void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t 
 
   if (!resource_table_search(resid, ifnum)) {
     debug_printf("usb: resource %d not found\n", resid);
-    return;
+    return CONTROL_BAD_COMMAND;
   }
 
   if (IS_CONTROL_CMD_READ(cmd)) {
     debug_printf("usb: read command code %d not expected in a SET request\n", cmd);
-    return;
+    return CONTROL_BAD_COMMAND;
   }
 
   debug_printf("usb: %d(%d) %d(write) %d bytes\n", /* may be affected by bug 13373 */
     resid, ifnum, cmd, num_data_bytes);
-  i[ifnum].write_command(resid, cmd, request_data, num_data_bytes);
+
+  return i[ifnum].write_command(resid, cmd, request_data, num_data_bytes);
 }
 
-void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
-                                     uint8_t request_data[],
-                                     client interface control i[n], unsigned n)
+control_res_t
+control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
+                                uint8_t request_data[],
+                                client interface control i[n], unsigned n)
 {
   unsigned num_data_bytes;
   control_resid_t resid;
@@ -436,22 +294,24 @@ void control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t 
 
   if (!resource_table_search(resid, ifnum)) {
     debug_printf("usb: resource %d not found\n", resid);
-    return;
+    return CONTROL_BAD_COMMAND;
   }
 
   if (!IS_CONTROL_CMD_READ(cmd)) {
     debug_printf("usb: write command code %d not expected in a GET request\n", cmd);
-    return;
+    return CONTROL_BAD_COMMAND;
   }
 
   debug_printf("usb: %d(%d) %d(read) %d bytes\n", /* may be affected by bug 13373 */
     resid, ifnum, cmd, num_data_bytes);
-  i[ifnum].read_command(resid, cmd, request_data, num_data_bytes);
+
+  return i[ifnum].read_command(resid, cmd, request_data, num_data_bytes);
 }
 
-void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
-                                   unsigned length_in, unsigned &length_out,
-                                   client interface control i[n], unsigned n)
+control_res_t
+control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
+                              unsigned length_in, unsigned &length_out,
+                              client interface control i[n], unsigned n)
 {
   struct control_xscope_header *h;
   struct control_xscope_packet *p;
@@ -461,21 +321,24 @@ void control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WO
   h = (struct control_xscope_header*)data_in_and_out;
   p = (struct control_xscope_packet*)data_in_and_out;
 
+  length_out = 0;
+
   if (!resource_table_search(h->resid, ifnum)) {
     debug_printf("xscope: resource %d not found\n", h->resid);
-    return;
+    return CONTROL_BAD_COMMAND;
   }
 
   if (IS_CONTROL_CMD_READ(h->cmd)) {
     length_out = sizeof(struct control_xscope_header) + h->data_nbytes;
     debug_printf("xscope: %d(%d) %d(read) %d bytes\n",
       h->resid, ifnum, h->cmd, h->data_nbytes);
-    i[ifnum].read_command(h->resid, h->cmd, p->data, h->data_nbytes);
+
+    return i[ifnum].read_command(h->resid, h->cmd, p->data, h->data_nbytes);
   }
   else {
-    length_out = 0;
     debug_printf("xscope: %d(%d) %d(write) %d bytes\n",
       h->resid, ifnum, h->cmd, h->data_nbytes);
-    i[ifnum].write_command(h->resid, h->cmd, p->data, h->data_nbytes);
+
+    return i[ifnum].write_command(h->resid, h->cmd, p->data, h->data_nbytes);
   }
 }

@@ -48,9 +48,9 @@ void make_command(struct command &c, const struct options &o)
     c.payload_size = 0;
 }
 
-void check(const struct options &o,
-           const struct command &c1, const struct command &c2,
-           int timeout)
+int check(const struct options &o,
+          const struct command &c1, const struct command &c2,
+          int timeout, control_res_t res)
 {
   int timeout_expected;
   int fail;
@@ -82,6 +82,10 @@ void check(const struct options &o,
           fail = 1;
         }
       }
+      if (res != CONTROL_SUCCESS) {
+        printf("processing function returned %d\n", res);
+        fail = 1;
+      }
     }
   }
 
@@ -98,6 +102,8 @@ void check(const struct options &o,
     printf("issued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
       c1.ifnum, c1.cmd, c1.resid, o.res_in_if, c1.payload_size);
   }
+
+  return fail;
 }
 
 select drive_user_task(struct command &c2, const struct command &c1, chanend d[2])
@@ -133,6 +139,9 @@ void test_client(client interface control i[2], chanend c_user_task[2])
   timer tmr;
   int t, j;
   uint32_t *unsafe buf_ptr;
+  int fails;
+  control_res_t res;
+  chan d;
 
   memset(buf, 0, XSCOPE_UPLOAD_MAX_WORDS);
 
@@ -150,6 +159,8 @@ void test_client(client interface control i[2], chanend c_user_task[2])
       }
     }
   }
+
+  fails = 0;
 
   for (c1.ifnum = 0; c1.ifnum < 3; c1.ifnum++) {
     for (o.read_cmd = 0; o.read_cmd < 2; o.read_cmd++) {
@@ -174,7 +185,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
               tmr :> t;
               timeout = 0;
               par {
-                control_process_xscope_upload((uint32_t*)buf_ptr, lenin, lenout, i, 2);
+                d <: control_process_xscope_upload((uint32_t*)buf_ptr, lenin, lenout, i, 2);
                 { select {
                     case drive_user_task(c2, c1, c_user_task);
                     case tmr when timerafter(t + 5000) :> void:
@@ -189,7 +200,8 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                     }
                   }
 
-                  check(o, c1, c2, timeout);
+                  d :> res;
+                  fails += check(o, c1, c2, timeout, res);
                 }
               }
             }
@@ -199,8 +211,13 @@ void test_client(client interface control i[2], chanend c_user_task[2])
     }
   }
 
-  printf("Success!\n");
-  exit(0);
+  if (fails == 0) {
+    printf("Success!\n");
+    exit(0);
+  }
+  else {
+    exit(1);
+  }
 }
 
 int main(void)

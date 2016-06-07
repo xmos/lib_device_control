@@ -48,9 +48,9 @@ void make_command(struct command &c, const struct options &o)
     c.payload_size = 0;
 }
 
-void check(const struct options &o,
-           const struct command &c1, const struct command &c2,
-           int timeout)
+int check(const struct options &o,
+          const struct command &c1, const struct command &c2,
+          int timeout, control_res_t res)
 {
   int timeout_expected;
   int fail;
@@ -82,6 +82,10 @@ void check(const struct options &o,
           fail = 1;
         }
       }
+      if (res != CONTROL_SUCCESS) {
+        printf("processing function returned %d\n", res);
+        fail = 1;
+      }
     }
   }
 
@@ -98,6 +102,8 @@ void check(const struct options &o,
     printf("issued ifnum %d cmd %d resid 0x%X (resource %d) payload %d\n",
       c1.ifnum, c1.cmd, c1.resid, o.res_in_if, c1.payload_size);
   }
+
+  return fail;
 }
 
 select drive_user_task(struct command &c2, const struct command &c1, chanend d[2], int read_cmd)
@@ -131,6 +137,9 @@ void test_client(client interface control i[2], chanend c_user_task[2])
   timer tmr;
   int t, j;
   uint8_t *unsafe payload_ptr;
+  int fails;
+  control_res_t res;
+  chan d;
 
   for (j = 0; j < 8; j++) {
     c1.payload[j] = j;
@@ -146,6 +155,8 @@ void test_client(client interface control i[2], chanend c_user_task[2])
       }
     }
   }
+
+  fails = 0;
 
   for (c1.ifnum = 0; c1.ifnum < 3; c1.ifnum++) {
     for (o.read_cmd = 0; o.read_cmd < 2; o.read_cmd++) {
@@ -170,10 +181,10 @@ void test_client(client interface control i[2], chanend c_user_task[2])
               timeout = 0;
               par {
                 { if (o.read_cmd)
-                    control_process_usb_get_request(windex, wvalue, wlength,
+                    d <: control_process_usb_get_request(windex, wvalue, wlength,
                       (uint8_t*)payload_ptr, i, 2);
                   else
-                    control_process_usb_set_request(windex, wvalue, wlength,
+                    d <: control_process_usb_set_request(windex, wvalue, wlength,
                       (uint8_t*)payload_ptr, i, 2);
                 }
                 { select {
@@ -182,7 +193,8 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                       timeout = 1;
                       break;
                   }
-                  check(o, c1, c2, timeout);
+                  d :> res;
+                  fails += check(o, c1, c2, timeout, res);
                 }
               }
             }
@@ -192,8 +204,13 @@ void test_client(client interface control i[2], chanend c_user_task[2])
     }
   }
 
-  printf("Success!\n");
-  exit(0);
+  if (fails == 0) {
+    printf("Success!\n");
+    exit(0);
+  }
+  else {
+    exit(1);
+  }
 }
 
 int main(void)
