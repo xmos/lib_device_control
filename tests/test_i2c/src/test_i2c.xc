@@ -50,7 +50,7 @@ void make_command(struct command &c, const struct options &o)
 
 int check(const struct options &o,
           const struct command &c1, const struct command &c2,
-          int timeout, control_res_t res)
+          int timeout, control_ret_t ret)
 {
   int timeout_expected;
   int fail;
@@ -82,8 +82,8 @@ int check(const struct options &o,
           fail = 1;
         }
       }
-      if (res != CONTROL_SUCCESS) {
-        printf("processing function returned %d\n", res);
+      if (ret != CONTROL_SUCCESS) {
+        printf("processing function returned %d\n", ret);
         fail = 1;
       }
     }
@@ -177,30 +177,30 @@ void test_client(client interface control i[2], chanend c_user_task[2])
               tmr :> t;
               timeout = 0;
               par {
-                { control_res_t res;
-                  res = CONTROL_SUCCESS;
-                  res |= control_process_i2c_write_start(i, 2);
+                { control_ret_t ret;
+                  ret = CONTROL_SUCCESS;
+                  ret |= control_process_i2c_write_start(i, 2);
                   for (j = 0; j < buf_len; j++) {
-                    res |= control_process_i2c_write_data(buf[j], i, 2);
+                    ret |= control_process_i2c_write_data(buf[j], i, 2);
                   }
                   if (o.read_cmd && payload_size > 0) {
-                    res |= control_process_i2c_read_start(i, 2);
+                    ret |= control_process_i2c_read_start(i, 2);
                     for (j = 0; j < payload_size; j++) {
-                      res |= control_process_i2c_read_data(payload_ptr[j], i, 2);
+                      ret |= control_process_i2c_read_data(payload_ptr[j], i, 2);
                     }
                   }
-                  res |= control_process_i2c_stop(i, 2);
-                  d <: res;
+                  ret |= control_process_i2c_stop(i, 2);
+                  d <: ret;
                 }
-                { control_res_t res;
+                { control_ret_t ret;
                   select {
                     case drive_user_task(c2, c1, c_user_task, o.read_cmd);
                     case tmr when timerafter(t + 50000) :> void:
                       timeout = 1;
                       break;
                   }
-                  d :> res;
-                  fails += check(o, c1, c2, timeout, res);
+                  d :> ret;
+                  fails += check(o, c1, c2, timeout, ret);
                 }
               }
             }

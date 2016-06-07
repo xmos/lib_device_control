@@ -50,7 +50,7 @@ void make_command(struct command &c, const struct options &o)
 
 int check(const struct options &o,
           const struct command &c1, const struct command &c2,
-          int timeout, control_res_t res)
+          int timeout, control_ret_t ret)
 {
   int timeout_expected;
   int fail;
@@ -82,8 +82,8 @@ int check(const struct options &o,
           fail = 1;
         }
       }
-      if (res != CONTROL_SUCCESS) {
-        printf("processing function returned %d\n", res);
+      if (ret != CONTROL_SUCCESS) {
+        printf("processing function returned %d\n", ret);
         fail = 1;
       }
     }
@@ -140,7 +140,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
   int t, j;
   uint32_t *unsafe buf_ptr;
   int fails;
-  control_res_t res;
+  control_ret_t ret;
   chan d;
 
   memset(buf, 0, XSCOPE_UPLOAD_MAX_WORDS);
@@ -200,8 +200,8 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                     }
                   }
 
-                  d :> res;
-                  fails += check(o, c1, c2, timeout, res);
+                  d :> ret;
+                  fails += check(o, c1, c2, timeout, ret);
                 }
               }
             }

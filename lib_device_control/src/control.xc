@@ -43,7 +43,7 @@ static struct {
   unsigned data_len_transmitted;
 } i2c = { I2C_IDLE, 0, 0, 0, 0 };
 
-control_res_t
+control_ret_t
 control_process_i2c_write_start(client interface control i[n], unsigned n)
 {
   // always start a new command
@@ -52,7 +52,7 @@ control_process_i2c_write_start(client interface control i[n], unsigned n)
   return CONTROL_SUCCESS;
 }
 
-control_res_t
+control_ret_t
 control_process_i2c_write_data(const uint8_t data,
                                client interface control i[n], unsigned n)
 {
@@ -121,10 +121,10 @@ control_process_i2c_write_data(const uint8_t data,
   }
 }
 
-control_res_t
+control_ret_t
 control_process_i2c_read_start(client interface control i[n], unsigned n)
 {
-  control_res_t res;
+  control_ret_t ret;
 
   if (i2c.state != I2C_WRITE_SIZE) {
     debug_printf("i2c: unexpected read transaction, needs to follow a correctly formed write\n");
@@ -137,15 +137,15 @@ control_process_i2c_read_start(client interface control i[n], unsigned n)
       debug_printf("i2c: %d read_command(%d, %d, %d)\n",
         i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_len_from_header);
 
-      res = i[i2c.ifnum].read_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_from_header);
+      ret = i[i2c.ifnum].read_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_from_header);
 
-      if (res == CONTROL_SUCCESS) {
+      if (ret == CONTROL_SUCCESS) {
         i2c.data_len_transmitted = 0;
         i2c.state = I2C_READ_START;
         return CONTROL_SUCCESS;
       }
       else {
-        return res;
+        return ret;
       }
     }
     else {
@@ -156,7 +156,7 @@ control_process_i2c_read_start(client interface control i[n], unsigned n)
   }
 }
 
-control_res_t
+control_ret_t
 control_process_i2c_read_data(uint8_t &data,
                               client interface control i[n], unsigned n)
 {
@@ -184,30 +184,30 @@ control_process_i2c_read_data(uint8_t &data,
   }
 }
 
-control_res_t
+control_ret_t
 control_process_i2c_stop(client interface control i[n], unsigned n)
 {
-  control_res_t res;
+  control_ret_t ret;
   int do_write;
 
-  res = CONTROL_SUCCESS;
+  ret = CONTROL_SUCCESS;
   do_write = 0;
 
   if (i2c.state == I2C_WRITE_SIZE) {
     if (i2c.data_len_from_header != 0) {
       debug_printf("i2c: no data written for a command with data length %d\n", i2c.data_len_from_header);
-      res = CONTROL_DATA_LENGTH_ERROR;
+      ret = CONTROL_DATA_LENGTH_ERROR;
     }
     else {
       do_write = 1;
-      res = CONTROL_SUCCESS;
+      ret = CONTROL_SUCCESS;
     }
   }
   else if (i2c.state == I2C_WRITE_DATA) {
     if (i2c.data_len_transmitted < i2c.data_len_from_header) {
       debug_printf("i2c: incomplete write command, %d expected, %d actual\n",
         i2c.data_len_from_header, i2c.data_len_transmitted);
-      res = CONTROL_DATA_LENGTH_ERROR;
+      ret = CONTROL_DATA_LENGTH_ERROR;
     }
     do_write = 1;
   }
@@ -217,13 +217,13 @@ control_process_i2c_stop(client interface control i[n], unsigned n)
   }
   else if (i2c.state == I2C_READ_START) {
     debug_printf("i2c: read command ended with no data transaction\n");
-    res = CONTROL_OTHER_TRANSPORT_ERROR;
+    ret = CONTROL_OTHER_TRANSPORT_ERROR;
   }
   else if (i2c.state == I2C_READ_DATA) {
     if (i2c.data_len_transmitted < i2c.data_len_from_header) {
       debug_printf("i2c: incompleted read command, %d expected, %d actual\n",
         i2c.data_len_from_header, i2c.data_len_transmitted);
-      res = CONTROL_DATA_LENGTH_ERROR;
+      ret = CONTROL_DATA_LENGTH_ERROR;
     }
   }
   else if (i2c.state == I2C_READ_OVERFLOW) {
@@ -239,16 +239,16 @@ control_process_i2c_stop(client interface control i[n], unsigned n)
     debug_printf("i2c: %d write_command(%d, %d, %d)\n",
       i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_len_transmitted);
 
-    res = i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_transmitted);
+    ret = i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_transmitted);
   }
 
   // always transition to idle after a stop bit
   i2c.state = I2C_IDLE;
 
-  return res;
+  return ret;
 }
 
-control_res_t
+control_ret_t
 control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 const uint8_t request_data[],
                                 client interface control i[n], unsigned n)
@@ -278,7 +278,7 @@ control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
   return i[ifnum].write_command(resid, cmd, request_data, num_data_bytes);
 }
 
-control_res_t
+control_ret_t
 control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 uint8_t request_data[],
                                 client interface control i[n], unsigned n)
@@ -308,7 +308,7 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
   return i[ifnum].read_command(resid, cmd, request_data, num_data_bytes);
 }
 
-control_res_t
+control_ret_t
 control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
                               unsigned length_in, unsigned &length_out,
                               client interface control i[n], unsigned n)

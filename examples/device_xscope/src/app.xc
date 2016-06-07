@@ -23,7 +23,7 @@ void app(server interface control i_control)
         break;
 
       case i_control.write_command(control_resid_t r, control_cmd_t c,
-                                   const uint8_t data[n], unsigned n) -> control_res_t res:
+                                   const uint8_t data[n], unsigned n) -> control_ret_t ret:
         printf("%u: W %d %d %d,", num_commands, r, c, n);
         for (i = 0; i < n; i++) {
           printf(" %02x", data[i]);
@@ -31,24 +31,24 @@ void app(server interface control i_control)
         printf("\n");
         if (r != RESOURCE_ID) {
           printf("unrecognised resource ID %d\n", r);
-          res = CONTROL_ERROR;
+          ret = CONTROL_ERROR;
           break;
         }
         num_commands++;
-        res = CONTROL_SUCCESS;
+        ret = CONTROL_SUCCESS;
         break;
 
       case i_control.read_command(control_resid_t r, control_cmd_t c,
-                                  uint8_t data[n], unsigned n) -> control_res_t res:
+                                  uint8_t data[n], unsigned n) -> control_ret_t ret:
         printf("%u: R %d %d %d\n", num_commands, r, c, n);
         if (r != RESOURCE_ID) {
           printf("unrecognised resource ID %d\n", r);
-          res = CONTROL_ERROR;
+          ret = CONTROL_ERROR;
           break;
         }
         if (n != 4) {
           printf("expecting 4 read bytes, not %d\n", n);
-          res = CONTROL_ERROR;
+          ret = CONTROL_ERROR;
           break;
         }
         data[0] = 0x12;
@@ -56,7 +56,7 @@ void app(server interface control i_control)
         data[2] = 0x56;
         data[3] = 0x78;
         num_commands++;
-        res = CONTROL_SUCCESS;
+        ret = CONTROL_SUCCESS;
         break;
     }
   }

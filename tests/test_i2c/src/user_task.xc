@@ -22,18 +22,18 @@ void user_task(server interface control i, chanend c)
         break;
 
       case i.write_command(control_resid_t resid, control_cmd_t cmd,
-                           const uint8_t data[n], unsigned n) -> control_res_t res:
+                           const uint8_t data[n], unsigned n) -> control_ret_t ret:
         c <: cmd;
         c <: resid;
         c <: n;
         for (j = 0; j < n; j++) {
           c <: data[j];
         }
-        res = CONTROL_SUCCESS;
+        ret = CONTROL_SUCCESS;
         break;
 
       case i.read_command(control_resid_t resid, control_cmd_t cmd,
-                          uint8_t data[n], unsigned n) -> control_res_t res:
+                          uint8_t data[n], unsigned n) -> control_ret_t ret:
         c <: cmd;
         c <: resid;
         c <: n;
@@ -42,7 +42,7 @@ void user_task(server interface control i, chanend c)
           c :> x;
           data[j] = x;
         }
-        res = CONTROL_SUCCESS;
+        ret = CONTROL_SUCCESS;
         break;
     }
   }
