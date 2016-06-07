@@ -8,5 +8,7 @@ Device control library change log
 
   * Changes to dependencies:
 
+    - lib_logging: Added dependency 2.0.1
+
     - lib_xassert: Added dependency 2.0.1
 

@@ -8,3 +8,4 @@ run_xdoc.log
 test_results.csv
 _build
 README.pdf
+doc/README/README.rst
