@@ -11,6 +11,9 @@
 #define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * sizeof(uint32_t))
 #define XSCOPE_DATA_MAX_BYTES (XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES)
 
+#define I2C_TRANSACTION_MAX_BYTES 256
+#define I2C_DATA_MAX_BYTES (I2C_TRANSACTION_MAX_BYTES - 3)
+
 struct control_xscope_packet {
 #define XSCOPE_HEADER_BYTES 4
   struct control_xscope_header {
@@ -20,12 +23,6 @@ struct control_xscope_packet {
     uint8_t pad;
   } header;
   uint8_t data[XSCOPE_DATA_MAX_BYTES];
-};
-
-#define I2C_SPECIAL_REGISTER 0
-
-enum control_i2c_special {
-  I2C_START_COMMAND
 };
 
 #endif // __control_transport_h_

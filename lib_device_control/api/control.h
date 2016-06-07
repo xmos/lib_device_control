@@ -18,8 +18,6 @@ typedef enum {
 #define XSCOPE_UPLOAD_MAX_WORDS 64
 #define XSCOPE_CONTROL_PROBE "Control Probe"
 
-#define I2C_MAX_BYTES 256
-
 #ifdef __XC__
 
 typedef interface control {
@@ -33,11 +31,22 @@ typedef interface control {
 
 void control_init(client interface control i[n], unsigned n);
 
-void control_process_i2c_write_transaction(uint8_t reg, uint8_t val,
-                                          client interface control i[n], unsigned n);
+control_res_t
+control_process_i2c_write_start(client interface control i[n], unsigned n);
 
-void control_process_i2c_read_transaction(uint8_t reg, uint8_t &val,
-                                         client interface control i[n], unsigned n);
+control_res_t
+control_process_i2c_read_start(client interface control i[n], unsigned n);
+
+control_res_t
+control_process_i2c_write_data(const uint8_t data,
+                               client interface control i[n], unsigned n);
+
+control_res_t
+control_process_i2c_read_data(uint8_t &data,
+                              client interface control i[n], unsigned n);
+
+control_res_t
+control_process_i2c_stop(client interface control i[n], unsigned n);
 
 void control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                      const uint8_t request_data[],

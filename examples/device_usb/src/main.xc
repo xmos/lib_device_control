@@ -37,7 +37,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
         case USB_BMREQ_H2D_VENDOR_DEV:
           res = XUD_GetBuffer(ep0_out, request_data, len);
           if (res == XUD_RES_OKAY) {
-            control_process_usb_ep0_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
+            control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
             res = XUD_DoSetRequestStatus(ep0_in);
           }
           break;
@@ -46,7 +46,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
           /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          control_process_usb_ep0_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
+          control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
           len = sp.wLength;
           res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
           break;

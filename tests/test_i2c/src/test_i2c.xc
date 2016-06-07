@@ -124,15 +124,14 @@ select drive_user_task(struct command &c2, struct command &c1, chanend d[2], int
 
 void test_client(client interface control i[2], chanend c_user_task[2])
 {
-  struct i2c_transaction seq[I2C_SEQUENCE_LENGTH];
-  size_t num;
+  uint8_t buf[I2C_TRANSACTION_MAX_BYTES];
+  size_t buf_len;
   struct command c1, c2;
   struct options o;
   int timeout;
   timer tmr;
   int t, j;
   uint8_t *unsafe payload_ptr;
-  uint8_t reg;
   unsigned payload_size;
   chan d;
 
@@ -158,36 +157,28 @@ void test_client(client interface control i[2], chanend c_user_task[2])
           for (o.with_payload = 0; o.with_payload < 2; o.with_payload++) {
             make_command(c1, o);
 
-            num = control_build_i2c_transaction_sequence(seq, c1.resid, c1.cmd, c1.payload_size);
+            buf_len = control_build_i2c_data(buf, c1.resid, c1.cmd, c1.payload, c1.payload_size);
 
             /* make a sequence of processing calls, catch the result and record it */
             unsafe {
-              reg = c1.resid;
-
               payload_size = c1.payload_size;
               if (o.read_cmd)
                 payload_ptr = c2.payload;
-              else
-                payload_ptr = c1.payload;
 
               tmr :> t;
               timeout = 0;
               par {
-                { for (j = 0; j < num; j++) {
-                    control_process_i2c_write_transaction(seq[j].reg, seq[j].val, i, 2);
+                { control_process_i2c_write_start(i, 2);
+                  for (j = 0; j < buf_len; j++) {
+                    control_process_i2c_write_data(buf[j], i, 2);
                   }
                   if (o.read_cmd) {
+                    control_process_i2c_read_start(i, 2);
                     for (j = 0; j < payload_size; j++) {
-                      uint8_t x;
-                      control_process_i2c_read_transaction(reg, x, i, 2);
-                      payload_ptr[j] = x;
+                      control_process_i2c_read_data(payload_ptr[j], i, 2);
                     }
                   }
-                  else {
-                    for (j = 0; j < payload_size; j++) {
-                      control_process_i2c_write_transaction(reg, payload_ptr[j], i, 2);
-                    }
-                  }
+                  control_process_i2c_stop(i, 2);
                   d <: 0;
                 }
                 { select {

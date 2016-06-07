@@ -2,6 +2,6 @@
 #ifndef __debug_conf_h__
 #define __debug_conf_h__
 
-#define DEBUG_PRINT_ENABLE 1
+#define DEBUG_PRINT_ENABLE_ALL 0
 
 #endif // __debug_conf_h__

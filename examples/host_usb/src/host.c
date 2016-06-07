@@ -31,8 +31,8 @@ void do_write_command(void)
   unsigned char payload[1];
 
   payload[0] = 1;
-  control_usb_ep0_fill_header(&windex, &wvalue, &wlength,
-    RESOURCE_ID_HASH, CONTROL_CMD_SET_WRITE(0), sizeof(payload));
+  control_usb_fill_header(&windex, &wvalue, &wlength,
+    RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), sizeof(payload));
 
   printf("%u: send write command: 0x%04x 0x%04x 0x%04x ",
     num_commands, windex, wvalue, wlength);
@@ -60,8 +60,8 @@ void do_read_command(void)
   uint16_t windex, wvalue, wlength;
   unsigned char payload[4];
 
-  control_usb_ep0_fill_header(&windex, &wvalue, &wlength,
-    RESOURCE_ID_HASH, CONTROL_CMD_SET_READ(0), sizeof(payload));
+  control_usb_fill_header(&windex, &wvalue, &wlength,
+    RESOURCE_ID, CONTROL_CMD_SET_READ(0), sizeof(payload));
 
   printf("%u: send read command: 0x%04x 0x%04x 0x%04x\n",
     num_commands, windex, wvalue, wlength);

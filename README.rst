@@ -78,6 +78,16 @@ their resources::
 
 For compatibility, a special command is provided to query version of control interface.
 
+References
+..........
+
+I2C
+***
+
+   * https://developer.mbed.org/users/okano/notebook/i2c-access-examples
+   * http://www.robot-electronics.co.uk/i2c-tutorial
+   * https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=15840&start=25
+
 Software version and dependencies
 .................................
 
