@@ -52,7 +52,7 @@ static inline size_t control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYT
                                             control_resid_t resid, control_cmd_t cmd,
                                             const uint8_t payload[], unsigned payload_size)
 {
-  int i;
+  unsigned i;
 
   data[0] = resid;
   data[1] = cmd;
