@@ -77,7 +77,7 @@ void record_callback(unsigned int id, unsigned long long timestamp,
     p = (struct control_xscope_packet*)databytes;
     /* no parsing, just print raw bytes */
 
-    printf("read data returned: ");
+    printf("response: ");
     print_bytes(databytes, length);
 
     record_count++;
@@ -135,18 +135,23 @@ void do_write_command(void)
     printf("xscope_ep_request_upload failed\n");
   }
 
+  /* wait for response on xSCOPE probe */
+  while (record_count == 0) {
+    pause_short();
+  }
+
   num_commands++;
 }
 
 void do_read_command(void)
 {
-  struct control_xscope_header h;
+  struct control_xscope_packet p;
   unsigned *b;
   size_t len;
 
-  memset(&h, 0, sizeof(struct control_xscope_header));
+  memset(&p, 0, sizeof(struct control_xscope_packet));
 
-  b = (unsigned*)&h;
+  b = (unsigned*)&p;
   len = control_xscope_create_upload_buffer(b,
     CONTROL_CMD_SET_READ(0), RESOURCE_ID, NULL, 4);
 

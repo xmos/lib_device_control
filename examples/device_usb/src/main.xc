@@ -18,6 +18,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   XUD_BusSpeed_t bus_speed;
   XUD_ep ep0_out, ep0_in;
   unsigned char request_data[EP0_MAX_PACKET_SIZE];
+  int handled;
   size_t len;
 
   ep0_out = XUD_InitEp(c_ep0_out, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
@@ -27,18 +28,23 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
 
   while (1) {
     res = USB_GetSetupPacket(ep0_out, ep0_in, sp);
+    handled = 0;
 
     if (res == XUD_RES_OKAY) {
-      /* set result to ERR, we expect it to get set to OKAY if a request is handled */
-      res = XUD_RES_ERR;
-
       switch ((sp.bmRequestType.Direction << 7) | (sp.bmRequestType.Type << 5) | (sp.bmRequestType.Recipient)) {
 
         case USB_BMREQ_H2D_VENDOR_DEV:
+          handled = 1;
           res = XUD_GetBuffer(ep0_out, request_data, len);
           if (res == XUD_RES_OKAY) {
-            control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
-            res = XUD_DoSetRequestStatus(ep0_in);
+            if (control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1) == CONTROL_SUCCESS) {
+              /* indicate success (zero length data) */
+              res = XUD_DoSetRequestStatus(ep0_in);
+            }
+            else {
+              /* indicate NAK */
+              res = XUD_RES_ERR;
+            }
           }
           break;
 
@@ -46,14 +52,20 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
           /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1);
-          len = sp.wLength;
-          res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
+          handled = 1;
+          if (control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1) == CONTROL_SUCCESS) {
+            len = sp.wLength;
+            res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
+          }
+          else {
+            /* indicate NAK */
+            res = XUD_RES_ERR;
+          }
           break;
       }
     }
 
-    if (res == XUD_RES_ERR) {
+    if (!handled) {
       /* if we haven't handled the request about then do standard enumeration requests */
       unsafe {
         res = USB_StandardRequests(ep0_out, ep0_in, devDesc,

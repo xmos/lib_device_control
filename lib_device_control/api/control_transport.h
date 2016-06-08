@@ -14,14 +14,21 @@
 #define I2C_TRANSACTION_MAX_BYTES 256
 #define I2C_DATA_MAX_BYTES (I2C_TRANSACTION_MAX_BYTES - 3)
 
-struct control_xscope_packet {
 #define XSCOPE_HEADER_BYTES 4
-  struct control_xscope_header {
-    control_resid_t resid;
-    control_cmd_t cmd;
-    uint8_t data_nbytes;
-    uint8_t pad;
-  } header;
+
+struct control_xscope_packet {
+  control_resid_t resid;
+  control_cmd_t cmd;
+  uint8_t data_nbytes;
+  uint8_t pad;
+  uint8_t data[XSCOPE_DATA_MAX_BYTES];
+};
+
+struct control_xscope_response {
+  control_resid_t resid;
+  control_cmd_t cmd;
+  uint8_t data_nbytes;
+  control_ret_t ret;
   uint8_t data[XSCOPE_DATA_MAX_BYTES];
 };
 

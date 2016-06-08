@@ -8,13 +8,14 @@
 typedef uint8_t control_resid_t;
 typedef uint8_t control_cmd_t;
 
-typedef enum {
+typedef uint8_t control_ret_t;
+enum {  // force short enum
   CONTROL_SUCCESS = 0,
   CONTROL_ERROR,
   CONTROL_BAD_COMMAND,
   CONTROL_DATA_LENGTH_ERROR,
   CONTROL_OTHER_TRANSPORT_ERROR
-} control_ret_t;
+};
 
 #define MAX_RESOURCES_PER_INTERFACE 64
 #define MAX_RESOURCES 256

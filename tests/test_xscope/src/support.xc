@@ -25,7 +25,8 @@ void make_command(struct command &c, const struct options &o)
 
 int check(const struct options &o,
           const struct command &c1, const struct command &c2,
-          int timeout, control_ret_t ret)
+          int timeout, control_ret_t ret1, control_ret_t ret2,
+	  int response_length)
 {
   int timeout_expected;
   int fail;
@@ -57,9 +58,35 @@ int check(const struct options &o,
           fail = 1;
         }
       }
-      if (ret != CONTROL_SUCCESS) {
-        printf("processing function returned %d\n", ret);
+      if (ret1 != CONTROL_SUCCESS) {
+        printf("response contained return code %d\n", ret1);
         fail = 1;
+      }
+      if (ret2 != CONTROL_SUCCESS) {
+        printf("processing function returned %d\n", ret2);
+        fail = 1;
+      }
+      if (ret1 != ret2) {
+        printf("mismatching return codes - processing function %d, response %d\n",
+	  ret2, ret1);
+
+	fail = 1;
+      }
+      if (o.read_cmd && ret1 == CONTROL_SUCCESS) {
+        if (response_length != XSCOPE_HEADER_BYTES + c2.payload_size) {
+          printf("wrong response length %d, expected %d\n",
+            response_length, XSCOPE_HEADER_BYTES + c2.payload_size);
+
+          fail = 1;
+        }
+      }
+      else {
+        if (response_length != XSCOPE_HEADER_BYTES) {
+          printf("wrong response length %d, expected %d\n",
+            response_length, XSCOPE_HEADER_BYTES);
+
+          fail = 1;
+        }
       }
     }
   }

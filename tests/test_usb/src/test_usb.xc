@@ -73,7 +73,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                 }
                 { select {
                     case drive_user_task(c2, c1, c_user_task, o.read_cmd);
-                    case tmr when timerafter(t + 3000) :> void:
+                    case tmr when timerafter(t + 500) :> void:
                       timeout = 1;
                       break;
                   }

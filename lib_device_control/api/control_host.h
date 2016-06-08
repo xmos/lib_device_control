@@ -10,36 +10,36 @@
 #include "control.h"
 #include "control_transport.h"
 
-static inline size_t control_xscope_create_upload_buffer(
-  uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
-  control_cmd_t cmd, control_resid_t resid,
-  const uint8_t *data, unsigned n)
+static inline size_t
+control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
+                                    control_cmd_t cmd, control_resid_t resid,
+                                    const uint8_t *data, unsigned n)
 {
+  struct control_xscope_packet *p;
+
+  p = (struct control_xscope_packet*)buffer;
+
   if (IS_CONTROL_CMD_READ(cmd)) {
-    struct control_xscope_header *h;
-    h = (struct control_xscope_header*)buffer;
-    h->resid = resid;
-    h->cmd = cmd;
-    h->data_nbytes = n;
-    return sizeof(struct control_xscope_header);
+    p->resid = resid;
+    p->cmd = cmd;
+    p->data_nbytes = n;
+    return XSCOPE_HEADER_BYTES;
   }
   else {
-    struct control_xscope_packet *p;
-    p = (struct control_xscope_packet*)buffer;
-    p->header.resid = resid;
-    p->header.cmd = cmd;
-    p->header.data_nbytes = n;
+    p->resid = resid;
+    p->cmd = cmd;
+    p->data_nbytes = n;
     if (data != NULL) {
       assert((n <= XSCOPE_DATA_MAX_BYTES) && "exceeded maximum xSCOPE payload size");
       memcpy(p->data, data, n);
     }
-    return sizeof(struct control_xscope_header) + n;
+    return XSCOPE_HEADER_BYTES + n;
   }
 }
 
-static inline void control_usb_fill_header(
-  uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
-  control_resid_t resid, control_cmd_t cmd, unsigned num_data_bytes)
+static inline void
+control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
+                        control_resid_t resid, control_cmd_t cmd, unsigned num_data_bytes)
 {
   *windex = resid;
   *wvalue = cmd;
@@ -48,9 +48,10 @@ static inline void control_usb_fill_header(
   *wlength = (uint16_t)num_data_bytes;
 }
 
-static inline size_t control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
-                                            control_resid_t resid, control_cmd_t cmd,
-                                            const uint8_t payload[], unsigned payload_size)
+static inline size_t
+control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
+                       control_resid_t resid, control_cmd_t cmd,
+                       const uint8_t payload[], unsigned payload_size)
 {
   int i;
 

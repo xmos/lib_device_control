@@ -24,7 +24,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
   int t, j;
   uint32_t *unsafe buf_ptr;
   int fails;
-  control_ret_t ret;
+  control_ret_t ret1, ret2;
   chan d;
 
   memset(buf, 0, XSCOPE_UPLOAD_MAX_WORDS);
@@ -72,7 +72,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                 d <: control_process_xscope_upload((uint32_t*)buf_ptr, lenin, lenout, i, 2);
                 { select {
                     case drive_user_task(c2, c1, c_user_task, o.read_cmd);
-                    case tmr when timerafter(t + 5000) :> void:
+                    case tmr when timerafter(t + 500) :> void:
                       timeout = 1;
                       break;
                   }
@@ -80,12 +80,17 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                   /* retrieve received payload for a read command */
                   if (!timeout && IS_CONTROL_CMD_READ(c2.cmd)) {
                     for (j = 0; j < c2.payload_size; j++) {
-                      c2.payload[j] = ((struct control_xscope_packet*)buf)->data[j];
+                      c2.payload[j] = ((struct control_xscope_response*)buf)->data[j];
                     }
                   }
 
-                  d :> ret;
-                  fails += check(o, c1, c2, timeout, ret);
+                  /* retrieve return code from processing call and as
+                   * embedded in the xSCOPE response
+                   */
+                  ret1 = ((struct control_xscope_response*)buf)->ret;
+                  d :> ret2;
+
+                  fails += check(o, c1, c2, timeout, ret1, ret2, lenout);
                 }
               }
             }
