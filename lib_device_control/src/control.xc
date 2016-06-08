@@ -83,7 +83,15 @@ control_process_i2c_write_data(const uint8_t data,
       i2c.data_len_from_header = data;
       i2c.data_len_transmitted = 0;
       i2c.state = I2C_WRITE_SIZE;
-      return CONTROL_SUCCESS;
+      if (i2c.data_len_from_header == 0) {
+        debug_printf("i2c: %d write_command(%d, %d, %d)\n",
+          i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_len_transmitted);
+
+        return i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_transmitted);
+      }
+      else {
+        return CONTROL_SUCCESS;
+      }
     }
   }
   else if (i2c.state == I2C_WRITE_SIZE) {
@@ -96,7 +104,15 @@ control_process_i2c_write_data(const uint8_t data,
       i2c.data[0] = data;
       i2c.data_len_transmitted = 1;
       i2c.state = I2C_WRITE_DATA;
-      return CONTROL_SUCCESS;
+      if (i2c.data_len_from_header == 1) {
+        debug_printf("i2c: %d write_command(%d, %d, %d)\n",
+          i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_len_transmitted);
+
+        return i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_transmitted);
+      }
+      else {
+        return CONTROL_SUCCESS;
+      }
     }
   }
   else if (i2c.state == I2C_WRITE_DATA) {
@@ -109,7 +125,15 @@ control_process_i2c_write_data(const uint8_t data,
     else {
       i2c.data[i2c.data_len_transmitted] = data;
       i2c.data_len_transmitted++;
-      return CONTROL_SUCCESS;
+      if (i2c.data_len_transmitted == i2c.data_len_from_header) {
+        debug_printf("i2c: %d write_command(%d, %d, %d)\n",
+          i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_len_transmitted);
+
+        return i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_transmitted);
+      }
+      else {
+        return CONTROL_SUCCESS;
+      }
     }
   }
   else if (i2c.state == I2C_WRITE_OVERFLOW) {
@@ -188,10 +212,8 @@ control_ret_t
 control_process_i2c_stop(client interface control i[n], unsigned n)
 {
   control_ret_t ret;
-  int do_write;
 
   ret = CONTROL_SUCCESS;
-  do_write = 0;
 
   if (i2c.state == I2C_WRITE_SIZE) {
     if (i2c.data_len_from_header != 0) {
@@ -199,7 +221,6 @@ control_process_i2c_stop(client interface control i[n], unsigned n)
       ret = CONTROL_DATA_LENGTH_ERROR;
     }
     else {
-      do_write = 1;
       ret = CONTROL_SUCCESS;
     }
   }
@@ -209,11 +230,9 @@ control_process_i2c_stop(client interface control i[n], unsigned n)
         i2c.data_len_from_header, i2c.data_len_transmitted);
       ret = CONTROL_DATA_LENGTH_ERROR;
     }
-    do_write = 1;
   }
   else if (i2c.state == I2C_WRITE_OVERFLOW) {
     debug_printf("i2c: write command with overflow\n");
-    do_write = 1;
   }
   else if (i2c.state == I2C_READ_START) {
     debug_printf("i2c: read command ended with no data transaction\n");
@@ -233,13 +252,6 @@ control_process_i2c_stop(client interface control i[n], unsigned n)
     i2c.state = I2C_IDLE;
     debug_printf("i2c: unexpected stop bit\n");
     return CONTROL_OTHER_TRANSPORT_ERROR;
-  }
-
-  if (do_write) {
-    debug_printf("i2c: %d write_command(%d, %d, %d)\n",
-      i2c.ifnum, i2c.resid, i2c.cmd, i2c.data_len_transmitted);
-
-    ret = i[i2c.ifnum].write_command(i2c.resid, i2c.cmd, i2c.data, i2c.data_len_transmitted);
   }
 
   // always transition to idle after a stop bit

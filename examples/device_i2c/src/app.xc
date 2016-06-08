@@ -11,6 +11,9 @@ void app(server interface control i_control)
   int i;
 
   printf("started\n");
+#ifdef ERRONEOUS_DEVICE
+  printf("generate errors\n");
+#endif
 
   num_commands = 0;
 
@@ -24,6 +27,11 @@ void app(server interface control i_control)
 
       case i_control.write_command(control_resid_t r, control_cmd_t c,
                                    const uint8_t data[n], unsigned n) -> control_ret_t ret:
+        num_commands++;
+#ifdef ERRONEOUS_DEVICE
+        if ((num_commands % 3) == 0)
+          r += 1;
+#endif
         printf("%u: W %d %d %d,", num_commands, r, c, n);
         for (i = 0; i < n; i++) {
           printf(" %02x", data[i]);
@@ -34,12 +42,16 @@ void app(server interface control i_control)
           ret = CONTROL_ERROR;
           break;
         }
-        num_commands++;
         ret = CONTROL_SUCCESS;
         break;
 
       case i_control.read_command(control_resid_t r, control_cmd_t c,
                                   uint8_t data[n], unsigned n) -> control_ret_t ret:
+        num_commands++;
+#ifdef ERRONEOUS_DEVICE
+        if ((num_commands % 3) == 0)
+          r += 1;
+#endif
         printf("%u: R %d %d %d\n", num_commands, r, c, n);
         if (r != RESOURCE_ID) {
           printf("unrecognised resource ID %d\n", r);
@@ -55,7 +67,6 @@ void app(server interface control i_control)
         data[1] = 0x34;
         data[2] = 0x56;
         data[3] = 0x78;
-        num_commands++;
         ret = CONTROL_SUCCESS;
         break;
     }

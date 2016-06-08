@@ -45,8 +45,12 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
         break;
 
       case i_i2c.master_sent_data(uint8_t data) -> i2c_slave_ack_t resp:
-        control_process_i2c_write_data(data, i_control, 1);
-        resp = I2C_SLAVE_ACK;
+        if (control_process_i2c_write_data(data, i_control, 1) == CONTROL_SUCCESS)
+          resp = I2C_SLAVE_ACK;
+        else {
+          printf("write data NAK\n");
+          resp = I2C_SLAVE_NACK;
+        }
         break;
 
       case i_i2c.master_requires_data(void) -> uint8_t data:

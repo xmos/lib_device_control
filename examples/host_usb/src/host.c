@@ -79,9 +79,10 @@ void do_read_command(void)
   if (ret != sizeof(payload)) {
     printf("libusb_control_transfer returned %d\n", ret);
   }
-
-  printf("read data returned: ");
-  print_bytes(payload, sizeof(payload));
+  else {
+    printf("read data returned: ");
+    print_bytes(payload, sizeof(payload));
+  }
 
   num_commands++;
 }

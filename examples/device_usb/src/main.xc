@@ -34,7 +34,6 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
       switch ((sp.bmRequestType.Direction << 7) | (sp.bmRequestType.Type << 5) | (sp.bmRequestType.Recipient)) {
 
         case USB_BMREQ_H2D_VENDOR_DEV:
-          handled = 1;
           res = XUD_GetBuffer(ep0_out, request_data, len);
           if (res == XUD_RES_OKAY) {
             if (control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1) == CONTROL_SUCCESS) {
@@ -46,13 +45,13 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
               res = XUD_RES_ERR;
             }
           }
+          handled = 1;
           break;
 
         case USB_BMREQ_D2H_VENDOR_DEV:
           /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          handled = 1;
           if (control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1) == CONTROL_SUCCESS) {
             len = sp.wLength;
             res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
@@ -61,6 +60,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
             /* indicate NAK */
             res = XUD_RES_ERR;
           }
+          handled = 1;
           break;
       }
     }
