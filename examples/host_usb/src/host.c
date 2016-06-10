@@ -25,6 +25,39 @@ static libusb_device_handle *devh = NULL;
 
 static const int sync_timeout_ms = 100;
 
+void do_version_command(void)
+{
+  uint16_t windex, wvalue, wlength;
+  control_version_t version;
+  uint8_t data[8];
+
+  control_usb_fill_header(&windex, &wvalue, &wlength,
+    CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
+
+  printf("%u: send version command: 0x%04x 0x%04x 0x%04x\n",
+    num_commands, windex, wvalue, wlength);
+
+#ifdef _WIN32
+  int ret = usb_control_msg(devh,
+    USB_ENDPOINT_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+    0, wvalue, windex, (char*)data, wlength, sync_timeout_ms);
+#else
+  int ret = libusb_control_transfer(devh,
+    LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
+    0, wvalue, windex, data, wlength, sync_timeout_ms);
+#endif
+
+  if (ret != sizeof(control_version_t)) {
+    printf("libusb_control_transfer returned %d\n", ret);
+  }
+  else {
+    memcpy(&version, data, sizeof(control_version_t));
+    printf("version returned: 0x%X\n", version);
+  }
+
+  num_commands++;
+}
+
 void do_write_command(void)
 {
   uint16_t windex, wvalue, wlength;
@@ -230,10 +263,11 @@ int main(void)
   init_usb(vendor_id, product_id);
   signals_setup_int(shutdown);
 
+  do_version_command();
+
   while (!done) {
     for (i = 0; !done && i < 4; i++) {
       do_write_command();
-
       pause_short(done);
       do_read_command();
       pause_long(done);

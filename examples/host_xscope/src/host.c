@@ -65,21 +65,16 @@ void register_callback(unsigned int id, unsigned int type,
   }
 }
 
+struct control_xscope_response last_response;
+
 void record_callback(unsigned int id, unsigned long long timestamp,
   unsigned int length, unsigned long long dataval, unsigned char *databytes)
 {
   UNUSED_PARAMETER(timestamp);
   UNUSED_PARAMETER(dataval);
 
-  struct control_xscope_packet *p;
-
   if (id == probe_id) {
-    p = (struct control_xscope_packet*)databytes;
-    /* no parsing, just print raw bytes */
-
-    printf("response: ");
-    print_bytes(databytes, length);
-
+    memcpy((void*)&last_response, databytes, length);
     record_count++;
   }
 }
@@ -114,6 +109,37 @@ void init_xscope(int port)
 
 unsigned num_commands = 0;
 
+void do_version_command(void)
+{
+  struct control_xscope_packet p;
+  unsigned *b;
+  size_t len;
+
+  memset(&p, 0, sizeof(struct control_xscope_packet));
+
+  b = (unsigned*)&p;
+  len = control_xscope_create_upload_buffer(b, CONTROL_GET_VERSION,
+    CONTROL_SPECIAL_RESID, NULL, sizeof(control_version_t));
+
+  printf("%u: send version command: ", num_commands);
+  print_bytes((unsigned char*)b, len);
+
+  record_count = 0;
+
+  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
+    printf("xscope_ep_request_upload failed\n");
+  }
+  else {
+    while (record_count == 0) { /* wait for response on xSCOPE probe */
+      pause_short();
+    }
+    printf("response: ");
+    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.data_nbytes);
+  }
+
+  num_commands++;
+}
+
 void do_write_command(void)
 {
   struct control_xscope_packet p;
@@ -131,13 +157,17 @@ void do_write_command(void)
   printf("%u: send write command: ", num_commands);
   print_bytes((unsigned char*)b, len);
 
+  record_count = 0;
+
   if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
     printf("xscope_ep_request_upload failed\n");
   }
-
-  /* wait for response on xSCOPE probe */
-  while (record_count == 0) {
-    pause_short();
+  else {
+    while (record_count == 0) { /* wait for response on xSCOPE probe */
+      pause_short();
+    }
+    printf("response: ");
+    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES);
   }
 
   num_commands++;
@@ -163,10 +193,12 @@ void do_read_command(void)
   if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
     printf("xscope_ep_request_upload failed\n");
   }
-
-  /* wait for response on xSCOPE probe */
-  while (record_count == 0) {
-    pause_short();
+  else {
+    while (record_count == 0) { /* wait for response on xSCOPE probe */
+      pause_short();
+    }
+    printf("response: ");
+    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.data_nbytes);
   }
 
   num_commands++;
@@ -185,6 +217,8 @@ int main(void)
   signals_init();
   init_xscope(10101);
   signals_setup_int(shutdown);
+
+  do_version_command();
 
   while (1) {
     for (i = 0; i < 4; i++) {

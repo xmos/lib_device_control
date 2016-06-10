@@ -5,16 +5,19 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#define CONTROL_VERSION 0x10
+
 typedef uint8_t control_resid_t;
 typedef uint8_t control_cmd_t;
 
 typedef uint8_t control_ret_t;
 enum {  // force short enum
   CONTROL_SUCCESS = 0,
-  CONTROL_ERROR,
+  CONTROL_REGISTRATION_FAILED,
   CONTROL_BAD_COMMAND,
   CONTROL_DATA_LENGTH_ERROR,
-  CONTROL_OTHER_TRANSPORT_ERROR
+  CONTROL_OTHER_TRANSPORT_ERROR,
+  CONTROL_ERROR
 };
 
 #define MAX_RESOURCES_PER_INTERFACE 64
@@ -34,7 +37,8 @@ typedef interface control {
   control_ret_t read_command(control_resid_t r, control_cmd_t c, uint8_t data[n], unsigned n);
 } control_if;
 
-void control_init(client interface control i[n], unsigned n);
+control_ret_t
+control_init(client interface control i[n], unsigned n);
 
 control_ret_t
 control_process_i2c_write_start(client interface control i[n], unsigned n);

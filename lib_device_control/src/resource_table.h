@@ -6,11 +6,12 @@
 #include "control_transport.h"
 
 #define RESOURCE_TABLE_MAX 256
+#define IFNUM_RESERVED 255
 
-void resource_table_init(void);
+void resource_table_init(control_resid_t reserved_id);
 
-void resource_table_add(const control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
-                        unsigned num_resources, unsigned char ifnum);
+int resource_table_add(const control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
+                       unsigned num_resources, unsigned char ifnum);
 
 int resource_table_search(control_resid_t resid, unsigned char &ifnum);
 

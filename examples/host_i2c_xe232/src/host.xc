@@ -27,6 +27,44 @@ unsigned num_commands = 0;
 
 const char device_addr = 123;
 
+void do_version_command(client interface i2c_master_if i_i2c)
+{
+  control_version_t version;
+  size_t num_bytes_sent;
+  i2c_res_t res;
+  unsigned char data[I2C_TRANSACTION_MAX_BYTES];
+  size_t data_len;
+
+  data_len = control_build_i2c_data(data, CONTROL_SPECIAL_RESID,
+    CONTROL_GET_VERSION, &version, sizeof(control_version_t));
+
+  printf("%u: send read command\n", num_commands);
+
+  res = i_i2c.write(device_addr, data, data_len, num_bytes_sent, 0);
+
+  if (res != I2C_ACK) {
+    printf("slave sent NAK (write transfer)\n");
+  }
+  else {
+    if (num_bytes_sent != data_len) {
+      printf("write transfer %d bytes (%d bytes expected)\n",
+        num_bytes_sent, data_len);
+    }
+    else {
+      res = i_i2c.read(device_addr, data, sizeof(control_version_t), 1);
+      if (res != I2C_ACK) {
+        printf("slave sent NAK (read transfer)\n");
+      }
+      else {
+        memcpy(&version, data, sizeof(control_version_t));
+        printf("version returned: 0x%X\n", version);
+      }
+    }
+  }
+
+  num_commands++;
+}
+
 void do_write_command(client interface i2c_master_if i_i2c)
 {
   unsigned char payload[1];
@@ -43,12 +81,14 @@ void do_write_command(client interface i2c_master_if i_i2c)
 
   res = i_i2c.write(device_addr, data, data_len, num_bytes_sent, 1);
 
-  if (res != I2C_ACK)
+  if (res != I2C_ACK) {
     printf("slave sent NAK (write transfer)\n");
-
-  if (num_bytes_sent != data_len) {
-    printf("write transfer %d bytes (%d bytes expected)\n",
-      num_bytes_sent, data_len);
+  }
+  else {
+    if (num_bytes_sent != data_len) {
+      printf("write transfer %d bytes (%d bytes expected)\n",
+        num_bytes_sent, data_len);
+    }
   }
 
   num_commands++;
@@ -62,7 +102,6 @@ void do_read_command(client interface i2c_master_if i_i2c)
   unsigned char data[I2C_TRANSACTION_MAX_BYTES];
   size_t data_len;
 
-  payload[0] = 1;
   data_len = control_build_i2c_data(data, RESOURCE_ID,
     CONTROL_CMD_SET_READ(0), payload, sizeof(payload));
 
@@ -70,18 +109,26 @@ void do_read_command(client interface i2c_master_if i_i2c)
 
   res = i_i2c.write(device_addr, data, data_len, num_bytes_sent, 0);
 
-  if (res != I2C_ACK)
+  if (res != I2C_ACK) {
     printf("slave sent NAK (write transfer)\n");
-
-  if (num_bytes_sent != data_len) {
-    printf("write transfer %d bytes (%d bytes expected)\n",
-      num_bytes_sent, data_len);
   }
-
-  res = i_i2c.read(device_addr, data, sizeof(payload), 1);
-
-  if (res != I2C_ACK)
-    printf("slave sent NAK (read transfer)\n");
+  else {
+    if (num_bytes_sent != data_len) {
+      printf("write transfer %d bytes (%d bytes expected)\n",
+        num_bytes_sent, data_len);
+    }
+    else {
+      res = i_i2c.read(device_addr, data, sizeof(payload), 1);
+      if (res != I2C_ACK) {
+        printf("slave sent NAK (read transfer)\n");
+      }
+      else {
+        memcpy(payload, data, sizeof(payload));
+        printf("read data returned: ");
+        print_bytes(payload, sizeof(payload));
+      }
+    }
+  }
 
   num_commands++;
 }
@@ -92,6 +139,8 @@ void app(client interface i2c_master_if i_i2c)
 
   printf("started\n");
   printf("device address %d\n", device_addr);
+
+  do_version_command(i_i2c);
 
   while (1) {
     for (i = 0; i < 4; i++) {
