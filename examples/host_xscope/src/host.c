@@ -134,7 +134,7 @@ void do_version_command(void)
       pause_short();
     }
     printf("response: ");
-    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.data_nbytes);
+    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.payload_len);
   }
 
   num_commands++;
@@ -198,7 +198,7 @@ void do_read_command(void)
       pause_short();
     }
     printf("response: ");
-    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.data_nbytes);
+    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.payload_len);
   }
 
   num_commands++;

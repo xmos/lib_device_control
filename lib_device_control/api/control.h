@@ -32,9 +32,11 @@ typedef interface control {
   void register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
                           unsigned &num_resources);
 
-  control_ret_t write_command(control_resid_t r, control_cmd_t c, const uint8_t data[n], unsigned n);
+  control_ret_t write_command(control_resid_t resid, control_cmd_t cmd,
+                              const uint8_t payload[payload_len], unsigned payload_len);
 
-  control_ret_t read_command(control_resid_t r, control_cmd_t c, uint8_t data[n], unsigned n);
+  control_ret_t read_command(control_resid_t resid, control_cmd_t cmd,
+                             uint8_t payload[payload_len], unsigned payload_len);
 } control_if;
 
 control_ret_t

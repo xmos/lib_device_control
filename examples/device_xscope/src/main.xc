@@ -25,7 +25,8 @@ void xscope_client(chanend c_xscope, client interface control i_control[1])
   int num_bytes_read;
   unsigned return_size;
 
-  control_init(i_control, 1);
+  control_init();
+  control_register_resources(i_control, 1);
 
   xscope_connect_data_from_host(c_xscope);
 
@@ -36,7 +37,7 @@ void xscope_client(chanend c_xscope, client interface control i_control[1])
       /* tools_xtrace/xscope_api/xcore_shared/xscope_shared_xc.xc */
       case xscope_data_from_host(c_xscope, (buffer, unsigned char[]), num_bytes_read):
         assert(num_bytes_read <= sizeof(buffer));
-        control_process_xscope_upload(buffer, num_bytes_read, return_size, i_control, 1);
+        control_process_xscope_upload(buffer, num_bytes_read, return_size, i_control);
         if (return_size > 0) {
           xscope_core_bytes(0, return_size, (buffer, unsigned char[]));
         }

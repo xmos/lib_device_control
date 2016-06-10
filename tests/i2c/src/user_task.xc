@@ -22,25 +22,25 @@ void user_task(server interface control i, chanend c)
         break;
 
       case i.write_command(control_resid_t resid, control_cmd_t cmd,
-                           const uint8_t data[n], unsigned n) -> control_ret_t ret:
+                           const uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
         c <: cmd;
         c <: resid;
-        c <: n;
-        for (j = 0; j < n; j++) {
-          c <: data[j];
+        c <: payload_len;
+        for (j = 0; j < payload_len; j++) {
+          c <: payload[j];
         }
         ret = CONTROL_SUCCESS;
         break;
 
       case i.read_command(control_resid_t resid, control_cmd_t cmd,
-                          uint8_t data[n], unsigned n) -> control_ret_t ret:
+                          uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
         c <: cmd;
         c <: resid;
-        c <: n;
-        for (j = 0; j < n; j++) {
+        c <: payload_len;
+        for (j = 0; j < payload_len; j++) {
           uint8_t x; /* must use temporary variable (bug 17370) */
           c :> x;
-          data[j] = x;
+          payload[j] = x;
         }
         ret = CONTROL_SUCCESS;
         break;

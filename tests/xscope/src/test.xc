@@ -82,7 +82,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                   /* retrieve received payload for a read command */
                   if (!timeout && IS_CONTROL_CMD_READ(c2.cmd)) {
                     for (j = 0; j < c2.payload_size; j++) {
-                      c2.payload[j] = ((struct control_xscope_response*)buf)->data[j];
+                      c2.payload[j] = ((struct control_xscope_response*)buf)->payload[j];
                     }
                   }
 

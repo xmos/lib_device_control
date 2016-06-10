@@ -19,17 +19,17 @@
 struct control_xscope_packet {
   control_resid_t resid;
   control_cmd_t cmd;
-  uint8_t data_nbytes;
+  uint8_t payload_len;
   uint8_t pad;
-  uint8_t data[XSCOPE_DATA_MAX_BYTES];
+  uint8_t payload[XSCOPE_DATA_MAX_BYTES];
 };
 
 struct control_xscope_response {
   control_resid_t resid;
   control_cmd_t cmd;
-  uint8_t data_nbytes;
+  uint8_t payload_len;
   control_ret_t ret;
-  uint8_t data[XSCOPE_DATA_MAX_BYTES];
+  uint8_t payload[XSCOPE_DATA_MAX_BYTES];
 };
 
 #define CONTROL_SPECIAL_RESID 0

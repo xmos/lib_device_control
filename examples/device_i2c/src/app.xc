@@ -25,48 +25,48 @@ void app(server interface control i_control)
         num_resources = 1;
         break;
 
-      case i_control.write_command(control_resid_t r, control_cmd_t c,
-                                   const uint8_t data[n], unsigned n) -> control_ret_t ret:
+      case i_control.write_command(control_resid_t resid, control_cmd_t cmd,
+                                   const uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
         num_commands++;
 #ifdef ERRONEOUS_DEVICE
         if ((num_commands % 3) == 0)
-          r += 1;
+          resid += 1;
 #endif
-        printf("%u: W %d %d %d,", num_commands, r, c, n);
-        for (i = 0; i < n; i++) {
-          printf(" %02x", data[i]);
+        printf("%u: W %d %d %d,", num_commands, resid, cmd, payload_len);
+        for (i = 0; i < payload_len; i++) {
+          printf(" %02x", payload[i]);
         }
         printf("\n");
-        if (r != RESOURCE_ID) {
-          printf("unrecognised resource ID %d\n", r);
+        if (resid != RESOURCE_ID) {
+          printf("unrecognised resource ID %d\n", resid);
           ret = CONTROL_ERROR;
           break;
         }
         ret = CONTROL_SUCCESS;
         break;
 
-      case i_control.read_command(control_resid_t r, control_cmd_t c,
-                                  uint8_t data[n], unsigned n) -> control_ret_t ret:
+      case i_control.read_command(control_resid_t resid, control_cmd_t cmd,
+                                  uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
         num_commands++;
 #ifdef ERRONEOUS_DEVICE
         if ((num_commands % 3) == 0)
-          r += 1;
+          resid += 1;
 #endif
-        printf("%u: R %d %d %d\n", num_commands, r, c, n);
-        if (r != RESOURCE_ID) {
-          printf("unrecognised resource ID %d\n", r);
+        printf("%u: R %d %d %d\n", num_commands, resid, cmd, payload_len);
+        if (resid != RESOURCE_ID) {
+          printf("unrecognised resource ID %d\n", resid);
           ret = CONTROL_ERROR;
           break;
         }
-        if (n != 4) {
-          printf("expecting 4 read bytes, not %d\n", n);
+        if (payload_len != 4) {
+          printf("expecting 4 read bytes, not %d\n", payload_len);
           ret = CONTROL_ERROR;
           break;
         }
-        data[0] = 0x12;
-        data[1] = 0x34;
-        data[2] = 0x56;
-        data[3] = 0x78;
+        payload[0] = 0x12;
+        payload[1] = 0x34;
+        payload[2] = 0x56;
+        payload[3] = 0x78;
         ret = CONTROL_SUCCESS;
         break;
     }

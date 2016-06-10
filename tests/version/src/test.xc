@@ -20,7 +20,7 @@ void test_xscope(client interface control i[1])
 
   ret = control_process_xscope_upload(buf, len, len2, i);
   resp = (struct control_xscope_response*)buf;
-  version = *((control_version_t*)resp->data);
+  version = *((control_version_t*)resp->payload);
 
   if (ret != CONTROL_SUCCESS) {
     printf("xSCOPE processing function returned %d\n", ret);
@@ -39,15 +39,15 @@ void test_xscope(client interface control i[1])
 void test_usb(client interface control i[1])
 {
   uint16_t windex, wvalue, wlength;
-  uint8_t data[8];
+  uint8_t request_data[64];
   control_version_t version;
   control_ret_t ret;
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
     CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
 
-  ret = control_process_usb_get_request(windex, wvalue, wlength, data, i);
-  memcpy(&version, data, sizeof(control_version_t));
+  ret = control_process_usb_get_request(windex, wvalue, wlength, request_data, i);
+  memcpy(&version, request_data, sizeof(control_version_t));
 
   if (ret != CONTROL_SUCCESS) {
     printf("USB processing function returned %d\n", ret);

@@ -24,7 +24,8 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   ep0_out = XUD_InitEp(c_ep0_out, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
   ep0_in = XUD_InitEp(c_ep0_in, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
 
-  control_init(i_control, 1);
+  control_init();
+  control_register_resources(i_control, 1);
 
   while (1) {
     res = USB_GetSetupPacket(ep0_out, ep0_in, sp);
@@ -36,7 +37,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
         case USB_BMREQ_H2D_VENDOR_DEV:
           res = XUD_GetBuffer(ep0_out, request_data, len);
           if (res == XUD_RES_OKAY) {
-            if (control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1) == CONTROL_SUCCESS) {
+            if (control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control) == CONTROL_SUCCESS) {
               /* zero length data to indicate success */
               res = XUD_DoSetRequestStatus(ep0_in);
             }
@@ -52,7 +53,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
           /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
-          if (control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1) == CONTROL_SUCCESS) {
+          if (control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control) == CONTROL_SUCCESS) {
             len = sp.wLength;
             res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
           }

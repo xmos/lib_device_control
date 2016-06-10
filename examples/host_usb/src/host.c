@@ -29,7 +29,7 @@ void do_version_command(void)
 {
   uint16_t windex, wvalue, wlength;
   control_version_t version;
-  uint8_t data[8];
+  uint8_t request_data[64];
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
     CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
@@ -40,18 +40,18 @@ void do_version_command(void)
 #ifdef _WIN32
   int ret = usb_control_msg(devh,
     USB_ENDPOINT_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
-    0, wvalue, windex, (char*)data, wlength, sync_timeout_ms);
+    0, wvalue, windex, (char*)request_data, wlength, sync_timeout_ms);
 #else
   int ret = libusb_control_transfer(devh,
     LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
-    0, wvalue, windex, data, wlength, sync_timeout_ms);
+    0, wvalue, windex, request_data, wlength, sync_timeout_ms);
 #endif
 
   if (ret != sizeof(control_version_t)) {
     printf("libusb_control_transfer returned %d\n", ret);
   }
   else {
-    memcpy(&version, data, sizeof(control_version_t));
+    memcpy(&version, request_data, sizeof(control_version_t));
     printf("version returned: 0x%X\n", version);
   }
 

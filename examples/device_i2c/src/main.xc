@@ -31,21 +31,21 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
   while (1) {
     select {
       case i_i2c.ack_write_request(void) -> i2c_slave_ack_t resp:
-        if (control_process_i2c_write_start(i_control, 1) == CONTROL_SUCCESS)
+        if (control_process_i2c_write_start(i_control) == CONTROL_SUCCESS)
           resp = I2C_SLAVE_ACK;
         else
           resp = I2C_SLAVE_NACK;
         break;
 
       case i_i2c.ack_read_request(void) -> i2c_slave_ack_t resp:
-        if (control_process_i2c_read_start(i_control, 1) == CONTROL_SUCCESS)
+        if (control_process_i2c_read_start(i_control) == CONTROL_SUCCESS)
           resp = I2C_SLAVE_ACK;
         else
           resp = I2C_SLAVE_NACK;
         break;
 
       case i_i2c.master_sent_data(uint8_t data) -> i2c_slave_ack_t resp:
-        if (control_process_i2c_write_data(data, i_control, 1) == CONTROL_SUCCESS)
+        if (control_process_i2c_write_data(data, i_control) == CONTROL_SUCCESS)
           resp = I2C_SLAVE_ACK;
         else {
           resp = I2C_SLAVE_NACK;
@@ -53,11 +53,11 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
         break;
 
       case i_i2c.master_requires_data(void) -> uint8_t data:
-        control_process_i2c_read_data(data, i_control, 1);
+        control_process_i2c_read_data(data, i_control);
         break;
 
       case i_i2c.stop_bit(void):
-        control_process_i2c_stop(i_control, 1);
+        control_process_i2c_stop(i_control);
         break;
 
       /* not using these */
@@ -77,6 +77,8 @@ int main(void)
     on tile[0]: app(i_control[0]);
     on tile[1]: {
       p_eth_phy_reset <: 0;
+      control_init();
+      control_register_resources(i_control, 1);
       /* bug 17317 - [[combine]] */
       par {
         i2c_client(i_i2c, i_control);
