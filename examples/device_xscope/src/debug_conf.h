@@ -3,5 +3,6 @@
 #define __debug_conf_h__
 
 #define DEBUG_PRINT_ENABLE_ALL 0
+#define DEBUG_PRINT_ENABLE_CONTROL 0
 
 #endif // __debug_conf_h__

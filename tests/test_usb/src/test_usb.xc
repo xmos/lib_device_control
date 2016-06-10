@@ -10,8 +10,6 @@
 #include "support_inline.h"
 #include "user_task.h"
 
-#define PRINT_ALL 0
-
 void test_client(client interface control i[2], chanend c_user_task[2])
 {
   uint16_t windex, wvalue, wlength;
@@ -105,6 +103,10 @@ int main(void)
     test_client(i, c_user_task);
     user_task(i[0], c_user_task[0]);
     user_task(i[1], c_user_task[1]);
+    { delay_microseconds(5000);
+      printf("test timeout\n");
+      exit(1);
+    }
   }
   return 0;
 }

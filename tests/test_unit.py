@@ -14,17 +14,8 @@ def runtest():
     tester.set_min_testlevel(testlevel)
     xmostest.run_on_simulator(resources['xsim'], binary, simargs=[], tester=tester)
 
-    binary = 'test_xscope/bin/test_xscope.xe'.format()
-    tester = xmostest.ComparisonTester(open('xscope.expect'),
-                                       'lib_device_control',
-                                       'lib_device_control_unit_tests',
-                                       'unit_test_%s' % testlevel,
-                                       {})
-    tester.set_min_testlevel(testlevel)
-    xmostest.run_on_simulator(resources['xsim'], binary, simargs=[], tester=tester)
-
-    binary = 'test_usb/bin/test_usb.xe'.format()
-    tester = xmostest.ComparisonTester(open('usb.expect'),
+    binary = 'test_version/bin/test_version.xe'.format()
+    tester = xmostest.ComparisonTester(open('version.expect'),
                                        'lib_device_control',
                                        'lib_device_control_unit_tests',
                                        'unit_test_%s' % testlevel,

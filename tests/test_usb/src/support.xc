@@ -6,6 +6,8 @@
 #include "resource.h"
 #include "support.h"
 
+#define PRINT_ALL 0
+
 void make_command(struct command &c, const struct options &o)
 {
   c.resid = RESID(c.ifnum, o.res_in_if);

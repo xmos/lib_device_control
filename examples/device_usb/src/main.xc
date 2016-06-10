@@ -37,11 +37,11 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
           res = XUD_GetBuffer(ep0_out, request_data, len);
           if (res == XUD_RES_OKAY) {
             if (control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control, 1) == CONTROL_SUCCESS) {
-              /* indicate success (zero length data) */
+              /* zero length data to indicate success */
               res = XUD_DoSetRequestStatus(ep0_in);
             }
             else {
-              /* indicate NAK */
+              /* issue STALL to indicate error */
               res = XUD_RES_ERR;
             }
           }
@@ -57,7 +57,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
             res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
           }
           else {
-            /* indicate NAK */
+            /* issue STALL to indicate error */
             res = XUD_RES_ERR;
           }
           handled = 1;

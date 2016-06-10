@@ -48,7 +48,6 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
         if (control_process_i2c_write_data(data, i_control, 1) == CONTROL_SUCCESS)
           resp = I2C_SLAVE_ACK;
         else {
-          printf("write data NAK\n");
           resp = I2C_SLAVE_NACK;
         }
         break;
