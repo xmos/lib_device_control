@@ -28,9 +28,11 @@ void test_client(client interface control i[2], chanend c_user_task[2])
     c1.payload[j] = j;
   }
 
+  control_init();
+
   /* trigger a registration call, catch it and supply resource IDs to register */
   par {
-    control_init(i, 2);
+    control_register_resources(i, 2);
     par (int j = 0; j < 2; j++) {
       { c_user_task[j] <: 2;
         c_user_task[j] <: RESID(j, 0);
@@ -61,17 +63,17 @@ void test_client(client interface control i[2], chanend c_user_task[2])
               par {
                 { control_ret_t ret;
                   ret = CONTROL_SUCCESS;
-                  ret |= control_process_i2c_write_start(i, 2);
+                  ret |= control_process_i2c_write_start(i);
                   for (j = 0; j < buf_len; j++) {
-                    ret |= control_process_i2c_write_data(buf[j], i, 2);
+                    ret |= control_process_i2c_write_data(buf[j], i);
                   }
                   if (o.read_cmd && payload_size > 0) {
-                    ret |= control_process_i2c_read_start(i, 2);
+                    ret |= control_process_i2c_read_start(i);
                     for (j = 0; j < payload_size; j++) {
-                      ret |= control_process_i2c_read_data(payload_ptr[j], i, 2);
+                      ret |= control_process_i2c_read_data(payload_ptr[j], i);
                     }
                   }
-                  ret |= control_process_i2c_stop(i, 2);
+                  ret |= control_process_i2c_stop(i);
                   d <: ret;
                 }
                 { control_ret_t ret;

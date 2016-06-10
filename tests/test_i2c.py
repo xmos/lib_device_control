@@ -5,7 +5,7 @@ def runtest():
     testlevel = 'smoke'
     resources = xmostest.request_resource('xsim')
 
-    binary = 'test_i2c/bin/test_i2c.xe'.format()
+    binary = 'i2c/bin/i2c.xe'.format()
     tester = xmostest.ComparisonTester(open('i2c.expect'),
                                        'lib_device_control',
                                        'lib_device_control_tests',

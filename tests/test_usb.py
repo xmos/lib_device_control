@@ -5,7 +5,7 @@ def runtest():
     testlevel = 'smoke'
     resources = xmostest.request_resource('xsim')
 
-    binary = 'test_usb/bin/test_usb.xe'.format()
+    binary = 'usb/bin/usb.xe'.format()
     tester = xmostest.ComparisonTester(open('usb.expect'),
                                        'lib_device_control',
                                        'lib_device_control_tests',

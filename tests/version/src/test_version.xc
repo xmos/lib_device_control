@@ -18,7 +18,7 @@ void test_xscope(client interface control i[1])
     CONTROL_GET_VERSION, CONTROL_SPECIAL_RESID,
     NULL, sizeof(control_version_t));
 
-  ret = control_process_xscope_upload(buf, len, len2, i, 1);
+  ret = control_process_xscope_upload(buf, len, len2, i);
   resp = (struct control_xscope_response*)buf;
   version = *((control_version_t*)resp->data);
 
@@ -46,7 +46,7 @@ void test_usb(client interface control i[1])
   control_usb_fill_header(&windex, &wvalue, &wlength,
     CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
 
-  ret = control_process_usb_get_request(windex, wvalue, wlength, data, i, 1);
+  ret = control_process_usb_get_request(windex, wvalue, wlength, data, i);
   memcpy(&version, data, sizeof(control_version_t));
 
   if (ret != CONTROL_SUCCESS) {
@@ -72,16 +72,16 @@ void test_i2c(client interface control i[1])
     CONTROL_GET_VERSION, data, sizeof(control_version_t));
 
   ret = CONTROL_SUCCESS;
-  ret |= control_process_i2c_write_start(i, 1);
+  ret |= control_process_i2c_write_start(i);
   for (j = 0; j < len; j++) {
-    ret |= control_process_i2c_write_data(buf[j], i, 1);
+    ret |= control_process_i2c_write_data(buf[j], i);
   }
-  ret |= control_process_i2c_read_start(i, 1);
+  ret |= control_process_i2c_read_start(i);
   for (j = 0; j < sizeof(control_version_t); j++) {
-    ret |= control_process_i2c_read_data(data[j], i, 1);
+    ret |= control_process_i2c_read_data(data[j], i);
   }
   memcpy(&version, data, sizeof(control_version_t));
-  ret |= control_process_i2c_stop(i, 1);
+  ret |= control_process_i2c_stop(i);
 
   if (ret != CONTROL_SUCCESS) {
     printf("I2C processing functions returned %d\n", ret);
@@ -102,7 +102,8 @@ int main(void)
 {
   interface control i[1];
   par {
-    { test_xscope(i);
+    { control_init();
+      test_xscope(i);
       test_usb(i);
       test_i2c(i);
       printf("Success!\n");

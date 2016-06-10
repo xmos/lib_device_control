@@ -9,14 +9,18 @@
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
 
-control_ret_t control_init(client interface control i[n], unsigned n)
+control_ret_t control_init(void)
+{
+  resource_table_init(CONTROL_SPECIAL_RESID);
+  return CONTROL_SUCCESS;
+}
+
+control_ret_t control_register_resources(client interface control i[n], unsigned n)
 {
   control_resid_t r[MAX_RESOURCES_PER_INTERFACE];
   control_ret_t ret;
   unsigned n0;
   unsigned j;
-
-  resource_table_init(CONTROL_SPECIAL_RESID);
 
   ret = CONTROL_SUCCESS;
 
@@ -76,7 +80,7 @@ special_read_command(control_cmd_t cmd, uint8_t data[], unsigned data_len)
 }
 
 static control_ret_t
-write_command(client interface control i[n], unsigned n,
+write_command(client interface control i[],
               unsigned char ifnum, control_resid_t resid, control_cmd_t cmd,
               const uint8_t data[], unsigned data_len)
 {
@@ -91,7 +95,7 @@ write_command(client interface control i[n], unsigned n,
 }
 
 static control_ret_t
-read_command(client interface control i[n], unsigned n,
+read_command(client interface control i[],
              unsigned char ifnum, control_resid_t resid, control_cmd_t cmd,
              uint8_t data[], unsigned data_len)
 {
@@ -105,7 +109,7 @@ read_command(client interface control i[n], unsigned n,
 }
 
 control_ret_t
-control_process_i2c_write_start(client interface control i[n], unsigned n)
+control_process_i2c_write_start(client interface control i[])
 {
   // always start a new command
   // that way a write start recovers us from errors
@@ -114,8 +118,7 @@ control_process_i2c_write_start(client interface control i[n], unsigned n)
 }
 
 control_ret_t
-control_process_i2c_write_data(const uint8_t data,
-                               client interface control i[n], unsigned n)
+control_process_i2c_write_data(const uint8_t data, client interface control i[])
 {
   unsigned char ifnum;
 
@@ -148,7 +151,7 @@ control_process_i2c_write_data(const uint8_t data,
       i2c.data_len_transmitted = 0;
       i2c.state = I2C_WRITE_SIZE;
       if (i2c.data_len_from_header == 0) {
-        return write_command(i, n, i2c.ifnum, i2c.resid, i2c.cmd,
+        return write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
           i2c.data, i2c.data_len_transmitted);
       }
       else {
@@ -167,7 +170,7 @@ control_process_i2c_write_data(const uint8_t data,
       i2c.data_len_transmitted = 1;
       i2c.state = I2C_WRITE_DATA;
       if (i2c.data_len_from_header == 1) {
-        return write_command(i, n, i2c.ifnum, i2c.resid, i2c.cmd,
+        return write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
           i2c.data, i2c.data_len_transmitted);
       }
       else {
@@ -186,7 +189,7 @@ control_process_i2c_write_data(const uint8_t data,
       i2c.data[i2c.data_len_transmitted] = data;
       i2c.data_len_transmitted++;
       if (i2c.data_len_transmitted == i2c.data_len_from_header) {
-        return write_command(i, n, i2c.ifnum, i2c.resid, i2c.cmd,
+        return write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
           i2c.data, i2c.data_len_transmitted);
       }
       else {
@@ -204,7 +207,7 @@ control_process_i2c_write_data(const uint8_t data,
 }
 
 control_ret_t
-control_process_i2c_read_start(client interface control i[n], unsigned n)
+control_process_i2c_read_start(client interface control i[])
 {
   control_ret_t ret;
 
@@ -217,7 +220,7 @@ control_process_i2c_read_start(client interface control i[n], unsigned n)
     if (IS_CONTROL_CMD_READ(i2c.cmd)) {
       // assume this is a repeated start
 
-      ret = read_command(i, n, i2c.ifnum, i2c.resid, i2c.cmd,
+      ret = read_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
         i2c.data, i2c.data_len_from_header);
 
       if (ret == CONTROL_SUCCESS) {
@@ -238,8 +241,7 @@ control_process_i2c_read_start(client interface control i[n], unsigned n)
 }
 
 control_ret_t
-control_process_i2c_read_data(uint8_t &data,
-                              client interface control i[n], unsigned n)
+control_process_i2c_read_data(uint8_t &data, client interface control i[])
 {
   if (i2c.state == I2C_READ_START) {
     data = i2c.data[0];
@@ -266,7 +268,7 @@ control_process_i2c_read_data(uint8_t &data,
 }
 
 control_ret_t
-control_process_i2c_stop(client interface control i[n], unsigned n)
+control_process_i2c_stop(client interface control i[])
 {
   control_ret_t ret;
 
@@ -320,7 +322,7 @@ control_process_i2c_stop(client interface control i[n], unsigned n)
 control_ret_t
 control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 const uint8_t request_data[],
-                                client interface control i[n], unsigned n)
+                                client interface control i[])
 {
   unsigned num_data_bytes;
   control_resid_t resid;
@@ -341,13 +343,13 @@ control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
     return CONTROL_BAD_COMMAND;
   }
 
-  return write_command(i, n, ifnum, resid, cmd, request_data, num_data_bytes);
+  return write_command(i, ifnum, resid, cmd, request_data, num_data_bytes);
 }
 
 control_ret_t
 control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 uint8_t request_data[],
-                                client interface control i[n], unsigned n)
+                                client interface control i[])
 {
   unsigned num_data_bytes;
   control_resid_t resid;
@@ -368,13 +370,13 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
     return CONTROL_BAD_COMMAND;
   }
 
-  return read_command(i, n, ifnum, resid, cmd, request_data, num_data_bytes);
+  return read_command(i, ifnum, resid, cmd, request_data, num_data_bytes);
 }
 
 control_ret_t
 control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
                               unsigned length_in, unsigned &length_out,
-                              client interface control i[n], unsigned n)
+                              client interface control i[])
 {
   struct control_xscope_packet *p;
   struct control_xscope_response *r;
@@ -391,7 +393,7 @@ control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
   }
 
   if (IS_CONTROL_CMD_READ(p->cmd)) {
-    r->ret = read_command(i, n, ifnum, p->resid, p->cmd,
+    r->ret = read_command(i, ifnum, p->resid, p->cmd,
       p->data, p->data_nbytes);
 
     // only return data if user task indicated success
@@ -399,7 +401,7 @@ control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
       length_out += p->data_nbytes;
   }
   else {
-    r->ret = write_command(i, n, ifnum, p->resid, p->cmd,
+    r->ret = write_command(i, ifnum, p->resid, p->cmd,
       p->data, p->data_nbytes);
   }
 

@@ -5,7 +5,7 @@ def runtest():
     testlevel = 'smoke'
     resources = xmostest.request_resource('xsim')
 
-    binary = 'test_basic/bin/test_basic.xe'.format()
+    binary = 'basic/bin/basic.xe'.format()
     tester = xmostest.ComparisonTester(open('basic.expect'),
                                        'lib_device_control',
                                        'lib_device_control_tests',

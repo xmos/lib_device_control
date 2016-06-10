@@ -6,6 +6,7 @@
 
 int main(void)
 {
+  control_init();
   printf("Success!\n");
   return 0;
 }

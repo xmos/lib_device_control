@@ -38,34 +38,37 @@ typedef interface control {
 } control_if;
 
 control_ret_t
-control_init(client interface control i[n], unsigned n);
+control_init(void);
 
 control_ret_t
-control_process_i2c_write_start(client interface control i[n], unsigned n);
+control_register_resources(client interface control i[n], unsigned n);
 
 control_ret_t
-control_process_i2c_read_start(client interface control i[n], unsigned n);
+control_process_i2c_write_start(client interface control i[]);
+
+control_ret_t
+control_process_i2c_read_start(client interface control i[]);
 
 control_ret_t
 control_process_i2c_write_data(const uint8_t data,
-                               client interface control i[n], unsigned n);
+                               client interface control i[]);
 
 control_ret_t
 control_process_i2c_read_data(uint8_t &data,
-                              client interface control i[n], unsigned n);
+                              client interface control i[]);
 
 control_ret_t
-control_process_i2c_stop(client interface control i[n], unsigned n);
+control_process_i2c_stop(client interface control i[]);
 
 control_ret_t
 control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 const uint8_t request_data[],
-                                client interface control i[n], unsigned n);
+                                client interface control i[]);
 
 control_ret_t
 control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 uint8_t request_data[],
-                                client interface control i[n], unsigned n);
+                                client interface control i[]);
 
 /* data return is device (control library) initiated
  * require word alignment so we can cast to struct
@@ -73,7 +76,7 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 control_ret_t
 control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
                               unsigned length_in, unsigned &length_out,
-                              client interface control i[n], unsigned n);
+                              client interface control i[]);
 
 #endif
 
