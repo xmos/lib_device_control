@@ -12,7 +12,7 @@
 
 #define PRINT_ALL 0
 
-void test_client(client interface control i[2], chanend c_user_task[2])
+void test_client(client interface control i[3], chanend c_user_task[3])
 {
   uint32_t buf[XSCOPE_UPLOAD_MAX_WORDS];
   struct command c1, c2;
@@ -24,7 +24,8 @@ void test_client(client interface control i[2], chanend c_user_task[2])
   int t, j;
   uint32_t *unsafe buf_ptr;
   int fails;
-  control_ret_t ret1, ret2;
+  control_ret_t ret, ret1;
+  int check_result;
   chan d;
 
   memset(buf, 0, XSCOPE_UPLOAD_MAX_WORDS);
@@ -37,18 +38,13 @@ void test_client(client interface control i[2], chanend c_user_task[2])
 
   /* trigger a registration call, catch it and supply resource IDs to register */
   par {
-    control_register_resources(i, 2);
-    par (int j = 0; j < 2; j++) {
-      { c_user_task[j] <: 2;
-        c_user_task[j] <: RESID(j, 0);
-        c_user_task[j] <: RESID(j, 1);
-      }
-    }
+    control_register_resources(i, 3);
+    drive_user_task_registration(c_user_task, 3);
   }
 
   fails = 0;
 
-  for (c1.ifnum = 0; c1.ifnum < 3; c1.ifnum++) {
+  for (c1.ifnum = 0; c1.ifnum < 4; c1.ifnum++) {
     for (o.read_cmd = 0; o.read_cmd < 2; o.read_cmd++) {
       for (o.res_in_if = 0; o.res_in_if < 3; o.res_in_if++) {
         for (o.bad_id = 0; o.bad_id < 2; o.bad_id++) {
@@ -73,7 +69,7 @@ void test_client(client interface control i[2], chanend c_user_task[2])
               par {
                 d <: control_process_xscope_upload((uint32_t*)buf_ptr, lenin, lenout, i);
                 { select {
-                    case drive_user_task(c2, c1, c_user_task, o.read_cmd);
+                    case drive_user_task_commands(c2, c1, c_user_task, o.read_cmd);
                     case tmr when timerafter(t + 500) :> void:
                       timeout = 1;
                       break;
@@ -90,9 +86,43 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                    * embedded in the xSCOPE response
                    */
                   ret1 = ((struct control_xscope_response*)buf)->ret;
-                  d :> ret2;
+                  d :> ret;
 
-                  fails += check(o, c1, c2, timeout, ret1, ret2, lenout);
+                  check_result = check(o, c1, c2, timeout, ret, 3);
+
+		  if (check_result != 0) {
+		    fails += 1;
+		  }
+
+		  /* additional checks specific to xSCOPE */
+		  if (fails != 0) {
+		    if (ret1 != CONTROL_SUCCESS) {
+		      printf("response contained return code %d\n", ret1);
+		      fails += 1;
+		    }
+		    else if (ret1 != ret) {
+		      printf("mismatching return codes - processing function %d, response %d\n",
+			ret, ret1);
+
+		      fails += 1;
+		    }
+		    else if (o.read_cmd && ret == CONTROL_SUCCESS) {
+		      if (lenout != XSCOPE_HEADER_BYTES + c2.payload_size) {
+			printf("wrong response length %d, expected %d\n",
+			  lenout, XSCOPE_HEADER_BYTES + c2.payload_size);
+
+			fails += 1;
+		      }
+		    }
+		    else {
+		      if (lenout != XSCOPE_HEADER_BYTES) {
+			printf("wrong response length %d, expected %d\n",
+			  lenout, XSCOPE_HEADER_BYTES);
+
+			fails += 1;
+		      }
+		    }
+		  }
                 }
               }
             }
@@ -113,12 +143,13 @@ void test_client(client interface control i[2], chanend c_user_task[2])
 
 int main(void)
 {
-  interface control i[2];
-  chan c_user_task[2];
+  interface control i[3];
+  chan c_user_task[3];
   par {
     test_client(i, c_user_task);
     user_task(i[0], c_user_task[0]);
     user_task(i[1], c_user_task[1]);
+    user_task(i[2], c_user_task[2]);
     { delay_microseconds(5000);
       printf("test timeout\n");
       exit(1);

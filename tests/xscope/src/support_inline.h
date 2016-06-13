@@ -5,8 +5,10 @@
 #include "support.h"
 
 // implementation only (no declaration) as per bug 17386
-select drive_user_task(struct command &c2, const struct command &c1,
-                       chanend c_user_task[2], int read_cmd)
+// due to a related issue, user task channel array size is hardcoded
+// ideally the xC syntax would be used like "f(chanend c[n], unsigned n)"
+select drive_user_task_commands(struct command &c2, const struct command &c1,
+                                chanend c_user_task[3], int read_cmd)
 {
   case c_user_task[int k] :> c2.cmd: {
     int j;

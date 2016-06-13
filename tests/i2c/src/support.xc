@@ -13,9 +13,9 @@ void make_command(struct command &c, const struct options &o)
   c.resid = RESID(c.ifnum, o.res_in_if);
 
   if (o.read_cmd)
-    c.cmd = CONTROL_CMD_SET_READ(0);
+    c.cmd = CONTROL_CMD_SET_READ(74);
   else
-    c.cmd = CONTROL_CMD_SET_WRITE(0);
+    c.cmd = CONTROL_CMD_SET_WRITE(35);
 
   if (o.bad_id)
     c.resid = BADID;
@@ -28,13 +28,13 @@ void make_command(struct command &c, const struct options &o)
 
 int check(const struct options &o,
           const struct command &c1, const struct command &c2,
-          int timeout, control_ret_t ret)
+          int timeout, control_ret_t ret, int num_interfaces)
 {
   int timeout_expected;
   int fail;
   int j;
 
-  timeout_expected = o.bad_id || c1.ifnum > 1 || o.res_in_if > 1;
+  timeout_expected = o.bad_id || c1.ifnum >= num_interfaces || o.res_in_if > 1;
   fail = 0;
 
   if (timeout_expected) {
@@ -82,4 +82,18 @@ int check(const struct options &o,
   }
 
   return fail;
+}
+
+void drive_user_task_registration(chanend c_user_task[n], unsigned n)
+{
+  /* the below could be parallel by replacing 'for' with 'par'
+   * par replication doesn't support variable count at the moment
+   * sequential is ok assuming interfaces are iterated in the same order
+   */
+  for (int j = 0; j < n; j++) {
+    { c_user_task[j] <: 2;
+      c_user_task[j] <: RESID(j, 0);
+      c_user_task[j] <: RESID(j, 1);
+    }
+  }
 }

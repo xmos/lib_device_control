@@ -10,7 +10,7 @@
 #include "support_inline.h"
 #include "user_task.h"
 
-void test_client(client interface control i[2], chanend c_user_task[2])
+void test_client(client interface control i[3], chanend c_user_task[3])
 {
   uint16_t windex, wvalue, wlength;
   struct command c1, c2;
@@ -31,18 +31,13 @@ void test_client(client interface control i[2], chanend c_user_task[2])
 
   /* trigger a registration call, catch it and supply resource IDs to register */
   par {
-    control_register_resources(i, 2);
-    par (int j = 0; j < 2; j++) {
-      { c_user_task[j] <: 2;
-        c_user_task[j] <: RESID(j, 0);
-        c_user_task[j] <: RESID(j, 1);
-      }
-    }
+    control_register_resources(i, 3);
+    drive_user_task_registration(c_user_task, 3);
   }
 
   fails = 0;
 
-  for (c1.ifnum = 0; c1.ifnum < 3; c1.ifnum++) {
+  for (c1.ifnum = 0; c1.ifnum < 4; c1.ifnum++) {
     for (o.read_cmd = 0; o.read_cmd < 2; o.read_cmd++) {
       for (o.res_in_if = 0; o.res_in_if < 3; o.res_in_if++) {
         for (o.bad_id = 0; o.bad_id < 2; o.bad_id++) {
@@ -72,13 +67,13 @@ void test_client(client interface control i[2], chanend c_user_task[2])
                       (uint8_t*)payload_ptr, i);
                 }
                 { select {
-                    case drive_user_task(c2, c1, c_user_task, o.read_cmd);
+                    case drive_user_task_commands(c2, c1, c_user_task, o.read_cmd);
                     case tmr when timerafter(t + 500) :> void:
                       timeout = 1;
                       break;
                   }
                   d :> ret;
-                  fails += check(o, c1, c2, timeout, ret);
+                  fails += check(o, c1, c2, timeout, ret, 3);
                 }
               }
             }
@@ -99,12 +94,13 @@ void test_client(client interface control i[2], chanend c_user_task[2])
 
 int main(void)
 {
-  interface control i[2];
-  chan c_user_task[2];
+  interface control i[3];
+  chan c_user_task[3];
   par {
     test_client(i, c_user_task);
     user_task(i[0], c_user_task[0]);
     user_task(i[1], c_user_task[1]);
+    user_task(i[2], c_user_task[2]);
     { delay_microseconds(5000);
       printf("test timeout\n");
       exit(1);

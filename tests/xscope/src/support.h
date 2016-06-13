@@ -23,7 +23,8 @@ void make_command(struct command &c, const struct options &o);
 
 int check(const struct options &o,
           const struct command &c1, const struct command &c2,
-          int timeout, control_ret_t ret1, control_ret_t ret2,
-	  int response_length);
+          int timeout, control_ret_t ret, int num_interfaces);
+
+void drive_user_task_registration(chanend c_user_task[n], unsigned n);
 
 #endif // __support_h__
