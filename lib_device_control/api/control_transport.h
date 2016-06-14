@@ -37,6 +37,4 @@ struct control_xscope_response {
 #define CONTROL_GET_VERSION CONTROL_CMD_SET_READ(0)
 #define CONTROL_GET_LAST_COMMAND_STATUS CONTROL_CMD_SET_READ(1)
 
-typedef uint8_t control_version_t;
-
 #endif // __control_transport_h_

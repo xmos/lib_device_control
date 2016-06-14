@@ -9,8 +9,10 @@
 
 typedef uint8_t control_resid_t;
 typedef uint8_t control_cmd_t;
+typedef uint8_t control_version_t;
 
 typedef uint8_t control_ret_t;
+
 enum {  // force short enum
   CONTROL_SUCCESS = 0,
   CONTROL_REGISTRATION_FAILED,

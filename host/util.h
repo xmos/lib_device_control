@@ -2,6 +2,9 @@
 #ifndef __util_h__
 #define __util_h__
 
+void pause_short();
+void pause_long();
+
 void print_bytes(const unsigned char data[], int num_bytes);
 
 #endif // __util_h__

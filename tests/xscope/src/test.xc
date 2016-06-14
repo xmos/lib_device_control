@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "control.h"
 #include "control_transport.h"
-#include "control_host.h"
+#include "control_host_support.h"
 #include "resource.h"
 #include "support.h"
 #include "support_inline.h"

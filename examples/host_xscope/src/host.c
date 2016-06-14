@@ -1,230 +1,66 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <stdio.h>
 #include <string.h>
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
 #include <signal.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "xscope_endpoint.h"
 #include "control_host.h"
-#include "util.h"
 #include "signals.h"
 #include "resource.h"
-
-#define UNUSED_PARAMETER(x) (void)(x)
-
-#ifdef _WIN32
-
-static void pause_short()
-{
-  Sleep(1);
-}
-
-static void pause_long()
-{
-  Sleep(1000);
-}
-
-#else
-
-static void pause_short()
-{
-  usleep(100000);
-}
-
-static void pause_long()
-{
-  sleep(1);
-}
-
-#endif // _WIN32
-
-static unsigned int probe_id = 0xffffffff;
-static int record_count = 0;
-
-void register_callback(unsigned int id, unsigned int type,
-  unsigned int r, unsigned int g, unsigned int b,
-  unsigned char *name, unsigned char *unit,
-  unsigned int data_type, unsigned char *data_name)
-{
-  UNUSED_PARAMETER(type);
-  UNUSED_PARAMETER(r);
-  UNUSED_PARAMETER(g);
-  UNUSED_PARAMETER(b);
-  UNUSED_PARAMETER(unit);
-  UNUSED_PARAMETER(data_type);
-  UNUSED_PARAMETER(data_name);
-
-  if (strcmp((char*)name, XSCOPE_CONTROL_PROBE) == 0) {
-    probe_id = id;
-    printf("registered probe %d\n", id);
-  }
-}
-
-struct control_xscope_response last_response;
-
-void record_callback(unsigned int id, unsigned long long timestamp,
-  unsigned int length, unsigned long long dataval, unsigned char *databytes)
-{
-  UNUSED_PARAMETER(timestamp);
-  UNUSED_PARAMETER(dataval);
-
-  if (id == probe_id) {
-    memcpy((void*)&last_response, databytes, length);
-    record_count++;
-  }
-}
-
-void init_xscope(int port)
-{
-  char port_str[16];
-
-  sprintf(port_str, "%d", port);
-
-  if (xscope_ep_set_register_cb(register_callback) != XSCOPE_EP_SUCCESS) {
-    fprintf(stderr, "xscope_ep_set_register_cb failed\n");
-    exit(1);
-  }
-
-  if (xscope_ep_set_record_cb(record_callback) != XSCOPE_EP_SUCCESS) {
-    fprintf(stderr, "xscope_ep_set_record_cb failed\n");
-    exit(1);
-  }
-
-  if (xscope_ep_connect("localhost", port_str) != XSCOPE_EP_SUCCESS) {
-    exit(1);
-  }
-
-  printf("connected to server at port %d\n", port);
-
-  /* wait for xSCOPE probe registration */
-  while (probe_id == -1) {
-    pause_short();
-  }
-}
-
-unsigned num_commands = 0;
-
-void do_version_command(void)
-{
-  struct control_xscope_packet p;
-  unsigned *b;
-  size_t len;
-
-  memset(&p, 0, sizeof(struct control_xscope_packet));
-
-  b = (unsigned*)&p;
-  len = control_xscope_create_upload_buffer(b, CONTROL_GET_VERSION,
-    CONTROL_SPECIAL_RESID, NULL, sizeof(control_version_t));
-
-  printf("%u: send version command: ", num_commands);
-  print_bytes((unsigned char*)b, len);
-
-  record_count = 0;
-
-  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
-    printf("xscope_ep_request_upload failed\n");
-  }
-  else {
-    while (record_count == 0) { /* wait for response on xSCOPE probe */
-      pause_short();
-    }
-    printf("response: ");
-    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.payload_len);
-  }
-
-  num_commands++;
-}
-
-void do_write_command(void)
-{
-  struct control_xscope_packet p;
-  unsigned *b;
-  unsigned char payload[1];
-  size_t len;
-
-  memset(&p, 0, sizeof(struct control_xscope_packet));
-
-  b = (unsigned*)&p;
-  payload[0] = 1;
-  len = control_xscope_create_upload_buffer(b,
-    CONTROL_CMD_SET_WRITE(0), RESOURCE_ID, payload, sizeof(payload));
-
-  printf("%u: send write command: ", num_commands);
-  print_bytes((unsigned char*)b, len);
-
-  record_count = 0;
-
-  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
-    printf("xscope_ep_request_upload failed\n");
-  }
-  else {
-    while (record_count == 0) { /* wait for response on xSCOPE probe */
-      pause_short();
-    }
-    printf("response: ");
-    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES);
-  }
-
-  num_commands++;
-}
-
-void do_read_command(void)
-{
-  struct control_xscope_packet p;
-  unsigned *b;
-  size_t len;
-
-  memset(&p, 0, sizeof(struct control_xscope_packet));
-
-  b = (unsigned*)&p;
-  len = control_xscope_create_upload_buffer(b,
-    CONTROL_CMD_SET_READ(0), RESOURCE_ID, NULL, 4);
-
-  printf("%d: send read command: ", num_commands);
-  print_bytes((unsigned char*)b, len);
-
-  record_count = 0;
-
-  if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
-    printf("xscope_ep_request_upload failed\n");
-  }
-  else {
-    while (record_count == 0) { /* wait for response on xSCOPE probe */
-      pause_short();
-    }
-    printf("response: ");
-    print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.payload_len);
-  }
-
-  num_commands++;
-}
+#include "pause.h"
 
 void shutdown(void)
 {
-  /* xSCOPE disconnect hangs (SIGINT propagated to pthread?) */
+  control_cleanup_xscope();
   exit(0);
 }
 
 int main(void)
 {
+  control_version_t version;
+  unsigned char payload[4];
   int i;
 
   signals_init();
-  init_xscope(10101);
   signals_setup_int(shutdown);
 
-  do_version_command();
+  if (control_init_xscope("localhost", "10101") != CONTROL_SUCCESS) {
+    printf("control init failed\n");
+    exit(1);
+  }
+
+  printf("device found\n");
+
+  if (control_query_version(&version) != CONTROL_SUCCESS) {
+    printf("control query version failed\n");
+    exit(1);
+  }
+  if (version != CONTROL_VERSION) {
+    printf("version expected 0x%X, received 0x%X\n", CONTROL_VERSION, version);
+  }
+
+  printf("started\n");
 
   while (1) {
     for (i = 0; i < 4; i++) {
-      do_write_command();
+      payload[0] = 1;
+      if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 1) != CONTROL_SUCCESS) {
+        printf("control write command failed\n");
+        exit(1);
+      }
+      printf("W");
+      fflush(stdout);
+
       pause_short();
-      do_read_command();
+
+      if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, 4) != CONTROL_SUCCESS) {
+        printf("control read command failed\n");
+        exit(1);
+      }
+      printf("R");
+      fflush(stdout);
+
       pause_long();
     }
   }

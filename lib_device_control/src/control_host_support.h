@@ -1,6 +1,6 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
-#ifndef __control_host_h__
-#define __control_host_h__
+#ifndef __control_host_support_h__
+#define __control_host_support_h__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -69,4 +69,4 @@ control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
   }
 }
 
-#endif // __control_host_h__
+#endif // __control_host_support_h__
