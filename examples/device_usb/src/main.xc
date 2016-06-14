@@ -45,15 +45,13 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
           res = XUD_GetBuffer(ep0_out, request_data, len);
           if (res == XUD_RES_OKAY) {
             if (control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control) == CONTROL_SUCCESS) {
-              /* zero length data to indicate success */
+              /* zero length data to indicate success
+               * on control error, go to standard requests, which will issue STALL
+               */
               res = XUD_DoSetRequestStatus(ep0_in);
-            }
-            else {
-              /* issue STALL to indicate error */
-              res = XUD_RES_ERR;
+              handled = 1;
             }
           }
-          handled = 1;
           break;
 
         case USB_BMREQ_D2H_VENDOR_DEV:
@@ -63,17 +61,15 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
           if (control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control) == CONTROL_SUCCESS) {
             len = sp.wLength;
             res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
+            handled = 1;
+            /* on control error, go to standard requests, which will issue STALL */
           }
-          else {
-            /* issue STALL to indicate error */
-            res = XUD_RES_ERR;
-          }
-          handled = 1;
           break;
       }
 
       if (!handled) {
         /* if we haven't handled the request about then do standard enumeration requests */
+        debug_printf("not handled, passing to standard requests\n");
         unsafe {
           res = USB_StandardRequests(ep0_out, ep0_in, devDesc,
             sizeof(devDesc), cfgDesc, sizeof(cfgDesc),
