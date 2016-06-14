@@ -5,6 +5,10 @@
 #include "control.h"
 #include "control_transport.h"
 
+#ifdef __cplusplus 
+extern "C" {
+#endif
+
 #if USE_I2C && __xcore__
 #include "i2c.h"
 #endif
@@ -42,5 +46,9 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
                      client interface i2c_master_if i_i2c,
 #endif
                      uint8_t payload[], size_t payload_len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __control_host_h__

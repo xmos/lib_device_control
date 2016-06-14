@@ -14,7 +14,11 @@
 #   ../../../host ---> ..../host
 #
 ifeq ("$(wildcard host)","")
-$(error need a symbolic link to the library's host folder in this directory, e.g. ln -s ../../../host)
+ifneq ($(OS),WINDOWS)
+$(shell ln -s ../../host)
+else
+$(error need a symbolic link to the host directory to build this XMOS app)
+endif
 endif
 
 TARGET = XE232.xn

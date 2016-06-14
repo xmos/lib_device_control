@@ -4,7 +4,6 @@
 #include <xscope.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "debug_print.h"
 #include "usb.h"
 #include "hid.h"
 #include "descriptors.h"

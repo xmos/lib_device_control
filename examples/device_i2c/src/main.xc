@@ -15,7 +15,7 @@
  *    SCL ETH_RXCLK X1D00 port 1A (resistor R60)
  *    SDA ETH_TXCLK X1D01 port 1B (resistor R57)
  *
- * also hold Ethernet PHY in reset to ensure it is not driving clock:
+ * Ethernet PHY reset:
  *
  *    ETH_RST_N X1D29 port 4F bit 1
  */
@@ -76,6 +76,7 @@ int main(void)
   par {
     on tile[0]: app(i_control[0]);
     on tile[1]: {
+      /* hold Ethernet PHY in reset to ensure it is not driving clock */
       p_eth_phy_reset <: 0;
       control_init();
       control_register_resources(i_control, 1);

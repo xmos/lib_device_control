@@ -1,8 +1,8 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <stdio.h>
 #include <stdlib.h>
-#include "signals.h"
 #include "control_host.h"
+#include "signals.h"
 #include "resource.h"
 #include "pause.h"
 
