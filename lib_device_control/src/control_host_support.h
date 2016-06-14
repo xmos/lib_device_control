@@ -18,18 +18,17 @@ control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
 
   p = (struct control_xscope_packet*)buffer;
 
+  p->resid = resid;
+  p->cmd = cmd;
+
+  assert((payload_len <= XSCOPE_DATA_MAX_BYTES) && "exceeded maximum xSCOPE payload size");
+  p->payload_len = (uint8_t)payload_len;
+
   if (IS_CONTROL_CMD_READ(cmd)) {
-    p->resid = resid;
-    p->cmd = cmd;
-    p->payload_len = payload_len;
     return XSCOPE_HEADER_BYTES;
   }
   else {
-    p->resid = resid;
-    p->cmd = cmd;
-    p->payload_len = payload_len;
     if (payload != NULL) {
-      assert((payload_len <= XSCOPE_DATA_MAX_BYTES) && "exceeded maximum xSCOPE payload size");
       memcpy(p->payload, payload, payload_len);
     }
     return XSCOPE_HEADER_BYTES + payload_len;
@@ -56,7 +55,7 @@ control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
 
   data[0] = resid;
   data[1] = cmd;
-  data[2] = payload_len;
+  data[2] = (uint8_t)payload_len;
 
   if (IS_CONTROL_CMD_READ(cmd)) {
     return 3;

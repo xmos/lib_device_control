@@ -44,8 +44,10 @@ void register_callback(unsigned int id, unsigned int type,
 void xscope_print(unsigned long long timestamp,
                   unsigned int length,
                   unsigned char *data) {
+  UNUSED_PARAMETER(timestamp);
+
   if (length) {
-    for (int i = 0; i < length; i++) {
+    for (unsigned i = 0; i < length; i++) {
       printf("%c", *(&data[i]));
     }
   }
@@ -201,7 +203,6 @@ control_ret_t control_cleanup_xscope(void)
   xscope_ep_disconnect();
   #endif
   // xSCOPE disconnect hangs (SIGINT propagated to pthread?)
-  exit(0);
 
   return CONTROL_SUCCESS;
 }

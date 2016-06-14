@@ -177,9 +177,11 @@ control_ret_t control_init_usb(int vendor_id, int product_id)
   return CONTROL_SUCCESS;
 }
 
-void cleanup_usb() {
+control_ret_t control_cleanup_usb(void)
+{
   usb_release_interface(devh, 0);
   usb_close(devh);
+  return CONTROL_SUCCESS;
 }
 
 #else

@@ -1,6 +1,10 @@
+# build tested with Visual Studio command prompt (just "nmake /f Makefile.Win32")
+# need to install libusb driver from libusb directory in this example
+# VID and PID in driver's INF file need to match this example's host code and corresponding device code
+
 all:
 	if not exist bin mkdir bin
-	CL.exe /Ilibusb/Win32 /I..\..\lib_device_control\api /nologo /W4 /WX- /O2 /EHa /Fe"bin\a.exe" /TP src\host.c src\signals.c src\util.c /link libusb\Win32\libusb.lib
+	CL.exe /Ilibusb/Win32 /I..\..\lib_device_control\api /I..\..\lib_device_control\src /I..\..\host /D USE_USB /nologo /W4 /WX- /O2 /EHa /Fe"bin\a.exe" /TP ..\..\host\device_access_usb.c ..\..\host\util.c src\host.c src\signals.c /link libusb\Win32\libusb.lib
 
 clean:
 	rmdir /s /q bin
