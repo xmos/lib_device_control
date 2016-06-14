@@ -7,21 +7,9 @@
 #include "control.h"
 #include "app.h"
 
-/* Microphone array board
- *
- * need to use 1bit ports for I2C, because I2C library slave is only 1bit port
- * I2C ports are on a 4bit port, so 1bit Ethernet ports instead:
- *
- *    SCL ETH_RXCLK X1D00 port 1A (resistor R60)
- *    SDA ETH_TXCLK X1D01 port 1B (resistor R57)
- *
- * Ethernet PHY reset:
- *
- *    ETH_RST_N X1D29 port 4F bit 1
- */
-port p_scl = on tile[1]: XS1_PORT_1A;
-port p_sda = on tile[1]: XS1_PORT_1B;
-out port p_eth_phy_reset = on tile[1]: XS1_PORT_4F;
+port p_scl = on tile[1]: XS1_PORT_1A; /* X1D0 mic array board resistor R60 and also ETH_RXCLK */
+port p_sda = on tile[1]: XS1_PORT_1B; /* X1D1 mic array board resistor R57 and also ETH_TXCLK */
+out port p_eth_phy_reset = on tile[1]: XS1_PORT_4F; /* X1D29, bit 1 of port 4F */
 
 const char i2c_device_addr = 123;
 

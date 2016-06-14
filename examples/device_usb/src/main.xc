@@ -10,6 +10,9 @@
 #include "control.h"
 #include "app.h"
 
+#define DEBUG_UNIT DEVICE
+#include "debug_print.h"
+
 void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_control[1])
 {
   USB_SetupPacket_t sp;
@@ -31,6 +34,11 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
     handled = 0;
 
     if (res == XUD_RES_OKAY) {
+
+      debug_printf("recipient %d type %d direction %d request %d value %d index %d length %d\n",
+        sp.bmRequestType.Recipient, sp.bmRequestType.Type, sp.bmRequestType.Direction,
+        sp.bRequest, sp.wValue, sp.wIndex, sp.wLength);
+
       switch ((sp.bmRequestType.Direction << 7) | (sp.bmRequestType.Type << 5) | (sp.bmRequestType.Recipient)) {
 
         case USB_BMREQ_H2D_VENDOR_DEV:
@@ -63,16 +71,16 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
           handled = 1;
           break;
       }
-    }
 
-    if (!handled) {
-      /* if we haven't handled the request about then do standard enumeration requests */
-      unsafe {
-        res = USB_StandardRequests(ep0_out, ep0_in, devDesc,
-          sizeof(devDesc), cfgDesc, sizeof(cfgDesc),
-          null, 0, null, 0,
-          stringDescriptors, sizeof(stringDescriptors) / sizeof(stringDescriptors[0]),
-          sp, bus_speed);
+      if (!handled) {
+        /* if we haven't handled the request about then do standard enumeration requests */
+        unsafe {
+          res = USB_StandardRequests(ep0_out, ep0_in, devDesc,
+            sizeof(devDesc), cfgDesc, sizeof(cfgDesc),
+            null, 0, null, 0,
+            stringDescriptors, sizeof(stringDescriptors) / sizeof(stringDescriptors[0]),
+            sp, bus_speed);
+        }
       }
     }
 

@@ -63,6 +63,7 @@ int main(void)
   }
 
   control_cleanup_usb();
+  printf("done\n");
 
   return 0;
 }
