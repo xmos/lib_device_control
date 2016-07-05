@@ -96,8 +96,5 @@ Software version and dependencies
 Related application notes
 .........................
 
-The following application notes use this library:
+    None
 
-  * ANxxxx - [App note title 1]
-  * ANxxxx - [App note title 2]
-  ...
