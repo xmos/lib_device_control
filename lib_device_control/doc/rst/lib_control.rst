@@ -1,25 +1,22 @@
 .. include:: ../../../README.rst
 
-External Signal Description
----------------------------
-
-[optional section on the hardware characteristics of peripherals and how to connect them to the xCORE device]
-
 Usage
 -----
 
-[optional section describing how to use the library if use model is complex]
+The control library support USB, I2C and xSCOPE as physical protocols.
+There are example applications for all three in the examples folder.
 
 API
 ---
 
-[API reference]
+[Todo]
+
 
 |appendix|
 
 Known Issues
 ------------
 
-[list of known issues]
+There are no known issues.
 
 .. include:: ../../../CHANGELOG.rst
