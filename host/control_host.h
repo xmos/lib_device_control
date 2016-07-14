@@ -20,7 +20,7 @@ control_ret_t control_cleanup_xscope(void);
 control_ret_t control_init_i2c(unsigned char i2c_slave_address);
 control_ret_t control_cleanup_i2c(void);
 #elif USE_USB
-control_ret_t control_init_usb(int vendor_id, int product_id);
+control_ret_t control_init_usb(int vendor_id, int product_id, int interface);
 control_ret_t control_cleanup_usb(void);
 #else
 #error "Please specify transport for lib_device_control using USE_xxx define and configure in config.h"
