@@ -4,7 +4,7 @@ Device control library change log
 2.0.0
 -----
 
-  * Added the ability to select USB interface.
+  * Added the ability to select USB interface (Allows control from Windows)
 
 1.0.0
 -----
