@@ -186,7 +186,7 @@ control_ret_t control_cleanup_usb(void)
 
 #else
 
-control_ret_t control_init_usb(int vendor_id, int product_id)
+control_ret_t control_init_usb(int vendor_id, int product_id, int interface)
 {
   int ret = libusb_init(NULL);
   if (ret < 0) {
