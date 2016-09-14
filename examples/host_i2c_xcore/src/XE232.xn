@@ -24,7 +24,7 @@
           </Tile>
           <Tile Number="1" Reference="tile[1]"/>
         </Node>
-        <Node Id="1" InPackageId="1" Type="XS2-L16A-256" SystemFrequency="500MHz" Oscillator="24MHz">
+        <Node Id="2" InPackageId="2" Type="XS2-L16A-256" SystemFrequency="500MHz" Oscillator="24MHz">
           <Boot>
             <Source Location="bootFlash1"/>
           </Boot>
@@ -35,7 +35,7 @@
           </Tile>
           <Tile Number="1" Reference="tile[3]"/>
         </Node>
-        <Node Id="2" InPackageId="2" Type="periph:XS1-SU" Reference="usb_tile[0]" Oscillator="24MHz">
+        <Node Id="1" InPackageId="1" Type="periph:XS1-SU" Reference="usb_tile[0]" Oscillator="24MHz">
         </Node>
         <Node Id="3" InPackageId="3" Type="periph:XS1-SU" Reference="usb_tile[1]" Oscillator="24MHz">
         </Node>
@@ -48,26 +48,26 @@
       <Links>
         <Link Encoding="5wire" Delays="1,1">
           <LinkEndpoint NodeId="0" Link="7"/>
-          <LinkEndpoint NodeId="1" Link="0"/>
+          <LinkEndpoint NodeId="2" Link="0"/>
         </Link>
         <Link Encoding="5wire" Delays="1,1">
           <LinkEndpoint NodeId="0" Link="4"/>
-          <LinkEndpoint NodeId="1" Link="3"/>
+          <LinkEndpoint NodeId="2" Link="3"/>
         </Link>
         <Link Encoding="5wire" Delays="1,1">
           <LinkEndpoint NodeId="0" Link="6"/>
-          <LinkEndpoint NodeId="1" Link="1"/>
+          <LinkEndpoint NodeId="2" Link="1"/>
         </Link>
         <Link Encoding="5wire" Delays="1,1">
           <LinkEndpoint NodeId="0" Link="5"/>
-          <LinkEndpoint NodeId="1" Link="2"/>
+          <LinkEndpoint NodeId="2" Link="2"/>
         </Link>
         <Link Encoding="5wire">
           <LinkEndpoint NodeId="0" Link="8" Delays="52clk,52clk"/>
-          <LinkEndpoint NodeId="2" Link="XL0" Delays="1clk,1clk"/>
+          <LinkEndpoint NodeId="1" Link="XL0" Delays="1clk,1clk"/>
         </Link>
         <Link Encoding="5wire">
-          <LinkEndpoint NodeId="1" Link="8" Delays="52clk,52clk"/>
+          <LinkEndpoint NodeId="2" Link="8" Delays="52clk,52clk"/>
           <LinkEndpoint NodeId="3" Link="XL0" Delays="1clk,1clk"/>
         </Link>
          <Link Encoding="2wire" Delays="5clk" Flags="XSCOPE">
@@ -83,7 +83,7 @@
       <Attribute Name="PORT_SQI_SCLK" Value="PORT_SQI_SCLK_0"/>
       <Attribute Name="PORT_SQI_SIO" Value="PORT_SQI_SIO_0"/>
     </Device>
-    <Device NodeId="1" Tile="0" Class="SQIFlash" Name="bootFlash1">
+    <Device NodeId="2" Tile="0" Class="SQIFlash" Name="bootFlash1">
       <Attribute Name="PORT_SQI_CS" Value="PORT_SQI_CS_1"/>
       <Attribute Name="PORT_SQI_SCLK" Value="PORT_SQI_SCLK_1"/>
       <Attribute Name="PORT_SQI_SIO" Value="PORT_SQI_SIO_1"/>
@@ -92,7 +92,7 @@
 
   <JTAGChain>
     <JTAGDevice NodeId="0"/>
-    <JTAGDevice NodeId="1"/>
+    <JTAGDevice NodeId="2"/>
   </JTAGChain>
 
 </Network>
