@@ -8,10 +8,14 @@
 #include "hid.h"
 #include "descriptors.h"
 #include "control.h"
+#include "mic_array_board_support.h"
 #include "app.h"
 
 #define DEBUG_UNIT DEVICE
 #include "debug_print.h"
+
+on tile[0]: mabs_led_ports_t p_leds = MIC_BOARD_SUPPORT_LED_PORTS;
+on tile[0]: in port p_buttons =  MIC_BOARD_SUPPORT_BUTTON_PORTS;
 
 void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_control[1])
 {
@@ -100,11 +104,15 @@ int main(void)
 {
   chan c_ep_out[NUM_EP_OUT], c_ep_in[NUM_EP_IN];
   interface control i_control[1];
+  interface mabs_led_button_if i_leds_buttons[1];
   par {
     on USB_TILE: par {
-      app(i_control[0]);
       endpoint0(c_ep_out[0], c_ep_in[0], i_control);
       xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
+    }
+    on tile[0]: par {
+      app(i_control[0], i_leds_buttons[0]);
+      mabs_button_and_led_server(i_leds_buttons, 1, p_leds, p_buttons);
     }
   }
   return 0;

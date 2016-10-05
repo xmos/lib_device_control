@@ -6,7 +6,11 @@
 #include <xscope.h>
 #include <stdint.h>
 #include "control.h"
+#include "mic_array_board_support.h"
 #include "app.h"
+
+on tile[0]: mabs_led_ports_t p_leds = MIC_BOARD_SUPPORT_LED_PORTS;
+on tile[0]: in port p_buttons =  MIC_BOARD_SUPPORT_BUTTON_PORTS;
 
 void xscope_user_init(void)
 {
@@ -48,10 +52,13 @@ int main(void)
 {
   chan c_xscope;
   interface control i_control[1];
+  interface mabs_led_button_if i_leds_buttons[1];
+
   par {
     xscope_host_data(c_xscope);
     on tile[0]: xscope_client(c_xscope, i_control);
-    on tile[0]: app(i_control[0]);
+    on tile[0]: app(i_control[0], i_leds_buttons[0]);
+    on tile[0]: mabs_button_and_led_server(i_leds_buttons, 1, p_leds, p_buttons);
   }
   return 0;
 }

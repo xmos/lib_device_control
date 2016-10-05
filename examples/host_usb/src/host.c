@@ -4,7 +4,6 @@
 #include "control_host.h"
 #include "signals.h"
 #include "resource.h"
-#include "pause.h"
 
 int done = 0;
 
@@ -41,12 +40,14 @@ int main(void)
 
   while (!done) {
     for (i = 0; !done && i < 4; i++) {
-      payload[0] = 1;
+      printf("Enter number of LEDs to be lit: ");
+      int num_leds;
+      scanf("%d", &num_leds);
+      payload[0] = (unsigned char)num_leds;
       if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 1) != CONTROL_SUCCESS) {
         printf("control write command failed\n");
         exit(1);
       }
-      printf("W");
       fflush(stdout);
 
       pause_short();
@@ -55,10 +56,8 @@ int main(void)
         printf("control read command failed\n");
         exit(1);
       }
-      printf("R");
+      printf("Last button event: %c, value: %d\n", 'A' + payload[0], payload[1]);
       fflush(stdout);
-
-      pause_long();
     }
   }
 
