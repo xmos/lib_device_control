@@ -1,6 +1,12 @@
 Device control library change log
 =================================
 
+2.0.2
+-----
+
+  * Added AN01034 application note based around USB transport example
+  * Examples use buttons/LEDs on the xCORE Array Microphone board
+
 2.0.1
 -----
 
