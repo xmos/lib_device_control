@@ -1,13 +1,10 @@
 .. include:: ../../../README.rst
 
-Usage
------
+Device Control Library
+----------------------
 
-The control library support USB, I2C and xSCOPE as physical protocols.
-There are example applications for all three in the examples folder.
-
-Specification
-.............
+Operation
+.........
 
 The *Host* controls *resources* on an xCORE *device* by sending *commands* to it over a
 *transport* protocol. Resources are identified by an 8bit identifier and exist in
@@ -23,14 +20,16 @@ when bit 7 is set. Read and write Commands include *data* bytes that are optiona
       **Send read command c to resource ``r`` and get ``n`` bytes of data ``d`` back**
 
 There is a transport task in the device (e.g. I2C slave or USB endpoint 0) that dispatches
-all commands. All other tasks that have resources connect to this transport task over xC
-interfaces.
+all commands. All other tasks that have resources connect to this transport task over xC interfaces.
 
-Tasks *register* their resources and these get bound to the tasks' interface. When commands are
- received by the transport task they forwarded on the matching interface.
+Tasks *register* their resources and these get bound to the tasks' interface. When commands are 
+received by the transport task they forwarded on the matching interface.
 
 Commands have a result code to indicate success or failure. The result is propagated to host so
 host can indicate error to the user.  
+
+The control library supports USB, I2C and xSCOPE as physical protocols.
+There are example applications for all three in the examples folder.
 
 Usage
 .....
@@ -40,7 +39,7 @@ calls a processing function on it from the library, passing in the whole array o
 The library's functionality happens inside the function that is called and once a command is complete, an
 interface call is made to pass the command over.
 
-The receiving task(s) then receive a write or read command over an xC interface.
+The receiving tasks then receive a write or read command over an xC interface.
 
 Over I2C slave, the command is split into multiple I2C transactions::
 
@@ -64,6 +63,8 @@ their resources::
 
 To ensure compatibility, a special command is provided to query the version of control interface.
 
+Please see the `API`_ section for further details.
+
 References
 ..........
 
@@ -74,10 +75,36 @@ I2C
    * http://www.robot-electronics.co.uk/i2c-tutorial
    * https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=15840&start=25
 
+USB
+***
+
+   * http://www.beyondlogic.org/usbnutshell/usb6.shtml
+
 API
 ---
 
-[Todo]
+.. doxygeninterface:: control
+
+.. doxygenfunction:: control_init
+
+.. doxygenfunction:: control_register_resources
+
+.. doxygenfunction:: control_process_i2c_write_start
+
+.. doxygenfunction:: control_process_i2c_read_start
+
+.. doxygenfunction:: control_process_i2c_write_data
+
+.. doxygenfunction:: control_process_i2c_read_data
+
+.. doxygenfunction:: control_process_i2c_stop
+
+.. doxygenfunction:: control_process_usb_set_request
+
+.. doxygenfunction:: control_process_usb_get_request
+
+.. doxygenfunction:: control_process_xscope_upload
+
 
 |newpage|
 
