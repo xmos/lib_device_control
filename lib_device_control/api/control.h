@@ -17,7 +17,7 @@ typedef uint8_t control_ret_t;
 
 /** This type enumerates the possible outcomes from a control transaction
  */
-enum {  // force short enum
+enum control_ret {  // force short enum
   CONTROL_SUCCESS = 0,
   CONTROL_REGISTRATION_FAILED,
   CONTROL_BAD_COMMAND,

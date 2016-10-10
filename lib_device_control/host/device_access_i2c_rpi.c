@@ -18,6 +18,14 @@
 //#define DBG(x) x
 #define DBG(x)
 
+/*Note there is an issue with RPI/Jessie where I2C repeated starts are not enabled by default.
+Try the following at the bash command line to enable them:
+
+sudo su -
+echo -n 1 > /sys/module/i2c_bcm2708/parameters/combined
+exit
+*/
+
 const char *devName = "/dev/i2c-1";                // Name of the i2c device we will be using
 unsigned char address = 0xff;                // Slave address. Initialise to invalid
 int fd;                                      // File descrition for i2c device

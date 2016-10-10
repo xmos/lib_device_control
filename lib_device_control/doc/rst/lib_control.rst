@@ -62,6 +62,9 @@ host can indicate error to the user.
 The control library supports USB, I2C and xSCOPE as physical protocols.
 There are example applications for all three in the examples folder.
 
+It would be straightforward to add support for additional physical protocols such as UART, SPI or 
+TCP/UDP over Ethernet.
+
 |newpage|
 
 Usage
@@ -70,7 +73,7 @@ Usage
 The transport task receives its natural unit of data, such as I2C transaction, or USB request, and
 calls a processing function on it from the library, passing in the whole array of xC interfaces.
 The library's functionality happens inside the function that is called and once a command is complete, an
-xC interface call is made to pass the command over.
+xC interface call is made to pass the command over to the controlled entity.
 
 The receiving tasks then receive a write or read command over an xC interface.
 
@@ -94,9 +97,11 @@ their resources::
 
       init() ==> i.register_resources(r[])
 
-To ensure compatibility, a special command is provided to query the version of control xC interface.
+To ensure compatibility, a special command is provided to query the version of control xC interface. This
+allows the host to query the device and check that it is running the same version, which will ensure
+command compatibility.
 
-Please see the `API`_ section for further details.
+Please see the `API---Device side`_ section for further details.
 
 |newpage|
 
@@ -115,8 +120,9 @@ USB
 
    * http://www.beyondlogic.org/usbnutshell/usb6.shtml
 
-API
----
+API---Device side
+-----------------
+
 .. doxygenenum:: control_ret
 
 .. doxygeninterface:: control
@@ -140,6 +146,27 @@ API
 .. doxygenfunction:: control_process_usb_get_request
 
 .. doxygenfunction:: control_process_xscope_upload
+
+|newpage|
+
+API - Host side
+---------------
+
+.. doxygenfunction:: control_init_xscope
+
+.. doxygenfunction:: control_cleanup_xscope
+
+.. doxygenfunction:: control_init_i2c
+
+.. doxygenfunction:: control_cleanup_i2c
+
+.. doxygenfunction:: control_init_usb
+
+.. doxygenfunction:: control_query_version
+
+.. doxygenfunction:: control_write_command
+
+.. doxygenfunction:: control_read_command
 
 |newpage|
 
