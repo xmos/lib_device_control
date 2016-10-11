@@ -1,0 +1,13 @@
+Start host app
+Start device app
+Device found
+started
+1: W 42 0 2, 99 ed
+Host written successfully
+2: R 42 128 4
+Host read successfully: 0x12, 0x34, 0x56, 0x78
+3: W 42 0 2, 99 ed
+Host written successfully
+4: R 42 128 4
+Host read successfully: 0x12, 0x34, 0x56, 0x78
+Success!!
