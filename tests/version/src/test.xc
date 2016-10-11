@@ -23,15 +23,15 @@ void test_xscope(client interface control i[1])
   version = *((control_version_t*)resp->payload);
 
   if (ret != CONTROL_SUCCESS) {
-    printf("xSCOPE processing function returned %d\n", ret);
+    printf("ERROR - xSCOPE processing function returned %d\n", ret);
     exit(1);
   }
   if (resp->ret != CONTROL_SUCCESS) {
-    printf("xSCOPE response return code %d\n", resp->ret);
+    printf("ERROR - xSCOPE response return code %d\n", resp->ret);
     exit(1);
   }
   else if (version != CONTROL_VERSION) {
-    printf("xSCOPE returned control version 0x%X, expected 0x%X\n", version, CONTROL_VERSION);
+    printf("ERROR - xSCOPE returned control version 0x%X, expected 0x%X\n", version, CONTROL_VERSION);
     exit(1);
   }
 }
@@ -50,11 +50,11 @@ void test_usb(client interface control i[1])
   memcpy(&version, request_data, sizeof(control_version_t));
 
   if (ret != CONTROL_SUCCESS) {
-    printf("USB processing function returned %d\n", ret);
+    printf("ERROR - USB processing function returned %d\n", ret);
     exit(1);
   }
   if (version != CONTROL_VERSION) {
-    printf("USB returned control version 0x%X, expected 0x%X\n", version, CONTROL_VERSION);
+    printf("ERROR - USB returned control version 0x%X, expected 0x%X\n", version, CONTROL_VERSION);
     exit(1);
   }
 }
@@ -84,11 +84,11 @@ void test_i2c(client interface control i[1])
   ret |= control_process_i2c_stop(i);
 
   if (ret != CONTROL_SUCCESS) {
-    printf("I2C processing functions returned %d\n", ret);
+    printf("ERROR - I2C processing functions returned %d\n", ret);
     exit(1);
   }
   if (version != CONTROL_VERSION) {
-    printf("I2C returned control version 0x%X, expected 0x%X\n", version, CONTROL_VERSION);
+    printf("ERROR - I2C returned control version 0x%X, expected 0x%X\n", version, CONTROL_VERSION);
     exit(1);
   }
 }
@@ -111,7 +111,7 @@ int main(void)
     }
     dummy_user_task(i[0]);
     { delay_microseconds(1000);
-      printf("test timeout\n");
+      printf("ERROR - test timeout\n");
       exit(1);
     }
   }

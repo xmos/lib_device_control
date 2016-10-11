@@ -5,11 +5,11 @@ def runtest():
     testlevel = 'smoke'
     resources = xmostest.request_resource('xsim')
 
-    binary = 'xscope/bin/xscope.xe'.format()
-    tester = xmostest.ComparisonTester(open('xscope.expect'),
+    binary = 'xscope_device/bin/xscope_device.xe'.format()
+    tester = xmostest.ComparisonTester(open('xscope_device.expect'),
                                        'lib_device_control',
                                        'lib_device_control_tests',
-                                       'xscope',
+                                       'xscope_device_api',
                                        {})
     tester.set_min_testlevel(testlevel)
     xmostest.run_on_simulator(resources['xsim'], binary, simargs=[], tester=tester)

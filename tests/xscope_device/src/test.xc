@@ -137,6 +137,7 @@ void test_client(client interface control i[3], chanend c_user_task[3])
     exit(0);
   }
   else {
+    printf("ERROR - %d fails found\n", fails);
     exit(1);
   }
 }
@@ -151,7 +152,7 @@ int main(void)
     user_task(i[1], c_user_task[1]);
     user_task(i[2], c_user_task[2]);
     { delay_microseconds(5000);
-      printf("test timeout\n");
+      printf("ERROR - test timeout\n");
       exit(1);
     }
   }
