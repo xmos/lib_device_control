@@ -57,8 +57,10 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface);
  *  \returns           Whether the shutdown was successful or not
  */
 control_ret_t control_cleanup_usb(void);
-#else
-#error "Please specify transport for lib_device_control using USE_xxx define and configure in config.h"
+#endif
+#if (!USE_USB && !USE_XSCOPE && !USE_I2C)
+#error "Please specify transport for lib_device_control using USE_xxx define in Makefile"
+#error "Eg. XCC_FLAGS = -DUSE_I2C=1"
 #endif // USE_XSCOPE
 
 #if USE_I2C && __xcore__
