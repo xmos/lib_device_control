@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/** This is the version of control protocol. Used to check compatibility */
 #define CONTROL_VERSION 0x10
 
 /** These types are used in control functions to identify the resource id,
@@ -17,7 +18,7 @@ typedef uint8_t control_ret_t;
 
 /** This type enumerates the possible outcomes from a control transaction
  */
-enum control_ret {  // force short enum
+enum control_ret {  /*This looks odd but helps us force byte enum */
   CONTROL_SUCCESS = 0,
   CONTROL_REGISTRATION_FAILED,
   CONTROL_BAD_COMMAND,
