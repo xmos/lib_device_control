@@ -13,14 +13,6 @@
 #
 #   ../../../host ---> ..../host
 #
-ifeq ("$(wildcard host)","")
-ifneq ($(OS),WINDOWS)
-$(shell ln -s ../../host)
-else
-$(error need a symbolic link to the host directory to build this XMOS app)
-endif
-endif
-
 TARGET = XE232.xn
 XCC_FLAGS = -Wall -g -D USE_I2C
 USED_MODULES = lib_device_control lib_i2c lib_logging
