@@ -3,7 +3,7 @@ ROOT = ../../../..
 
 all:
 	mkdir -p bin
-	cd src ; gcc -Wall -g -D HOST_APP -o ../bin/a.out -I $(ROOT)/lib_device_control/api -I $(ROOT)/lib_device_control/src -I $(ROOT)/lib_device_control/host/src -I $(ROOT)/lib_device_control/host/api -I ${XMOS_TOOL_PATH}/include ${XMOS_TOOL_PATH}/lib/xscope_endpoint.so -D USE_XSCOPE $(ROOT)/lib_device_control/host/src/device_access_xscope.c $(ROOT)/lib_device_control/host/src/util.c signals.c host.c
+	cd src ; gcc -Wall -g -D HOST_APP -o ../bin/xscope.out -I $(ROOT)/lib_device_control/api -I $(ROOT)/lib_device_control/src -I $(ROOT)/lib_device_control/host -I $(ROOT)/lib_device_control/host -I ${XMOS_TOOL_PATH}/include ${XMOS_TOOL_PATH}/lib/xscope_endpoint.so -D USE_XSCOPE $(ROOT)/lib_device_control/host/device_access_xscope.c $(ROOT)/lib_device_control/host/util.c signals.c host.c
 
 clean:
 	rm -rf bin

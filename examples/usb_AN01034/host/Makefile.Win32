@@ -4,7 +4,7 @@
 
 all:
 	if not exist bin mkdir bin
-	CL.exe /DUSE_USB /Ilibusb\Win32 /I..\..\..\lib_device_control\api /I..\..\..\lib_device_control\src /I..\..\..\lib_device_control\host\api /I..\..\..\lib_device_control\host\src /nologo /W4 /WX- /O2 /EHa /Fe"bin\usb_host_app.exe" /TP ..\..\..\lib_device_control\host\src\device_access_usb.c ..\..\..\lib_device_control\host\src\util.c src\host.c src\signals.c /link libusb\Win32\libusb.lib
+	CL.exe /DUSE_USB /Ilibusb\Win32 /I..\..\..\lib_device_control\api /I..\..\..\lib_device_control\src  /I..\..\..\lib_device_control\host /nologo /W4 /WX- /O2 /EHa /Fe"bin\usb_host_app.exe" /TP ..\..\..\lib_device_control\host\device_access_usb.c ..\..\..\lib_device_control\host\util.c src\host.c src\signals.c /link libusb\Win32\libusb.lib
 
 clean:
 	rmdir /s /q bin
