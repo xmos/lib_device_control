@@ -1,0 +1,8 @@
+ROOT = ../../../..
+
+all:
+	mkdir -p bin
+	cd src ; gcc -Wall -g  -D USE_USB  -D HOST_APP -I ../libusb/OSX64 -o ../bin/usb_host_app.out -I $(ROOT)/lib_device_control/api -I $(ROOT)/lib_device_control/src -I $(ROOT)/lib_device_control/host/api -I $(ROOT)/lib_device_control/host/src ../libusb/OSX64/libusb-1.0.0.dylib $(ROOT)/lib_device_control/host/src/device_access_usb.c $(ROOT)/lib_device_control/host/src/util.c host.c signals.c
+
+clean:
+	rm -rf bin
