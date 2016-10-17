@@ -17,7 +17,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifdef HOST_APP //Prevent XC compiler from picking this up
 #ifndef __USB_H__
 #define __USB_H__
 
@@ -411,5 +410,4 @@ extern "C" {
 #endif
 
 #endif /* __USB_H__ */
-#endif /* HOSTAPP */
 
