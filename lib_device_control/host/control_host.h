@@ -52,7 +52,7 @@ control_ret_t control_cleanup_i2c(void);
  *
  *  \returns           Whether the initialization was successful or not
  */
-control_ret_t control_init_usb(int vendor_id, int product_id, int interface);
+control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num);
 /** Shutdown the USB host interface connection
  *
  *  \returns           Whether the shutdown was successful or not
