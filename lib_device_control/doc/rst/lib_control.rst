@@ -6,7 +6,7 @@ Device Control Library
 Introduction
 ............
 
-The Device Control Library takes care of routing control messages between a host and the one or 
+The Device Control Library handles the routing of control messages between a host and one or 
 many controllable entities within the controlled device.
 
 
@@ -16,7 +16,7 @@ many controllable entities within the controlled device.
    Logical view of lib_device_control
 
 All communications are fully acknowledged and so the host will be informed whether or not the
-device has successfully processed or provided the required control information.
+device has correctly received or provided the required control information.
 
 |newpage|
 
@@ -46,24 +46,46 @@ Read and write Commands include *data* bytes that are optional (can have a data 
 There is a transport task in the device (e.g. I2C slave or USB endpoint 0) that dispatches
 all commands. All other tasks that have resources connect to this transport task over xC interfaces.
 
+|newpage|
+
 Tasks *register* their resources and these get bound to the tasks' xC interface. When commands are 
-received by the transport task they forwarded on the matching xC interface. This means multiple tasks
-residing in different cores or even tiles can be easily controlled using a single instance of 
-Device Control and a single control interface to the host.
+received by the transport task they forwarded over the matching xC interface.
+
 
 .. figure:: images/resource_mapping.pdf
    :width: 80%
 
    Mapping between resource IDs and xC interfaces
 
+
+This means multiple tasks residing in different cores or even tiles on the device can be easily 
+controlled using a single instance of the Device Control library and a single control interface to the host.
+
 Commands have a result code to indicate success or failure. The result is propagated to host so
 host can indicate error to the user.  
 
-The control library supports USB, I2C and xSCOPE as physical protocols.
-There are example applications for all three in the examples folder.
+The control library supports USB (device is USB device), I2C (device is I2C slave) and xSCOPE 
+(device is target connected via xTAG debug adapter) as physical protocols. The maximum data packet size for
+each of the trasport types is as follows:
+
+.. list-table:: Maximum Data Length for Device Control Library Transports
+ :header-rows: 1
+
+ * - Transort
+   - Data length
+   - Limitation
+ * - I2C
+   - 253 Bytes
+   - Arbitrary
+ * - USB
+   - 64 Bytes 
+   - USB control transfer specification
+ * - xSCOPE
+   - 256 Bytes
+   - Arbitrary
 
 It would be straightforward to add support for additional physical protocols such as UART, SPI or 
-TCP/UDP over Ethernet.
+TCP/UDP over Ethernet or add additional control hosts where the hardware and operating system supports it.
 
 |newpage|
 
@@ -71,11 +93,13 @@ Usage
 .....
 
 The transport task receives its natural unit of data, such as I2C transaction, or USB request, and
-calls a processing function on it from the library, passing in the whole array of xC interfaces.
-The library's functionality happens inside the function that is called and once a command is complete, an
+calls a processing function on it from the library. At the same time it passes in the whole array of xC interfaces
+which connect to all of the controlled tasks.
+
+The library's logic happens inside the function that is called and once a command is complete, an
 xC interface call is made to pass the command over to the controlled entity.
 
-The receiving tasks then receive a write or read command over an xC interface.
+The receiving task then receives a write or read command over the xC interface.
 
 Over I2C slave, the command is split into multiple I2C transactions::
 
