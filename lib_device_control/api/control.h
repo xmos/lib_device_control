@@ -30,10 +30,19 @@ enum control_ret {  /*This looks odd but helps us force byte enum */
 /** Resource count limits. Sets the size of the arrays used for storing the mappings
  */
 #define MAX_RESOURCES_PER_INTERFACE 64
-#define MAX_RESOURCES 256
+#define RESOURCE_TABLE_MAX 256
+#define IFNUM_RESERVED 255
 
-#define XSCOPE_UPLOAD_MAX_WORDS 64
+#define XSCOPE_UPLOAD_MAX_WORDS 64  //Long words (4 bytes)
 #define XSCOPE_CONTROL_PROBE "Control Probe"
+
+#define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * sizeof(uint32_t))
+#define XSCOPE_DATA_MAX_BYTES (XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES)
+
+#define I2C_TRANSACTION_MAX_BYTES 256
+#define I2C_DATA_MAX_BYTES (I2C_TRANSACTION_MAX_BYTES - 3)
+
+#define XSCOPE_HEADER_BYTES 4
 
 #ifdef __XC__
 /** This interface is used to communicate with the control library from the application
