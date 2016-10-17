@@ -1,5 +1,4 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
-#ifdef HOST_APP // Prevent device app from finding this source
 #include "signals.h"
 #ifdef _WIN32
 
@@ -55,4 +54,3 @@ void signals_init(void)
 }
 
 #endif // _WIN32
-#endif // HOST_APP

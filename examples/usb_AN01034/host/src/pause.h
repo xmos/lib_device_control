@@ -1,5 +1,4 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
-#ifdef HOST_APP //Prevent XC compiler from picking this up
 #ifndef __pause_h__
 #define __pause_h__
 
@@ -36,4 +35,3 @@ static void pause_long(void)
 #endif // WIN32
 
 #endif // __pause_h__
-#endif //HOST_APP

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #ifdef _WIN32
 #include <windows.h>
-#include "lusb.h"
+#include "usb.h"
 #else
 #include <unistd.h>
 #include "libusb64.h"

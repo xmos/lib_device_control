@@ -1,5 +1,4 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
-#ifdef HOST_APP //Prevent XC compiler from picking this up
 #include <stdio.h>
 #include <stdlib.h>
 #include "control_host.h"
@@ -68,4 +67,3 @@ int main(void)
 
   return 0;
 }
-#endif //HOST_APP

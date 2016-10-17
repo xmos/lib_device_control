@@ -1,5 +1,4 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
-#ifdef HOST_APP // Prevent device app from finding this source
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
@@ -68,4 +67,3 @@ int main(void)
 
   return 0;
 }
-#endif //HOST_APP
