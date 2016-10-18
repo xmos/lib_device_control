@@ -92,7 +92,7 @@ method call across the interface ``i_control``. A call to the ``read_command()``
 
 .. literalinclude:: app.xc
    :start-on: case i_control.read_command
-   :end-before: num_commands++;
+   :end-before: printf(
 
 Writing over Device Control
 ...........................
@@ -110,7 +110,7 @@ method call across the interface ``i_control``. The call to the ``write_command(
 
 .. literalinclude:: app.xc
    :start-on: case i_control.write_command
-   :end-before: num_commands++;
+   :end-before: printf(
 
 
 The application main() function
@@ -159,6 +159,7 @@ These cases are outlined above and handle registration, reading and writing even
 It waits for calls to these cases from the client side (Endpoint 0) and handles them accordingly by registering the controlled 
 resource, setting LEDs or reading the buttons.
 
+Please see the source code listing app_listing_ for more details.
 
 |appendix|
 
@@ -232,6 +233,8 @@ or for OSX::
 
 The build will result in a binary being compiled into /bin/a.out.
 
+When running under a Windows platform, additionally a driver will be required to fully enumerate the USB device. See below for details.
+
 Running the host application
 ............................
 
@@ -256,6 +259,42 @@ indicates that the last button event was button C being released::
 
   Last button event: C value: 1
 
+|newpage|
+
+Installing the Driver on Windows
+................................
+
+The test vendor specific device used in this application which requires a driver on Windows. The driver is installed 
+by finding the device when the application is running and connected to the host PC. Select :menuitem:`Control Panel,Device Manager`    
+
+.. figure:: images/driver_1.png
+   :width: 50%
+
+   Device before driver install
+
+Right click on the device and select **Update Driver Software....**
+
+.. figure:: images/driver_2.png
+   :width: 50%
+
+   Update the driver
+
+Select **Browse for driver software on your computer** and choose the ``libusb\Win32\driver`` directory.
+
+.. figure:: images/driver_3.png
+   :width: 50%
+
+   Locate the driver
+
+The driver should be installed and create a device called **XMOS Custom Device**.
+
+.. figure:: images/driver_4.png
+   :width: 50%
+
+   Once the driver has been installed
+
+The device is now ready to be controlled on Windows.
+
 
 |newpage|
 
@@ -276,6 +315,10 @@ References
 
     http://www.xmos.com/support/libraries/lib_device_control
 
+  * XMOS USB Library (and it's associated application notes)
+
+    http://www.xmos.com/support/libraries/lib_usb
+
 |newpage|
 
 Full source code listing
@@ -286,6 +329,8 @@ Source code for main.xc
 
 .. literalinclude:: main.xc
   :largelisting:
+
+.. _app_listing:
 
 Source code for app.xc
 .......................
