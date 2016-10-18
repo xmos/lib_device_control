@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "usb.h"
-#include "hid.h"
 #include "descriptors.h"
 #include "control.h"
 #include "mic_array_board_support.h"
