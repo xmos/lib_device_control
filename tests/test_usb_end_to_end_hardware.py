@@ -42,8 +42,8 @@ class device_control_endtoend_tester(xmostest.Tester):
                         line):
                 self.record_failure(line)
 
-        output = {'device_job_output':''.join(dut_programming_job_output),
-                  'host_job_output':''.join(control_job_output)
+        output = {'device_job_output':''.join(device_job_output),
+                  'host_job_output':''.join(host_job_output)
                   }
 
         if not self.result:
