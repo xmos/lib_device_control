@@ -3,6 +3,8 @@ import xmostest
 import re
 import os.path
 
+#This can be tested locally using ./runtests.py --remote-resourcer 10.0.102.121:9995
+
 class device_control_endtoend_tester(xmostest.Tester):
     # This checks for errors reported by all of the processes run
     # during the test. If no errors are seen the test will be marked as a pass.
