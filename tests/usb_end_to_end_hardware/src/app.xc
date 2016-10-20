@@ -1,6 +1,7 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <assert.h>
 #include "control.h"
 #include "app.h"
@@ -17,7 +18,7 @@ void app(server interface control i_control)
 
   num_commands = 0;
 
-  while (1) {
+  while (num_commands!=8) {
     select {
       case i_control.register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
                                         unsigned &num_resources):
@@ -32,7 +33,7 @@ void app(server interface control i_control)
         if ((num_commands % 3) == 0)
           resid += 1;
 #endif
-        printf("%u: W %d %d %d,", num_commands, resid, cmd, payload_len);
+        printf("%u: W %d %d %d,\t=", num_commands, resid, cmd, payload_len);
         for (i = 0; i < payload_len; i++) {
           printf(" %02x", payload[i]);
         }
@@ -52,7 +53,15 @@ void app(server interface control i_control)
         if ((num_commands % 3) == 0)
           resid += 1;
 #endif
-        printf("%u: R %d %d %d\n", num_commands, resid, cmd, payload_len);
+        payload[0] = 0x12;
+        payload[1] = 0x34;
+        payload[2] = 0x56;
+        payload[3] = 0x78;
+        printf("%u: R %d %d %d,\t=", num_commands, resid, cmd, payload_len);
+        for (i = 0; i < payload_len; i++) {
+          printf(" %02x", payload[i]);
+        }
+        printf("\n");
         if (resid != RESOURCE_ID) {
           printf("unrecognised resource ID %d\n", resid);
           ret = CONTROL_ERROR;
@@ -63,12 +72,9 @@ void app(server interface control i_control)
           ret = CONTROL_ERROR;
           break;
         }
-        payload[0] = 0x12;
-        payload[1] = 0x34;
-        payload[2] = 0x56;
-        payload[3] = 0x78;
         ret = CONTROL_SUCCESS;
         break;
     }
   }
+  _Exit(0);
 }

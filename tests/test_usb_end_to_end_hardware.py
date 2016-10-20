@@ -12,7 +12,7 @@ class device_control_endtoend_tester(xmostest.Tester):
         super(device_control_endtoend_tester, self).__init__()
         self.product = "lib_device_control"
         self.group = "lib_device_control_tests"
-        self.test = test
+        self.test = "End-to-end-hw"
         self.config = {'transport':transport}
         self.register_test(self.product, self.group, self.test, self.config)
 
@@ -67,45 +67,44 @@ def runtest():
       print 'remote resourcer not avaliable'
       return
 
-    testlevel = 'smoke'
-    tester.set_min_testlevel(testlevel)
-
     device_app_name = 'usb_end_to_end_hardware/bin/usb_end_to_end_hardware.xe'.format()
-    host_app_name = 'usb_end_to_end_hardware_host/bin/usb_end_to_end_hardware_host.out'
-
-    board = 'uac2_xcore200_mc_testrig_os_x_11'
+    #This path is relative from xmostest up the view and back down to lib_device_control
+    host_app_name = '../../../../lib_device_control/tests/usb_end_to_end_hardware_host/bin/usb_end_to_end_hardware_host.bin'
 
     # Setup the tester which will determine and record the result
     tester = xmostest.CombinedTester(2, device_control_endtoend_tester("usb",
                                                        host_app_name, device_app_name))
 
+    testlevel = 'smoke'
+    tester.set_min_testlevel(testlevel)
+
+    board = 'uac2_xcore200_mc_testrig_os_x_11'
+
     # Get the hardware resources to run the test on
     resources = None
     try:
-        resources = xmostest.request_resource(board, tester)
+        resources = xmostest.request_resource(board, tester, remote_resource_lease_time=30)
     except xmostest.XmosTestError:
         print "Unable to find required board %s required to run test" % board
         tester.shutdown()
         return
 
+    env = ""
 
     # Start the xCORE DUT
     device_job = xmostest.run_on_xcore(resources['dut'], device_app_name,
                                         do_xe_prebuild = True,
                                         tester = tester[0],
-                                        enable_xscope=True, 
-                                        xscope_handler=None, 
-                                        timeout=60,
+                                        enable_xscope = True, 
+                                        xscope_handler = None, 
+                                        timeout = 30,
                                         build_env = env)
 
-
     # Start the control app
-    host_job = xmostest.run_on_pc(resources['host_primary'],
-                                     ['python', host_app_name,
-                                      'agc_on', '0',
-                                      'doa_dir', str(doa_dir)],
+    host_job = xmostest.run_on_pc(resources['host'],
+                                     [host_app_name],
                                      tester = tester[1],
-                                     timeout = 5,
+                                     timeout = 10,
                                      initial_delay = 5)
                                       #start_after_completed = [device_job]
     

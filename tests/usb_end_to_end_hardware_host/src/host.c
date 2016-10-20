@@ -39,27 +39,28 @@ int main(void)
 
   printf("started\n");
 
-  while (!done) {
-    for (i = 0; !done && i < 4; i++) {
-      printf("Enter number of LEDs to be lit: ");
-      int num_leds;
-      scanf("%d", &num_leds);
-      payload[0] = (unsigned char)num_leds;
-      if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 1) != CONTROL_SUCCESS) {
-        printf("control write command failed\n");
-        exit(1);
-      }
-      fflush(stdout);
-
-      pause_short();
-
-      if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, 4) != CONTROL_SUCCESS) {
-        printf("control read command failed\n");
-        exit(1);
-      }
-      printf("Last button event: %c, value: %d\n", 'A' + payload[0], payload[1]);
-      fflush(stdout);
+  for (i = 0; i < 4; i++) {
+    payload[0] = 0xaa;
+    payload[1] = 0xff;
+    payload[2] = 0x55;
+    payload[3] = 0xed;
+    if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 4) != CONTROL_SUCCESS) {
+      printf("control write command failed\n");
+      exit(1);
     }
+    printf("Written payload\t= %2x, %2x, %2x, %2x\n", payload[0], payload[1], payload[2], payload[3]);
+    fflush(stdout);
+
+    pause_short();
+
+    if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, 4) != CONTROL_SUCCESS) {
+      printf("control read command failed\n");
+      exit(1);
+    }
+    printf("Read payload\t= %2x, %2x, %2x, %2x\n", payload[0], payload[1], payload[2], payload[3]);
+    fflush(stdout);
+
+    pause_long();
   }
 
   control_cleanup_usb();

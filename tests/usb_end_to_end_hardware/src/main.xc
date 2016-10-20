@@ -10,6 +10,8 @@
 #include "control.h"
 #include "app.h"
 
+on tile[0]: out port p_usb_mux = XS1_PORT_8C;
+
 void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_control[1])
 {
   USB_SetupPacket_t sp;
@@ -32,9 +34,9 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
 
     if (res == XUD_RES_OKAY) {
 
-      printf("recipient %d type %d direction %d request %d value %d index %d length %d\n",
+      /*printf("recipient %d type %d direction %d request %d value %d index %d length %d\n",
         sp.bmRequestType.Recipient, sp.bmRequestType.Type, sp.bmRequestType.Direction,
-        sp.bRequest, sp.wValue, sp.wIndex, sp.wLength);
+        sp.bRequest, sp.wValue, sp.wIndex, sp.wLength);*/
 
       switch ((sp.bmRequestType.Direction << 7) | (sp.bmRequestType.Type << 5) | (sp.bmRequestType.Recipient)) {
 
@@ -68,7 +70,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
 
       if (!handled) {
         /* if we haven't handled the request about then do standard enumeration requests */
-        printf("not handled, passing to standard requests\n");
+        //printf("not handled, passing to standard requests\n");
         unsafe {
           res = USB_StandardRequests(ep0_out, ep0_in, devDesc,
             sizeof(devDesc), cfgDesc, sizeof(cfgDesc),
@@ -83,6 +85,13 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
       bus_speed = XUD_ResetEndpoint(ep0_out, ep0_in);
     }
   }
+}
+
+void setup_hw(void){
+  /* 0b1100 : USB B */
+  /* 0b0100 : Lightning */
+  /* 0b1000 : USB A */
+  p_usb_mux <: 0xC;
 }
 
 enum {
@@ -105,6 +114,7 @@ int main(void)
       xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
     }
     on tile[0]: par {
+      setup_hw();
       app(i_control[0]);
     }
   }
