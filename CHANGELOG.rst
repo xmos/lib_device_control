@@ -1,7 +1,7 @@
 Device control library change log
 =================================
 
-2.0.2
+2.1.0
 -----
 
   * Added AN01034 application note based around USB transport example
@@ -24,7 +24,7 @@ Device control library change log
 
   * Changes to dependencies:
 
-    - lib_logging: Added dependency 2.0.1
+    - lib_logging: Added dependency 2.1.0
 
     - lib_xassert: Added dependency 2.0.1
 
