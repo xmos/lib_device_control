@@ -38,7 +38,7 @@ class device_control_endtoend_tester(xmostest.Tester):
         for line in (device_job_output
                      + host_job_output
                      ):
-            if re.match('.*ERROR|.*error|.*Error|.*Problem|.*ruined|could not',
+            if re.match('.*ERROR|.*error|.*Error|.*Problem|.*failed|.*could not|.*unrecognised',
                         line):
                 self.record_failure(line)
 
@@ -70,7 +70,7 @@ def runtest():
       return
 
     device_app_name = 'usb_end_to_end_hardware/bin/usb_end_to_end_hardware.xe'.format()
-    #This path is relative from xmostest up the view and back down to lib_device_control
+    #This path is relative from xmostest in the view used. goes up and back down to lib_device_control
     host_app_name = '../../../../lib_device_control/tests/usb_end_to_end_hardware_host/bin/usb_end_to_end_hardware_host.bin'
 
     # Setup the tester which will determine and record the result
@@ -106,8 +106,7 @@ def runtest():
     host_job = xmostest.run_on_pc(resources['host'],
                                      [host_app_name],
                                      tester = tester[1],
-                                     timeout = 10,
-                                     initial_delay = 5)
-                                      #start_after_completed = [device_job]
+                                     timeout = 30,
+                                     initial_delay = 10) #Enough time for xtag to load firmware and host to enumerate device
     
     xmostest.complete_all_jobs()

@@ -11,6 +11,8 @@ void app(server interface control i_control)
   unsigned num_commands;
   int i;
 
+  const unsigned char rx_expected_payload[4] = {0xaa, 0xff, 0x55, 0xed};
+
   printf("started\n");
 #ifdef ERRONEOUS_DEVICE
   printf("generate errors\n");
@@ -36,6 +38,11 @@ void app(server interface control i_control)
         printf("%u: W %d %d %d,\t=", num_commands, resid, cmd, payload_len);
         for (i = 0; i < payload_len; i++) {
           printf(" %02x", payload[i]);
+          if (payload[i] != rx_expected_payload[i]) {
+            printf("\nERROR - incorrect data received - expecting 0x%x\n", rx_expected_payload[i]);
+            ret = CONTROL_ERROR;
+            break;
+          }
         }
         printf("\n");
         if (resid != RESOURCE_ID) {
@@ -68,7 +75,7 @@ void app(server interface control i_control)
           break;
         }
         if (payload_len != 4) {
-          printf("expecting 4 read bytes, not %d\n", payload_len);
+          printf("ERROR - expecting 4 read bytes, not %d\n", payload_len);
           ret = CONTROL_ERROR;
           break;
         }
