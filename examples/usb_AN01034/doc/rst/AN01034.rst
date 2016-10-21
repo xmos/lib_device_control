@@ -188,7 +188,7 @@ the binary for the xCORE device. The xCORE binary has a XMOS standard .xe extens
 Launching from the command line
 ...............................
 
-From the command line you use the ``xrun`` tool to download and run the code
+From the command line use the ``xrun`` tool to download and run the code
 on the xCORE device::
 
   xrun --xscope bin/AN01034_usb.xe
@@ -200,9 +200,9 @@ Launching from xTIMEcomposer Studio
 ...................................
 
 From xTIMEcomposer Studio use the run mechanism to download code to xCORE device.
-Select the xCORE binary from the ``bin/`` directory, right click and go to Run
-Configurations. Double click on xCORE application to create a new run configuration,
-enable the xSCOPE I/O mode in the dialog box and then select Run.
+Select the xCORE binary from the ``bin/`` directory, right click and go to **Run
+Configurations**. Double click on xCORE application to create a new run configuration,
+enable the xSCOPE I/O mode in the dialog box and then select **Run**.
 
 Once this command has executed the application will be running on the xCORE Array Microphone board.
 
@@ -210,7 +210,7 @@ Running the application
 .......................
 
 Once the application is started using either of the above methods there should
-be output printed to the console::
+be the following output printed to the console::
 
   started
 
@@ -233,7 +233,8 @@ or for OSX::
 
 The build will result in a binary being compiled into /bin/a.out.
 
-When running under a Windows platform, additionally a driver will be required to fully enumerate the USB device. See below for details.
+When running under a Windows platform, additionally a driver will be required to fully enumerate the USB device. See 
+the ``Intsalling the Driver on Windows`` section driver_ for details.
 
 Running the host application
 ............................
@@ -261,6 +262,8 @@ indicates that the last button event was button C being released::
 
 |newpage|
 
+.. _driver:
+
 Installing the Driver on Windows
 ................................
 
@@ -268,28 +271,30 @@ The test vendor specific device used in this application which requires a driver
 by finding the device when the application is running and connected to the host PC. Select :menuitem:`Control Panel,Device Manager`    
 
 .. figure:: images/driver_1.png
-   :width: 50%
+   :width: 40%
 
    Device before driver install
 
 Right click on the device and select **Update Driver Software....**
 
 .. figure:: images/driver_2.png
-   :width: 50%
+   :width: 40%
 
    Update the driver
+
+|newpage|
 
 Select **Browse for driver software on your computer** and choose the ``libusb\Win32\driver`` directory.
 
 .. figure:: images/driver_3.png
-   :width: 50%
+   :width: 40%
 
    Locate the driver
 
 The driver should be installed and create a device called **XMOS Custom Device**.
 
 .. figure:: images/driver_4.png
-   :width: 50%
+   :width: 40%
 
    Once the driver has been installed
 
