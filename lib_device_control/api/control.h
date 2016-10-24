@@ -18,7 +18,7 @@ typedef uint8_t control_ret_t;
 
 /** This type enumerates the possible outcomes from a control transaction
  */
-enum control_ret {  /*This looks odd but helps us force byte enum */
+enum control_ret_values {  /*This looks odd but helps us force byte enum */
   CONTROL_SUCCESS = 0,
   CONTROL_REGISTRATION_FAILED,
   CONTROL_BAD_COMMAND,
@@ -154,9 +154,9 @@ control_process_i2c_stop(client interface control i[]);
 
   /** Inform the control library that a USB set (write) has occured. Called from USB EP0 handler.
    *
-   *  \param windex       Index of USB Setup packet
-   *  \param wvalue       Value of USB Setup packet
-   *  \param wlength      Length of USB Setup packet
+   *  \param windex       wIndex field from the USB Setup packet
+   *  \param wvalue       wValue field from the USB Setup packet
+   *  \param wlength      wLength field from the USB Setup packet
    *  \param request_data Array of byte data to be written to the device
    *  \param i            Array of interfaces used to communicate with controllable entities
    *
@@ -169,9 +169,9 @@ control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 
   /** Inform the control library that a USB get (read) has occured. Called from USB EP0 handler.
    *
-   *  \param windex       Index of USB Setup packet
-   *  \param wvalue       Value of USB Setup packet
-   *  \param wlength      Length of USB Setup packet
+   *  \param windex       wIndex field from the USB Setup packet
+   *  \param wvalue       wValue field from the USB Setup packet
+   *  \param wlength      wLength field from the USB Setup packet
    *  \param request_data Reference to array of byte data to be passed back from the device
    *  \param i            Array of interfaces used to communicate with controllable entities
    *

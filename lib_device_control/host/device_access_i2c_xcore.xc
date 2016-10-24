@@ -45,9 +45,7 @@ control_ret_t control_query_version(control_version_t *version,
       return CONTROL_ERROR;
     }
     else {
-      //Bug 17527 in tools 14.3.0
-      //res = i_i2c.read(slave_address, data, sizeof(control_version_t), 1);
-      res = i_i2c.read(slave_address, data, 1, 1);
+      res = i_i2c.read(slave_address, data, sizeof(control_version_t), 1);
       if (res != I2C_ACK) {
         debug_printf("slave sent NAK (read transfer)\n");
 	return CONTROL_ERROR;

@@ -68,7 +68,7 @@ defined in ``mic_array_board_support.h`` which themselves are defined in the pla
 Registering Controllable Resources
 ..................................
 
-Before any control can take place the controlled entity must register controllable entities. This is done by populating
+Before any control can take place the controlled entity must register controllable resources. This is done by populating
 a table of resource IDs at startup which is done by ``register_resources()``. The ``register_resources()`` method is only called once at initialization time. For this
 application, only one controllable resource is registered.
 

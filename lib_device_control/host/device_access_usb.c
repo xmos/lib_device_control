@@ -152,7 +152,7 @@ static void find_xmos_device(int vendor_id, int product_id)
   }
 }
 
-control_ret_t control_init_usb(int vendor_id, int product_id, int interface)
+control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
 {
   usb_init();
   usb_find_busses(); /* find all busses */
@@ -167,7 +167,7 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface)
     return CONTROL_ERROR;
   }
 
-  r = usb_claim_interface(devh, interface);
+  r = usb_claim_interface(devh, interface_num);
   if (r < 0) {
     fprintf(stderr, "Error claiming interface %d %d\n", 0, r);
     return CONTROL_ERROR;
@@ -185,7 +185,7 @@ control_ret_t control_cleanup_usb(void)
 
 #else
 
-control_ret_t control_init_usb(int vendor_id, int product_id, int interface)
+control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
 {
   int ret = libusb_init(NULL);
   if (ret < 0) {

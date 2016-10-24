@@ -7,7 +7,7 @@ Introduction
 ............
 
 The Device Control Library handles the routing of control messages between a host and one or 
-many controllable entities within the controlled device.
+many controllable resources within the controlled device.
 
 
 .. figure:: images/control_logical_view.pdf
@@ -97,7 +97,7 @@ calls a processing function on it from the library. At the same time it passes i
 which connect to all of the controlled tasks.
 
 The library's logic happens inside the function that is called and once a command is complete, an
-xC interface call is made to pass the command over to the controlled entity.
+xC interface call is made to pass the command over to the controlled resource.
 
 The receiving task then receives a write or read command over the xC interface.
 
@@ -147,7 +147,7 @@ USB
 API---Device side
 -----------------
 
-.. doxygenenum:: control_ret
+.. doxygenenum:: control_ret_values
 
 .. doxygeninterface:: control
 

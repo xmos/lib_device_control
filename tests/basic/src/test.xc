@@ -6,7 +6,10 @@
 
 int main(void)
 {
-  if (control_init() != CONTROL_SUCCESS) printf("ERROT on control_init\n");
-  else printf("Success!\n");
+  if (control_init() != CONTROL_SUCCESS)
+    printf("ERROR on control_init\n");
+  else
+    printf("Success!\n");
+
   return 1;
 }
