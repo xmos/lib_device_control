@@ -14,6 +14,7 @@ control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
                                     control_cmd_t cmd, control_resid_t resid,
                                     const uint8_t *payload, unsigned payload_len)
 {
+  const size_t header_size = sizeof(struct control_xscope_response);
   struct control_xscope_packet *p;
 
   p = (struct control_xscope_packet*)buffer;
@@ -21,17 +22,17 @@ control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
   p->resid = resid;
   p->cmd = cmd;
 
-  assert((payload_len <= XSCOPE_DATA_MAX_BYTES) && "exceeded maximum xSCOPE payload size");
+  assert(payload_len < (1<<8) && "payload length can't be represented as a uint8_t");
   p->payload_len = (uint8_t)payload_len;
 
-  if (IS_CONTROL_CMD_READ(cmd)) {
-    return XSCOPE_HEADER_BYTES;
+  if (!IS_CONTROL_CMD_READ(cmd) && payload != NULL) {
+    if (payload_len + header_size <= XSCOPE_UPLOAD_MAX_WORDS * sizeof(uint32_t)) {
+      memcpy((uint8_t*)buffer + header_size, payload, payload_len);
+    }
+    return header_size + payload_len;
   }
   else {
-    if (payload != NULL) {
-      memcpy(p->payload, payload, payload_len);
-    }
-    return XSCOPE_HEADER_BYTES + payload_len;
+    return header_size;
   }
 }
 

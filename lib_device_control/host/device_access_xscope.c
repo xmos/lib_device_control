@@ -5,6 +5,7 @@
 #include <string.h>
 #include <signal.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "xscope_endpoint.h"
@@ -19,7 +20,9 @@
 
 static unsigned int probe_id = 0xffffffff;
 static size_t record_count = 0;
-static struct control_xscope_response last_response;
+static unsigned char *last_response = NULL;
+static struct control_xscope_response *last_response_struct = NULL;
+static unsigned last_response_length = 0;
 static unsigned num_commands = 0;
 
 void register_callback(unsigned int id, unsigned int type,
@@ -60,10 +63,13 @@ void record_callback(unsigned int id, unsigned long long timestamp,
   UNUSED_PARAMETER(dataval);
 
   if (id == probe_id) {
-    if (length > sizeof(struct control_xscope_response))
-      length = sizeof(struct control_xscope_response);
-
-    memcpy((void*)&last_response, databytes, length);
+    if (last_response != NULL) {
+      free(last_response);
+    }
+    last_response = malloc(length);
+    last_response_struct = (struct control_xscope_response*)last_response;
+    last_response_length = length;
+    memcpy(last_response, databytes, length);
 
     record_count++;
   }
@@ -102,9 +108,8 @@ control_ret_t control_init_xscope(const char *host_str, const char *port_str)
 
 control_ret_t control_query_version(control_version_t *version)
 {
-  struct control_xscope_packet p;
+  unsigned b[XSCOPE_UPLOAD_MAX_WORDS];
 
-  unsigned *b = (unsigned*)&p;
   size_t len = control_xscope_create_upload_buffer(b,
     CONTROL_GET_VERSION, CONTROL_SPECIAL_RESID, NULL, sizeof(control_version_t));
 
@@ -123,23 +128,49 @@ control_ret_t control_query_version(control_version_t *version)
   }
 
   DBG(printf("response: "));
-  DBG(print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.payload_len));
+  DBG(print_bytes(last_response, last_response_length));
 
-  *version = *(control_version_t*)&last_response.payload;
+  *version = *(control_version_t*)(last_response + sizeof(struct control_xscope_response));
 
   num_commands++;
-  return CONTROL_SUCCESS + last_response.ret;
+  return CONTROL_SUCCESS + last_response_struct->ret;
+}
+
+/*
+ * xSCOPE has an internally hardcoded limit of 256 bytes. Where it passes
+ * the xSCOPE endpoint API upload command to xGDB server, it truncates
+ * payload to 256 bytes.
+ *
+ * Let's have host code check payload size here. No additional checks on
+ * device side. Device will need a 256-byte buffer to receive from xSCOPE
+ * service.
+ *
+ * No checking of read data which goes in other direction, device to host.
+ * This is xSCOPE probe bytes API, which has no limit.
+ */
+static bool upload_len_exceeds_xscope_limit(size_t len)
+{
+  if (len > XSCOPE_UPLOAD_MAX_BYTES) {
+    printf("upload of %zd bytes requested\n", len);
+    printf("maximum upload size is %d\n", XSCOPE_UPLOAD_MAX_BYTES);
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 control_ret_t
 control_write_command(control_resid_t resid, control_cmd_t cmd,
                       const uint8_t payload[], size_t payload_len)
 {
-  struct control_xscope_packet p;
+  unsigned b[XSCOPE_UPLOAD_MAX_WORDS];
 
-  unsigned *b = (unsigned*)&p;
   size_t len = control_xscope_create_upload_buffer(b,
     CONTROL_CMD_SET_WRITE(cmd), resid, payload, payload_len);
+
+  if (upload_len_exceeds_xscope_limit(len))
+    return CONTROL_DATA_LENGTH_ERROR;
 
   DBG(printf("%u: send write command: ", num_commands));
   DBG(print_bytes((unsigned char*)b, len));
@@ -156,19 +187,18 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   }
 
   DBG(printf("response: "));
-  DBG(print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES));
+  DBG(print_bytes(last_response, XSCOPE_HEADER_BYTES));
 
   num_commands++;
-  return CONTROL_SUCCESS + last_response.ret;
+  return CONTROL_SUCCESS + last_response_struct->ret;
 }
 
 control_ret_t
 control_read_command(control_resid_t resid, control_cmd_t cmd,
                      uint8_t payload[], size_t payload_len)
 {
-  struct control_xscope_packet p;
+  unsigned b[XSCOPE_UPLOAD_MAX_WORDS];
 
-  unsigned *b = (unsigned*)&p;
   size_t len = control_xscope_create_upload_buffer(b,
     CONTROL_CMD_SET_READ(cmd), resid, NULL, payload_len);
 
@@ -187,13 +217,13 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   }
 
   DBG(printf("response: "));
-  DBG(print_bytes((uint8_t*)&last_response, XSCOPE_HEADER_BYTES + last_response.payload_len));
+  DBG(print_bytes(last_response, last_response_length));
 
   // ignore returned payload length, use one supplied in request
-  memcpy(payload, last_response.payload, payload_len);
+  memcpy(payload, b + sizeof(struct control_xscope_response), payload_len);
 
   num_commands++;
-  return CONTROL_SUCCESS + last_response.ret;
+  return CONTROL_SUCCESS + last_response_struct->ret;
 }
 
 control_ret_t control_cleanup_xscope(void)

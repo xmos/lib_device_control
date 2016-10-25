@@ -33,16 +33,7 @@ enum control_ret_values {  /*This looks odd but helps us force byte enum */
 #define RESOURCE_TABLE_MAX 256
 #define IFNUM_RESERVED 255
 
-#define XSCOPE_UPLOAD_MAX_WORDS 64  //Long words (4 bytes)
 #define XSCOPE_CONTROL_PROBE "Control Probe"
-
-#define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * sizeof(uint32_t))
-#define XSCOPE_DATA_MAX_BYTES (XSCOPE_UPLOAD_MAX_BYTES - XSCOPE_HEADER_BYTES)
-
-#define I2C_TRANSACTION_MAX_BYTES 256
-#define I2C_DATA_MAX_BYTES (I2C_TRANSACTION_MAX_BYTES - 3)
-
-#define XSCOPE_HEADER_BYTES 4
 
 #ifdef __XC__
 /** This interface is used to communicate with the control library from the application
@@ -187,7 +178,8 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
    *  The data return is device (control library) initiated. Note: Data requires word alignment 
    *  so we can cast to struct.
    *
-   *  \param data_in_and_out  Array of long words for read and write data. 
+   *  \param buf              Array of bytes for read and write data.
+   *  \param buf_size         Array size in bytes
    *  \param length_in        Number of bytes to be written to device
    *  \param length_out       Number of bytes returned from device to be read by host
    *  \param i                Array of interfaces used to communicate with controllable entities
@@ -195,7 +187,7 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
    *  \returns                Whether the transfer was successful or not
    */
 control_ret_t
-control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
+control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
                               unsigned length_in, unsigned &length_out,
                               client interface control i[]);
 

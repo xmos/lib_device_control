@@ -374,7 +374,7 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 }
 
 control_ret_t
-control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
+control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
                               unsigned length_in, unsigned &length_out,
                               client interface control i[])
 {
@@ -382,10 +382,10 @@ control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
   struct control_xscope_response *r;
   unsigned char ifnum;
 
-  p = (struct control_xscope_packet*)data_in_and_out;
-  r = (struct control_xscope_response*)data_in_and_out;
+  p = (struct control_xscope_packet*)buf;
+  r = (struct control_xscope_response*)buf;
 
-  length_out = XSCOPE_HEADER_BYTES;
+  length_out = sizeof(struct control_xscope_response);
 
   if (resource_table_search(p->resid, ifnum) != 0) {
     debug_printf("resource %d not found\n", p->resid);
@@ -394,7 +394,7 @@ control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
 
   if (IS_CONTROL_CMD_READ(p->cmd)) {
     r->ret = read_command(i, ifnum, p->resid, p->cmd,
-      p->payload, p->payload_len);
+      buf + sizeof(struct control_xscope_response), p->payload_len);
 
     // only return data if user task indicated success
     if (r->ret == CONTROL_SUCCESS)
@@ -402,7 +402,7 @@ control_process_xscope_upload(uint32_t data_in_and_out[XSCOPE_UPLOAD_MAX_WORDS],
   }
   else {
     r->ret = write_command(i, ifnum, p->resid, p->cmd,
-      p->payload, p->payload_len);
+      buf + sizeof(struct control_xscope_packet), p->payload_len);
   }
 
   return r->ret;

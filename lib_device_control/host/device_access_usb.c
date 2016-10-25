@@ -1,6 +1,7 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #if USE_USB
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #ifdef _WIN32
 #include <windows.h>
@@ -26,10 +27,13 @@ static libusb_device_handle *devh = NULL;
 
 static const int sync_timeout_ms = 100;
 
+/* USB 2.0 section 5.5.3 */
+#define CONTROL_MAX_PAYLOAD_SIZE 64
+
 control_ret_t control_query_version(control_version_t *version)
 {
   uint16_t windex, wvalue, wlength;
-  uint8_t request_data[64];
+  uint8_t request_data[CONTROL_MAX_PAYLOAD_SIZE];
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
     CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
@@ -60,11 +64,39 @@ control_ret_t control_query_version(control_version_t *version)
   return CONTROL_SUCCESS;
 }
 
+/*
+ * Ideally we would examine configuration descriptors and check for actual
+ * wMaxPacketSize on given control endpoint.
+ *
+ * For now, just assume the greatest control transfer size, 64. Have host
+ * code only check payload size here. Device will not need any additional
+ * checks. Device application code will set wMaxPacketSize in its
+ * descriptors and take care of allocating a buffer for receiving control
+ * requests of up to 64 bytes.
+ *
+ * Without checking, libusb would set wLength in header to any number and
+ * only send 64 bytes of payload, truncating the rest.
+ */
+static bool payload_len_exceeds_control_packet_size(size_t payload_len)
+{
+  if (payload_len > CONTROL_MAX_PAYLOAD_SIZE) {
+    printf("control transfer of %zd bytes requested\n", payload_len);
+    printf("maximum control packet size is %d\n", CONTROL_MAX_PAYLOAD_SIZE);
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 control_ret_t
 control_write_command(control_resid_t resid, control_cmd_t cmd,
                       const uint8_t payload[], size_t payload_len)
 {
   uint16_t windex, wvalue, wlength;
+
+  if (payload_len_exceeds_control_packet_size(payload_len))
+    return CONTROL_DATA_LENGTH_ERROR;
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
     resid, CONTROL_CMD_SET_WRITE(cmd), payload_len);
@@ -98,6 +130,9 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
                      uint8_t payload[], size_t payload_len)
 {
   uint16_t windex, wvalue, wlength;
+
+  if (payload_len_exceeds_control_packet_size(payload_len))
+    return CONTROL_DATA_LENGTH_ERROR;
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
     resid, CONTROL_CMD_SET_READ(cmd), payload_len);

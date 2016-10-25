@@ -29,7 +29,7 @@ control_ret_t control_init_xscope(const char *host_str, const char *port_str);
  */
 control_ret_t control_cleanup_xscope(void);
 #endif
-#if USE_I2C ||__DOXYGEN__
+#if USE_I2C || __DOXYGEN__
 /** Initialize the I2C host (master) interface
  *
  *  \param i2c_slave_address    I2C address of the slave (controlled device)

@@ -24,7 +24,7 @@ void xscope_user_init(void)
 [[combinable]]
 void xscope_client(chanend c_xscope, client interface control i_control[1])
 {
-  uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS];
+  uint8_t buffer[256]; /* 256 bytes from xscope.h */
   int num_bytes_read;
   unsigned return_size;
 
@@ -37,11 +37,10 @@ void xscope_client(chanend c_xscope, client interface control i_control[1])
 
   while (1) {
     select {
-      case xscope_data_from_host(c_xscope, (buffer, unsigned char[]), num_bytes_read):
-        assert(num_bytes_read <= sizeof(buffer));
-        control_process_xscope_upload(buffer, num_bytes_read, return_size, i_control);
+      case xscope_data_from_host(c_xscope, buffer, num_bytes_read):
+        control_process_xscope_upload(buffer, sizeof(buffer), num_bytes_read, return_size, i_control);
         if (return_size > 0) {
-          xscope_core_bytes(0, return_size, (buffer, unsigned char[]));
+          xscope_core_bytes(0, return_size, buffer);
         }
         break;
     }
