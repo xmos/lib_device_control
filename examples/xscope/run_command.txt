@@ -1,4 +1,4 @@
 The target needs to be running the xscope realtime server to support xscope download to target.
 Please use the following command line to launch the app on the target:
 
-xrun --xscope-realtime --xscope-port 127.0.0.1:10101 bin/xscope.xe 
+xrun --xscope-port 127.0.0.1:10101 bin/xscope.xe 
