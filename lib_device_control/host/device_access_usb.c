@@ -10,7 +10,7 @@
 #include "usb.h"
 #else
 #include <unistd.h>
-#include "libusb64.h"
+#include "libusb.h"
 #endif
 #include "control_host.h"
 #include "control_host_support.h"
