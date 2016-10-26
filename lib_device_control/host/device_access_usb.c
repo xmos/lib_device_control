@@ -1,7 +1,9 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #if USE_USB
 #include <stdio.h>
+#ifndef _WIN32
 #include <stdbool.h>
+#endif
 #include <stdlib.h>
 #ifdef _WIN32
 #include <windows.h>

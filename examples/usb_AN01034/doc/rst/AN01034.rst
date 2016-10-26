@@ -231,7 +231,7 @@ or for OSX::
 
   make -f Makefile.OSX
 
-The build will result in a binary being compiled into /bin/a.out.
+The build will result in a binary being compiled into bin/a.out.
 
 When running under a Windows platform, additionally a driver will be required to fully enumerate the USB device. See 
 the ``Intsalling the Driver on Windows`` section driver_ for details.

@@ -5,7 +5,9 @@
 #include <string.h>
 #include <signal.h>
 #include <assert.h>
+#ifndef _WIN32
 #include <stdbool.h>
+#endif
 #include <stdlib.h>
 #include <stdint.h>
 #include "xscope_endpoint.h"
@@ -66,7 +68,7 @@ void record_callback(unsigned int id, unsigned long long timestamp,
     if (last_response != NULL) {
       free(last_response);
     }
-    last_response = malloc(length);
+    last_response = (unsigned char*)malloc(length);
     last_response_struct = (struct control_xscope_response*)last_response;
     last_response_length = length;
     memcpy(last_response, databytes, length);
