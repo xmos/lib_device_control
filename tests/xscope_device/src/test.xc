@@ -14,7 +14,7 @@
 
 void test_client(client interface control i[3], chanend c_user_task[3])
 {
-  uint32_t buf[XSCOPE_UPLOAD_MAX_WORDS];
+  uint32_t buf[64];
   struct command c1, c2;
   struct options o;
   unsigned lenin;
@@ -22,13 +22,13 @@ void test_client(client interface control i[3], chanend c_user_task[3])
   int timeout;
   timer tmr;
   int t, j;
-  uint32_t *unsafe buf_ptr;
+  uint8_t *unsafe buf_ptr;
   int fails;
   control_ret_t ret, ret1;
   int check_result;
   chan d;
 
-  memset(buf, 0, XSCOPE_UPLOAD_MAX_WORDS);
+  memset(buf, 0, sizeof(buf));
 
   for (j = 0; j < 8; j++) {
     c1.payload[j] = j;
@@ -62,13 +62,17 @@ void test_client(client interface control i[3], chanend c_user_task[3])
              * test tasks actually receives a command (e.g. when resource ID not found)
              */
             unsafe {
-              buf_ptr = buf;
+              buf_ptr = (uint8_t*)buf;
 
               tmr :> t;
               timeout = 0;
               par {
-                d <: control_process_xscope_upload((uint32_t*)buf_ptr, lenin, lenout, i);
-                { select {
+                d <: control_process_xscope_upload((uint8_t*)buf_ptr, sizeof(buf), lenin, lenout, i);
+                { const size_t header_len = sizeof(struct control_xscope_response);
+                  struct control_xscope_response *resp = (struct control_xscope_response*)buf;
+                  uint8_t *payload = (uint8_t*)(resp + 1);
+
+                  select {
                     case drive_user_task_commands(c2, c1, c_user_task, o.read_cmd);
                     case tmr when timerafter(t + 500) :> void:
                       timeout = 1;
@@ -78,14 +82,14 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                   /* retrieve received payload for a read command */
                   if (!timeout && IS_CONTROL_CMD_READ(c2.cmd)) {
                     for (j = 0; j < c2.payload_size; j++) {
-                      c2.payload[j] = ((struct control_xscope_response*)buf)->payload[j];
+                      c2.payload[j] = payload[j];
                     }
                   }
 
                   /* retrieve return code from processing call and as
                    * embedded in the xSCOPE response
                    */
-                  ret1 = ((struct control_xscope_response*)buf)->ret;
+                  ret1 = resp->ret;
                   d :> ret;
 
                   check_result = check(o, c1, c2, timeout, ret, 3);
@@ -107,17 +111,17 @@ void test_client(client interface control i[3], chanend c_user_task[3])
 		      fails += 1;
 		    }
 		    else if (o.read_cmd && ret == CONTROL_SUCCESS) {
-		      if (lenout != XSCOPE_HEADER_BYTES + c2.payload_size) {
+		      if (lenout != header_len + c2.payload_size) {
 			printf("wrong response length %d, expected %d\n",
-			  lenout, XSCOPE_HEADER_BYTES + c2.payload_size);
+			  lenout, header_len + c2.payload_size);
 
 			fails += 1;
 		      }
 		    }
 		    else {
-		      if (lenout != XSCOPE_HEADER_BYTES) {
+		      if (lenout != header_len) {
 			printf("wrong response length %d, expected %d\n",
-			  lenout, XSCOPE_HEADER_BYTES);
+			  lenout, header_len);
 
 			fails += 1;
 		      }

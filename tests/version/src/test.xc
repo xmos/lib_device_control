@@ -8,7 +8,7 @@
 
 void test_xscope(client interface control i[1])
 {
-  uint32_t buf[XSCOPE_UPLOAD_MAX_WORDS];
+  uint32_t buf[64];
   struct control_xscope_response *resp;
   control_version_t version;
   size_t len, len2;
@@ -18,9 +18,9 @@ void test_xscope(client interface control i[1])
     CONTROL_GET_VERSION, CONTROL_SPECIAL_RESID,
     NULL, sizeof(control_version_t));
 
-  ret = control_process_xscope_upload(buf, len, len2, i);
+  ret = control_process_xscope_upload((uint8_t*)buf, sizeof(buf), len, len2, i);
   resp = (struct control_xscope_response*)buf;
-  version = *((control_version_t*)resp->payload);
+  version = *(control_version_t*)(resp + 1);
 
   if (ret != CONTROL_SUCCESS) {
     printf("ERROR - xSCOPE processing function returned %d\n", ret);
