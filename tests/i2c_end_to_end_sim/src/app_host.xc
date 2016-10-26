@@ -1,5 +1,5 @@
-
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
+
 #include <platform.h>
 #include <stdio.h>
 #include <stdlib.h>
