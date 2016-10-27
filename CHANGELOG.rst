@@ -1,11 +1,11 @@
 Device control library change log
 =================================
 
-2.1.0
+3.0.0
 -----
 
-  * Replace xSCOPE and USB size limits in public API by runtime errors. xSCOPE
-    API change, change buffer type from 64 words to 256 bytes.
+  * Replace xSCOPE and USB size limits in public API by runtime errors
+  * xSCOPE API change - buffer type from 64 words to 256 bytes
   * Windows build fixes
   * xTIMEcomposer project files for AN01034 and xSCOPE examples
   * Documentation updates
