@@ -222,7 +222,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   DBG(print_bytes(last_response, last_response_length));
 
   // ignore returned payload length, use one supplied in request
-  memcpy(payload, b + sizeof(struct control_xscope_response), payload_len);
+  memcpy(payload, last_response + sizeof(struct control_xscope_response), payload_len);
 
   num_commands++;
   return CONTROL_SUCCESS + last_response_struct->ret;

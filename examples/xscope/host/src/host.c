@@ -49,7 +49,7 @@ int main(void)
         printf("control write command failed\n");
         exit(1);
       }
-      printf("W");
+      printf("W %d %x\n", 1, payload[0]);
       fflush(stdout);
 
       pause_short();
@@ -58,7 +58,7 @@ int main(void)
         printf("control read command failed\n");
         exit(1);
       }
-      printf("R");
+      printf("R %d %x %x %x %x\n", 4, payload[0], payload[1], payload[2], payload[3]);
       fflush(stdout);
 
       pause_long();
