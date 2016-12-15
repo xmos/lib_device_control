@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+3.0.1
+-----
+
+  * Fixed incorrectly returned read data in xSCOPE example host code
+
 3.0.0
 -----
 
