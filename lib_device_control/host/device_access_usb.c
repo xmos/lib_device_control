@@ -206,7 +206,7 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
 
   r = usb_claim_interface(devh, interface_num);
   if (r < 0) {
-    fprintf(stderr, "Error claiming interface %d %d\n", 0, r);
+    fprintf(stderr, "Error claiming interface %d %d\n", interface_num, r);
     return CONTROL_ERROR;
   }
 
