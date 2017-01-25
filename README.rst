@@ -30,7 +30,7 @@ Adding new transport layers and/or hosts is straightforward where the hardware s
    - Yes
    - Yes
  * - PC / OSX
-   - 
+   - Yes
    - Yes
    - Yes
  * - Raspberry Pi / Linux
