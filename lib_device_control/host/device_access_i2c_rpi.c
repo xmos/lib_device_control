@@ -32,8 +32,9 @@ int fd;                                      // File descrition for i2c device
 
 control_ret_t control_init_i2c(unsigned char i2c_slave_address)
 {
-
-  address = i2c_slave_address >> 1;                //We need to right shift this down for i2c
+  // Previously this shifted the address down by 1(>>1)
+  // but this wasn't found to be necessary
+  address = i2c_slave_address;
 
   if ((fd = open(devName, O_RDWR)) < 0) {          // Open port for reading and writing
     fprintf(stderr, "Failed to open i2c port: ");
