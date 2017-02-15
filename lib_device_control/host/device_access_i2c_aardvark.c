@@ -55,7 +55,7 @@ control_ret_t control_init_i2c(unsigned char i2c_slave_address)
     return 1;
   }
 
-  DBG(printf("Opened Aardvark adapter; features = 0x%02x\n", aaext.features);)
+  DBG(printf("Opened Aardvark adapter; features = 0x%02x\n", aaext.features));
 
   return CONTROL_SUCCESS;
 }
