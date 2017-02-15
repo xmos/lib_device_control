@@ -12,7 +12,7 @@ Features
 
   * Simple read/write API
   * Fully acknowledged protocol
-  * Includes different transports including I2C slave, USB requests or xSCOPE over xCONNECT
+  * Includes different transports including I2C slave, USB requests, xSCOPE over xCONNECT and SPI slave
   * Supports multiple resources per task
 
 The table below shows combinations of host and transport mechanisms that are currently supported. 
@@ -25,22 +25,29 @@ Adding new transport layers and/or hosts is straightforward where the hardware s
    - I2C
    - USB
    - xSCOPE
+   - SPI
  * - PC / Windows
    - 
    - Yes
    - Yes
+   -
  * - PC / OSX
+   - Yes\*
    - Yes
    - Yes
-   - Yes
+   - Yes\*
  * - Raspberry Pi / Linux
    - Yes
    - TBD
-   - 
+   -
+   - Yes
  * - xCORE
    - Yes
    - 
    - 
+   - 
+
+\*You will need an Aardvark I2C/SPI Host Adapter from Total Phase.
 
 Typical resource usage
 ......................
