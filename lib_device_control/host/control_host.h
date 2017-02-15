@@ -71,6 +71,10 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
 control_ret_t control_cleanup_usb(void);
 #endif
 #if USE_SPI || __DOXYGEN__
+#if RPI
+#include "bcm2835.h"
+control_ret_t control_init_spi_pi(spi_mode_t spi_mode, bcm2835SPIClockDivider clock_divider, unsigned delay_for_read)
+#else
 /** Initialize the SPI host (master) interface
  *
  *  \param spi_mode             Mode that the SPI will run in
@@ -79,6 +83,7 @@ control_ret_t control_cleanup_usb(void);
  *  \returns                    Whether the initialization was successful or not
  */
 control_ret_t control_init_spi(spi_mode_t spi_mode, int spi_bitrate, unsigned delay_for_read);
+#endif
 /** Shutdown the SPI host (master) interface connection
  *
  *  \returns           Whether the shutdown was successful or not
