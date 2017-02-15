@@ -92,14 +92,6 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   int data_len = control_build_spi_data(data_to_send, resid, cmd, payload, payload_len);
   int num_bytes_sent = aa_spi_write(handle, (u16)data_len, data_to_send, (u16)data_len, data_recieved);
 
-  // printf("Data to send:  ");
-  // for(unsigned i=0; i<data_len; ++i)
-  //   printf("%-3d ", data_to_send[i]);
-  // printf("\nData recieved: ");
-  // for(unsigned i=0; i<data_len; ++i)
-  //   printf("%-3d ", data_recieved[i]);
-  // printf("\n");
-
   if (num_bytes_sent < 0) {
     fprintf(stderr, "SPI Error while sending: %s\n", aa_status_string(num_bytes_sent));
   } else if (num_bytes_sent == 0) {
@@ -112,10 +104,6 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
 
   return ret;
 }
-
-#define SPI_SLEEP_MILLISECONDS 10
-#define SPI_TIMEOUT_MILLISECONDS 100
-#define SPI_RECV_READY 100
 
 control_ret_t
 control_read_command(control_resid_t resid, control_cmd_t cmd,
