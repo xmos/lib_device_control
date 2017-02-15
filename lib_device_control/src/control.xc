@@ -5,6 +5,7 @@
 #include "control.h"
 #include "control_transport.h"
 #include "resource_table.h"
+#include <string.h>
 
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
@@ -406,4 +407,154 @@ control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
   }
 
   return r->ret;
+}
+
+/* SPI state */
+static struct {
+  enum {
+    SPI_IDLE,
+    SPI_RES_RECVD,
+    SPI_WRITE_CMD_RECVD,
+    SPI_WRITE_DATA,
+    SPI_READ_CMD_RECVD,
+    SPI_READ_DATA_START,
+    SPI_READ_DATA_WAIT,
+    SPI_READ_DATA,
+    SPI_ERROR
+  } state;
+  control_resid_t resid;
+  control_cmd_t cmd;
+  unsigned char ifnum;
+  unsigned payload_len_from_header;
+  unsigned payload_len_transmitted;
+  uint8_t payload[SPI_DATA_MAX_BYTES];
+} spi = { SPI_IDLE, 0, 0, 0, 0, 0, {0} };
+
+/* Debugging */
+// static unsigned char buffer[50] = {0};
+// static unsigned buffer_length=0;
+/************/
+
+control_ret_t
+control_process_spi_master_ends_transaction(client interface control i_ctl[])
+{
+  /* Debugging */
+  // debug_printf("Recieved: ");
+  // for(unsigned i=0; i<buffer_length; ++i)
+  //   debug_printf("%u ", buffer[i]);
+  // debug_printf("\n");
+  // buffer_length=0;
+  /*************/
+
+  control_ret_t ret = CONTROL_SUCCESS;
+  unsigned reset = 1;
+
+  switch(spi.state) {
+    case SPI_WRITE_DATA:
+      ret = write_command(i_ctl, spi.ifnum, spi.resid, spi.cmd, 
+                          spi.payload, spi.payload_len_transmitted);
+      break;
+
+    case SPI_READ_DATA_WAIT:
+      spi.state = SPI_READ_DATA;
+      reset = 0;
+      break;
+
+    default:
+      break;
+  }
+
+  if(reset) {
+    memset(&spi, 0, sizeof(spi));
+  }
+
+  return ret;
+}
+
+control_ret_t
+control_process_spi_master_requires_data(uint32_t &data, client interface control i_ctl[])
+{ 
+  control_ret_t ret = CONTROL_SUCCESS;
+  data = 0;
+
+  switch(spi.state) {
+    case SPI_READ_DATA_START:
+      ret = read_command(i_ctl, spi.ifnum, spi.resid, spi.cmd, 
+                         spi.payload, spi.payload_len_from_header);
+      spi.state = SPI_READ_DATA_WAIT;
+      break;
+
+    case SPI_READ_DATA:
+      data = spi.payload[spi.payload_len_transmitted];
+      ++spi.payload_len_transmitted;
+      break;
+
+    default:
+      break;
+  }
+
+  return ret;
+}
+
+/* resid, cmd, payload_len, data[0], data[1], ..., data[payload_len-1] */
+/* Valid bits always assumed to be 8 */
+control_ret_t
+control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, client interface control i_ctl[])
+{ 
+  /* Debugging */
+  // buffer[buffer_length] = (unsigned char) datum;
+  // buffer_length++;
+  /*************/
+
+  control_ret_t ret = CONTROL_SUCCESS;
+  unsigned char ifnum;
+
+  if(spi.state == SPI_READ_DATA_WAIT &&
+     datum != 0) {
+    /* Reset */
+    memset(&spi, 0, sizeof(spi));
+  }
+
+  switch(spi.state) {
+    case SPI_IDLE:
+      if (resource_table_search(datum, ifnum) != 0) {
+        debug_printf("Resource %d not found\n", datum);
+        spi.state = SPI_ERROR;
+        ret = CONTROL_ERROR;
+      } else {
+        spi.resid = datum;
+        spi.ifnum = ifnum;
+        spi.state = SPI_RES_RECVD;
+      }
+      break;
+
+    case SPI_RES_RECVD:
+      spi.cmd = datum & 0x7F; /* 0111 1111 */
+      if(IS_CONTROL_CMD_READ(datum)) {
+        spi.state = SPI_READ_CMD_RECVD;
+      } else {
+        spi.state = SPI_WRITE_CMD_RECVD;
+      }
+      break;
+    
+    case SPI_READ_CMD_RECVD:
+      spi.payload_len_from_header = datum;
+      spi.state = SPI_READ_DATA_START;
+      break;
+
+    case SPI_WRITE_CMD_RECVD:
+      spi.payload_len_from_header = datum;
+      spi.state = SPI_WRITE_DATA;
+      break;
+
+    case SPI_WRITE_DATA:
+      spi.payload[spi.payload_len_transmitted] = datum;
+      ++spi.payload_len_transmitted;
+      break;
+
+    default:
+      break;
+  }
+
+  return ret;
 }
