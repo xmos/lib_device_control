@@ -420,7 +420,8 @@ static struct {
     SPI_READ_DATA_START,
     SPI_READ_DATA_WAIT,
     SPI_READ_DATA,
-    SPI_ERROR
+    SPI_ERROR,
+    SPI_PAYLOAD_ERROR
   } state;
   control_resid_t resid;
   control_cmd_t cmd;
@@ -431,7 +432,7 @@ static struct {
 } spi = { SPI_IDLE, 0, 0, 0, 0, 0, {0} };
 
 /* Debugging */
-// static unsigned char buffer[50] = {0};
+// static unsigned char buffer[SPI_TRANSACTION_MAX_BYTES] = {0};
 // static unsigned buffer_length=0;
 /************/
 
@@ -451,16 +452,31 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
 
   switch(spi.state) {
     case SPI_WRITE_DATA:
-      ret = write_command(i_ctl, spi.ifnum, spi.resid, spi.cmd, 
-                          spi.payload, spi.payload_len_transmitted);
+      if(spi.payload_len_transmitted < spi.payload_len_from_header) {
+        debug_printf("Payload is less than specified in header. "
+                     "Expected %d bytes; recieved %d bytes. Did not pass payload to program.\n",
+                     spi.payload_len_from_header, spi.payload_len_transmitted);
+        ret = CONTROL_ERROR;
+      } else {
+        ret = write_command(i_ctl, spi.ifnum, spi.resid, spi.cmd, 
+                            spi.payload, spi.payload_len_transmitted);
+      }
+      break;
+
+    case SPI_PAYLOAD_ERROR:
+      if(spi.payload_len_transmitted > spi.payload_len_from_header) {
+        debug_printf("Payload is greater than specified in header. ");
+      } else if (spi.payload_len_transmitted > SPI_DATA_MAX_BYTES) {
+        debug_printf("Payload is greater than SPI_DATA_MAX_BYTES (%d). ", SPI_DATA_MAX_BYTES);
+      }
+      debug_printf("Expected %d bytes; recieved %d bytes. "
+                   "Discarded rest of input and didn't pass payload to program.\n",
+                   spi.payload_len_from_header, spi.payload_len_transmitted);
       break;
 
     case SPI_READ_DATA_WAIT:
       spi.state = SPI_READ_DATA;
       reset = 0;
-      break;
-
-    default:
       break;
   }
 
@@ -485,19 +501,17 @@ control_process_spi_master_requires_data(uint32_t &data, client interface contro
       break;
 
     case SPI_READ_DATA:
-      data = spi.payload[spi.payload_len_transmitted];
-      ++spi.payload_len_transmitted;
-      break;
-
-    default:
+      if(spi.payload_len_transmitted < spi.payload_len_from_header && 
+         spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
+        data = spi.payload[spi.payload_len_transmitted];
+        ++spi.payload_len_transmitted;
+      }
       break;
   }
 
   return ret;
 }
 
-/* resid, cmd, payload_len, data[0], data[1], ..., data[payload_len-1] */
-/* Valid bits always assumed to be 8 */
 control_ret_t
 control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, client interface control i_ctl[])
 { 
@@ -507,16 +521,22 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
   /*************/
 
   control_ret_t ret = CONTROL_SUCCESS;
-  unsigned char ifnum;
 
-  if(spi.state == SPI_READ_DATA_WAIT &&
-     datum != 0) {
-    /* Reset */
+  // TODO: Fix it so valid_bits need not be 8
+  if(valid_bits != 8) {
+    debug_printf("control_process_spi_master_supplied_data() expecting valid_bits to be 8. "
+                 "Should be fed data from spi_slave using the parameter SPI_TRANSFER_SIZE_8.\n");
+    return CONTROL_ERROR;
+  }
+
+  if(spi.state == SPI_READ_DATA_WAIT && datum) {
+    // Reset
     memset(&spi, 0, sizeof(spi));
   }
 
   switch(spi.state) {
     case SPI_IDLE:
+      unsigned char ifnum;
       if (resource_table_search(datum, ifnum) != 0) {
         debug_printf("Resource %d not found\n", datum);
         spi.state = SPI_ERROR;
@@ -529,7 +549,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       break;
 
     case SPI_RES_RECVD:
-      spi.cmd = datum & 0x7F; /* 0111 1111 */
+      spi.cmd = datum & 0x7F; // 0111 1111
       if(IS_CONTROL_CMD_READ(datum)) {
         spi.state = SPI_READ_CMD_RECVD;
       } else {
@@ -548,11 +568,18 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       break;
 
     case SPI_WRITE_DATA:
-      spi.payload[spi.payload_len_transmitted] = datum;
+      if(spi.payload_len_transmitted < spi.payload_len_from_header && 
+         spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
+        spi.payload[spi.payload_len_transmitted] = datum;
+      } else {
+        spi.state = SPI_PAYLOAD_ERROR;
+        ret = CONTROL_ERROR;
+      }
       ++spi.payload_len_transmitted;
       break;
 
-    default:
+    case SPI_PAYLOAD_ERROR:
+      ++spi.payload_len_transmitted;
       break;
   }
 

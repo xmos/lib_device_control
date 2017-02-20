@@ -97,7 +97,8 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   } else if (num_bytes_sent == 0) {
     fprintf(stderr, "SPI Error: No bytes written. Potentially wrong slave address\n");
   } else if (num_bytes_sent != data_len) {
-    fprintf(stderr, "SPI Error: Only a partial number of bytes written. %d instead of %d\n", num_bytes_sent, data_len);
+    fprintf(stderr, "SPI Error: Incorrect number of bytes written. %d instead of %d\n",
+            num_bytes_sent, data_len);
   } else {
     ret = CONTROL_SUCCESS;
   }
@@ -105,19 +106,10 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   return ret;
 }
 
-control_ret_t
-control_read_command(control_resid_t resid, control_cmd_t cmd,
-                     uint8_t payload[], size_t payload_len)
+static control_ret_t
+send_read(uint8_t data_to_send[], uint8_t data_recieved[], int data_len, size_t payload_len)
 {
   control_ret_t ret = CONTROL_ERROR;
-  uint8_t data_to_send[SPI_TRANSACTION_MAX_BYTES] = {0};
-  uint8_t data_recieved[SPI_TRANSACTION_MAX_BYTES] = {0};
-
-  int data_len = control_build_spi_data(data_to_send, resid, cmd, payload, payload_len);
-  if (data_len != 8) {
-    fprintf(stderr, "Error building read command section of read_device. data_len should be 8 but is %d\n", data_len);
-    return CONTROL_ERROR;
-  }
 
   int num_bytes_sent = aa_spi_write(handle, (u16)data_len, data_to_send, (u16)data_len, data_recieved);
 
@@ -125,9 +117,9 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   memset(data_recieved, 0, SPI_TRANSACTION_MAX_BYTES);
 
   unsigned transaction_length = payload_len < 8 ? 8 : payload_len;
-
   usleep(delay_milliseconds * 1000);
   aa_spi_write(handle, (u16)transaction_length, data_to_send, (u16)transaction_length, data_recieved);
+  
   DBG(printf("Data recieved: "));
   for(unsigned i=0; i<transaction_length; ++i) {
     DBG(printf("%-3d ", data_recieved[i]));
@@ -140,8 +132,29 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   } else if (num_bytes_sent != data_len) {
     fprintf(stderr, "SPI Error: Only a partial number of bytes written. %d instead of %d\n", num_bytes_sent, data_len);
   } else {
-    memcpy(payload, data_recieved, payload_len);
     ret = CONTROL_SUCCESS;
+  }
+
+  return ret;
+}
+
+control_ret_t
+control_read_command(control_resid_t resid, control_cmd_t cmd,
+                     uint8_t payload[], size_t payload_len)
+{
+  uint8_t data_to_send[SPI_TRANSACTION_MAX_BYTES] = {0};
+  uint8_t data_recieved[SPI_TRANSACTION_MAX_BYTES] = {0};
+
+  int data_len = control_build_spi_data(data_to_send, resid, cmd, payload, payload_len);
+  if (data_len != 8) {
+    fprintf(stderr, "Error building read command section of read_device. \
+                     data_len should be 8 but is %d\n", data_len);
+    return CONTROL_ERROR;
+  }
+
+  control_ret_t ret = send_read(data_to_send, data_recieved, data_len, payload_len);
+  if(ret == CONTROL_SUCCESS) {
+    memcpy(payload, data_recieved, payload_len);
   }
 
   return ret;
