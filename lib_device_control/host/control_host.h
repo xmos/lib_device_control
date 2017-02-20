@@ -71,19 +71,30 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
 control_ret_t control_cleanup_usb(void);
 #endif
 #if USE_SPI || __DOXYGEN__
-#if RPI
+#if RPI || __DOXYGEN__
 #include "bcm2835.h"
-control_ret_t control_init_spi_pi(spi_mode_t spi_mode, bcm2835SPIClockDivider clock_divider, unsigned delay_for_read)
+/** Initialize the SPI host (master) interface for the Raspberry Pi
+ *
+ *  \param spi_mode             Mode that the SPI will run in
+ *  \param clock_divider        The amount to divide the Raspberry Pi's clock by, e.g.
+ *                              BCM2835_SPI_CLOCK_DIVIDER_1024 gives a clock of ~122kHz
+ *                              on the RPI 2.
+ *  \param delay_for_read       Delay between send and recieve for read command
+ *
+ *  \returns                    Whether the initialization was successful or not
+ */
+control_ret_t control_init_spi_pi(spi_mode_t spi_mode, bcm2835SPIClockDivider clock_divider, unsigned delay_for_read);
 #else
 /** Initialize the SPI host (master) interface
  *
  *  \param spi_mode             Mode that the SPI will run in
  *  \param spi_bitrate          Bitrate for SPI to run at
+ *  \param delay_for_read       Delay between send and recieve for read command
  *
  *  \returns                    Whether the initialization was successful or not
  */
 control_ret_t control_init_spi(spi_mode_t spi_mode, int spi_bitrate, unsigned delay_for_read);
-#endif
+#endif // RPI || __DOXYGEN__
 /** Shutdown the SPI host (master) interface connection
  *
  *  \returns           Whether the shutdown was successful or not
