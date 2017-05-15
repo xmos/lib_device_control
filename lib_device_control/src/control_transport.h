@@ -34,4 +34,7 @@ struct control_xscope_response {
 #define I2C_TRANSACTION_MAX_BYTES 256
 #define I2C_DATA_MAX_BYTES (I2C_TRANSACTION_MAX_BYTES - 3)
 
+#define SPI_TRANSACTION_MAX_BYTES 256
+#define SPI_DATA_MAX_BYTES (SPI_TRANSACTION_MAX_BYTES - 3)
+
 #endif // __control_transport_h_

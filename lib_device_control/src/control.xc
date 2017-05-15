@@ -5,6 +5,7 @@
 #include "control.h"
 #include "control_transport.h"
 #include "resource_table.h"
+#include <string.h>
 
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
@@ -406,4 +407,181 @@ control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
   }
 
   return r->ret;
+}
+
+/* SPI state */
+static struct {
+  enum {
+    SPI_IDLE,
+    SPI_RES_RECVD,
+    SPI_WRITE_CMD_RECVD,
+    SPI_WRITE_DATA,
+    SPI_READ_CMD_RECVD,
+    SPI_READ_DATA_START,
+    SPI_READ_DATA_WAIT,
+    SPI_READ_DATA,
+    SPI_ERROR,
+    SPI_PAYLOAD_ERROR
+  } state;
+  control_resid_t resid;
+  control_cmd_t cmd;
+  unsigned char ifnum;
+  unsigned payload_len_from_header;
+  unsigned payload_len_transmitted;
+  uint8_t payload[SPI_DATA_MAX_BYTES];
+} spi = { SPI_IDLE, 0, 0, 0, 0, 0, {0} };
+
+/* Debugging */
+// static unsigned char buffer[SPI_TRANSACTION_MAX_BYTES] = {0};
+// static unsigned buffer_length=0;
+/************/
+
+control_ret_t
+control_process_spi_master_ends_transaction(client interface control i_ctl[])
+{
+  /* Debugging */
+  // debug_printf("Recieved: ");
+  // for(unsigned i=0; i<buffer_length; ++i)
+  //   debug_printf("%u ", buffer[i]);
+  // debug_printf("\n");
+  // buffer_length=0;
+  /*************/
+
+  control_ret_t ret = CONTROL_SUCCESS;
+  unsigned reset = 1;
+
+  switch(spi.state) {
+    case SPI_WRITE_DATA:
+      if(spi.payload_len_transmitted < spi.payload_len_from_header) {
+        debug_printf("Payload is less than specified in header. "
+                     "Expected %d bytes; recieved %d bytes. Did not pass payload to program.\n",
+                     spi.payload_len_from_header, spi.payload_len_transmitted);
+        ret = CONTROL_ERROR;
+      } else {
+        ret = write_command(i_ctl, spi.ifnum, spi.resid, spi.cmd, 
+                            spi.payload, spi.payload_len_transmitted);
+      }
+      break;
+
+    case SPI_PAYLOAD_ERROR:
+      if(spi.payload_len_transmitted > spi.payload_len_from_header) {
+        debug_printf("Payload is greater than specified in header. ");
+      } else if (spi.payload_len_transmitted > SPI_DATA_MAX_BYTES) {
+        debug_printf("Payload is greater than SPI_DATA_MAX_BYTES (%d). ", SPI_DATA_MAX_BYTES);
+      }
+      debug_printf("Expected %d bytes; recieved %d bytes. "
+                   "Discarded rest of input and didn't pass payload to program.\n",
+                   spi.payload_len_from_header, spi.payload_len_transmitted);
+      break;
+
+    case SPI_READ_DATA_WAIT:
+      spi.state = SPI_READ_DATA;
+      reset = 0;
+      break;
+  }
+
+  if(reset) {
+    memset(&spi, 0, sizeof(spi));
+  }
+
+  return ret;
+}
+
+control_ret_t
+control_process_spi_master_requires_data(uint32_t &data, client interface control i_ctl[])
+{ 
+  control_ret_t ret = CONTROL_SUCCESS;
+  data = 0;
+
+  switch(spi.state) {
+    case SPI_READ_DATA_START:
+      ret = read_command(i_ctl, spi.ifnum, spi.resid, spi.cmd, 
+                         spi.payload, spi.payload_len_from_header);
+      spi.state = SPI_READ_DATA_WAIT;
+      break;
+
+    case SPI_READ_DATA:
+      if(spi.payload_len_transmitted < spi.payload_len_from_header && 
+         spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
+        data = spi.payload[spi.payload_len_transmitted];
+        ++spi.payload_len_transmitted;
+      }
+      break;
+  }
+
+  return ret;
+}
+
+control_ret_t
+control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, client interface control i_ctl[])
+{ 
+  /* Debugging */
+  // buffer[buffer_length] = (unsigned char) datum;
+  // buffer_length++;
+  /*************/
+
+  control_ret_t ret = CONTROL_SUCCESS;
+
+  // TODO: Fix it so valid_bits need not be 8
+  if(valid_bits != 8) {
+    debug_printf("control_process_spi_master_supplied_data() expecting valid_bits to be 8. "
+                 "Should be fed data from spi_slave using the parameter SPI_TRANSFER_SIZE_8.\n");
+    return CONTROL_ERROR;
+  }
+
+  if(spi.state == SPI_READ_DATA_WAIT && datum) {
+    // Reset
+    memset(&spi, 0, sizeof(spi));
+  }
+
+  switch(spi.state) {
+    case SPI_IDLE:
+      unsigned char ifnum;
+      if (resource_table_search(datum, ifnum) != 0) {
+        debug_printf("Resource %d not found\n", datum);
+        spi.state = SPI_ERROR;
+        ret = CONTROL_ERROR;
+      } else {
+        spi.resid = datum;
+        spi.ifnum = ifnum;
+        spi.state = SPI_RES_RECVD;
+      }
+      break;
+
+    case SPI_RES_RECVD:
+      spi.cmd = datum & 0x7F; // 0111 1111
+      if(IS_CONTROL_CMD_READ(datum)) {
+        spi.state = SPI_READ_CMD_RECVD;
+      } else {
+        spi.state = SPI_WRITE_CMD_RECVD;
+      }
+      break;
+    
+    case SPI_READ_CMD_RECVD:
+      spi.payload_len_from_header = datum;
+      spi.state = SPI_READ_DATA_START;
+      break;
+
+    case SPI_WRITE_CMD_RECVD:
+      spi.payload_len_from_header = datum;
+      spi.state = SPI_WRITE_DATA;
+      break;
+
+    case SPI_WRITE_DATA:
+      if(spi.payload_len_transmitted < spi.payload_len_from_header && 
+         spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
+        spi.payload[spi.payload_len_transmitted] = datum;
+      } else {
+        spi.state = SPI_PAYLOAD_ERROR;
+        ret = CONTROL_ERROR;
+      }
+      ++spi.payload_len_transmitted;
+      break;
+
+    case SPI_PAYLOAD_ERROR:
+      ++spi.payload_len_transmitted;
+      break;
+  }
+
+  return ret;
 }

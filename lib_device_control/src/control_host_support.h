@@ -48,6 +48,26 @@ control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
 }
 
 static inline size_t
+control_build_spi_data(uint8_t data[SPI_TRANSACTION_MAX_BYTES],
+                       control_resid_t resid, control_cmd_t cmd,
+                       const uint8_t payload[], unsigned payload_len)
+{
+  data[0] = resid;
+  data[1] = cmd;
+  data[2] = (uint8_t) payload_len;
+
+  for(unsigned i=0; i<5; ++i)
+    data[3+i] = 0;
+
+  if (IS_CONTROL_CMD_READ(cmd)) return 8;
+
+  for(unsigned i=0; i<payload_len; ++i)
+    data[3 + i] = payload[i];
+
+  return 3 + payload_len;
+}
+
+static inline size_t
 control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
                        control_resid_t resid, control_cmd_t cmd,
                        const uint8_t payload[], unsigned payload_len)

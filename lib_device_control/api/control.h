@@ -191,6 +191,42 @@ control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
                               unsigned length_in, unsigned &length_out,
                               client interface control i[]);
 
-#endif
+  /** Inform the control library that the SPI master has ended the transaction. If the command
+   *  was a write, this is the point that a write command is emitted on the i_ctl interface.
+   *
+   *  \param i_ctl            Array of interfaces used to communicate with controllable entities
+   *
+   *  \returns                Whether the transfer was successful or not
+   */
+control_ret_t
+control_process_spi_master_ends_transaction(client interface control i_ctl[]);
+
+  /** Inform the control library that the SPI master requires data. If the command
+   *  was a read, then this is the point that a read command is emitted on the i_ctl interface.
+   *  The master will then end the transaction and pause. The data will be sent to the master 
+   *  on the next transaction.
+   *
+   *  \param data             The data to be sent over SPI
+   *  \param i_ctl            Array of interfaces used to communicate with controllable entities
+   *
+   *  \returns                Whether the transfer was successful or not
+   */
+control_ret_t
+control_process_spi_master_requires_data(uint32_t &data, client interface control i_ctl[]);
+
+  /** Inform the control library that the SPI master supplied data. 
+   *  NOTE: It is assumed that the datum is 8 bits wide, i.e. spi_slave(...) is set up with
+   *        SPI_TRANSFER_SIZE_8 as its last parameter.
+   *
+   *  \param datum            The data provided by the SPI master
+   *  \param valid_bits       The bits that are valid in datum
+   *  \param i_ctl            Array of interfaces used to communicate with controllable entities
+   *
+   *  \returns                Whether the transfer was successful or not
+   */
+control_ret_t
+control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, client interface control i_ctl[]);
+
+#endif // __XC__
 
 #endif // __control_h__
