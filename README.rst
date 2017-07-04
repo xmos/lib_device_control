@@ -32,10 +32,10 @@ Adding new transport layers and/or hosts is straightforward where the hardware s
    - Yes
    -
  * - PC / OSX
-   - Yes\*
+   -
    - Yes
    - Yes
-   - Yes\*
+   -
  * - Raspberry Pi / Linux
    - Yes
    - TBD
@@ -46,8 +46,6 @@ Adding new transport layers and/or hosts is straightforward where the hardware s
    - 
    - 
    - 
-
-\*You will need an Aardvark I2C/SPI Host Adapter from Total Phase.
 
 Typical resource usage
 ......................
