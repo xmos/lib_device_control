@@ -4,8 +4,8 @@ Device control library change log
 3.1.0
 -----
 
-  * Add SPI support with Raspberry Pi hosts
-  * No longer shift I2C address down by 1 on Raspberry Pi hosts
+  * Add SPI support for Raspberry Pi host
+  * No longer down-shift I2C address on Raspberry Pi host
 
 3.0.1
 -----
