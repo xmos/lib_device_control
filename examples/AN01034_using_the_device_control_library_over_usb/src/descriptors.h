@@ -1,5 +1,5 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
-#include "usb.h"
+#include "usb_std_descriptors.h"
 
 #define EP0_MAX_PACKET_SIZE 64
 
