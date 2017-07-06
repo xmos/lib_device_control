@@ -2,7 +2,7 @@
 Using the Device Control Library over USB
 =========================================
 
-.. version:: 2.0.2
+.. version:: 2.0.3
 
 Summary
 -------
@@ -24,8 +24,8 @@ Required hardware
 .................
 
 The example code provided by this application has been implemented
-and tested to work on the xCORE Array Microphone board. It is also 
-know to work with the XVSM-2000 Smart Microphone board.
+and tested to work on the Vocal Fusion board. It is also 
+know to work with other xCORE-200 based boards with a USB interface.
 
 Prerequisites
 .............

@@ -33,10 +33,11 @@ To start using the device control library add ``lib_device_control`` to your Mak
 
   USED_MODULES = .. lib_device_control ...
 
-The application in this application note also uses the USB Device library (``lib_usb``) for access to USB and the Mic Array Board Support library
-(``lib_mic_array_board_support``) for access to the buttons and LEDs on the hardware. So the Makefile also includes::
+The application in this application note also uses the USB Core, Device and Shared libraries (``module_xud module_usb_device module_usb_shared``) for access to USB and
+the Mic Array Board Support library (``lib_mic_array_board_support``) for access to the buttons
+and LEDs on the hardware. So the Makefile also includes::
 
-  USED_MODULES = .. lib_usb lib_mic_array_board_support ..
+  USED_MODULES = .. module_xud module_usb_device module_usb_shared lib_mic_array_board_support ..
 
 
 Includes
@@ -49,9 +50,9 @@ This application requires the system header that defines XMOS xCORE specific def
    :end-before: include "app.h"
 
 The Device Control library library functions and types are defined in ``control.h``. This header must
-be included in your code to use the library. The low level USB device functionality is provided by ``usb.h`` 
-and the USB device functionality is provided by the API described in ``hid.h`` and it's associated descriptor
-set in ``decriptors.h``. Access to the xCORE Array Microphone board GPIO is provided by ``mic_array_board_support.h``.
+be included in your code to use the library. The low level USB device functionality is provided by ``xud.h``,
+``usb_std_requests.h`` and ``usb_device.h``. USB descriptor set is defined in ``decriptors.h``. Access
+to the Vocal Fusion board GPIO is provided by ``mic_array_board_support.h``.
 
 Allocating hardware resources
 .............................
@@ -59,7 +60,7 @@ Allocating hardware resources
 On an xCORE the pins are controlled by ``ports``. The Device Control library itself requires no ports. 
 However the application uses USB and GPIO. The USB I/O resources are implicitly defined by including the USB library
 whereas the buttons and LEDs ports are explicitly passed to the I/O server task. The specific resource IDs are
-defined in ``mic_array_board_support.h`` which themselves are defined in the platform file ``MIC-ARRAY-1V0.xn``:
+defined in ``mic_array_board_support.h`` which themselves are defined in the platform file ``vfspk_base.xn``:
 
 .. literalinclude:: main.xc
    :start-on: on tile[0]: mabs_led_ports_t p_leds
@@ -79,8 +80,7 @@ application, only one controllable resource is registered.
 Reading over Device Control
 ...........................
 
-When the host requests a read from a controlled resource a setup packet to be sent ``xud()``. This is then forwarded to endpoint 0 where it is identified as a device-to-host vendor request 
-and is subsequently processed.
+When the host requests a read from a controlled resource, endpoint 0 receives a device-to-host vendor request.
 
 .. literalinclude:: main.xc
    :start-on: case USB_BMREQ_D2H_VENDOR_DEV
@@ -97,8 +97,8 @@ method call across the interface ``i_control``. A call to the ``read_command()``
 Writing over Device Control
 ...........................
 
-When the host requests a write to a controlled resource a setup packet is received by ``xud()`` and then sent to endpoint 0 where it is identified as a host-to-device vendor request 
-and is subsequently processed.
+When the host requests a write to a controlled resource, a similar packet to read is sent to endpoint 0,
+which is a host-to-device vendor request.
 
 .. literalinclude:: main.xc
    :start-on: case USB_BMREQ_H2D_VENDOR_DEV:
@@ -166,7 +166,7 @@ Please see the source code listing app_listing_ for more details.
 Demo Hardware Setup
 -------------------
 
-To run the demo, connect a USB cable to power the xCORE Array Microphone board
+To run the demo, connect a USB cable to power the Vocal Fusion board
 and plug the xTAG to the board and connect the xTAG USB cable to your development machine.
 
 .. figure:: images/hw_setup.pdf
@@ -180,7 +180,7 @@ Launching the demo application
 ------------------------------
 
 Once the demo example has been built either from the command line using xmake from the project directory 
-wherer the Makefile can be found or via the build mechanism of xTIMEcomposer studio it can be executed on the xCORE Array Microphone board.
+wherer the Makefile can be found or via the build mechanism of xTIMEcomposer studio it can be executed on the Vocal Fusion board.
 
 Once built there will be a ``bin/`` directory within the project which contains
 the binary for the xCORE device. The xCORE binary has a XMOS standard .xe extension.
@@ -194,7 +194,7 @@ on the xCORE device::
   xrun --xscope bin/AN01034_usb.xe
 
 Once this command has executed the application will be running on the
-xCORE Array Microphone board.
+Vocal Fusion board.
 
 Launching from xTIMEcomposer Studio
 ...................................
@@ -204,7 +204,7 @@ Select the xCORE binary from the ``bin/`` directory, right click and go to **Run
 Configurations**. Double click on xCORE application to create a new run configuration,
 enable the xSCOPE I/O mode in the dialog box and then select **Run**.
 
-Once this command has executed the application will be running on the xCORE Array Microphone board.
+Once this command has executed the application will be running on the Vocal Fusion board.
 
 Running the application
 .......................
