@@ -1,6 +1,13 @@
 Device control library change log
 =================================
 
+3.1.1
+-----
+
+  * Use Vocal Fusion board XN file in xSCOPE and USB examples
+  * Make USB example use XUD and full-speed only (fixes occasional enumeration
+    failures)
+
 3.1.0
 -----
 
