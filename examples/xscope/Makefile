@@ -1,4 +1,4 @@
-TARGET = MIC-ARRAY-1V0.xn
+TARGET = vfspk_base.xn
 XCC_FLAGS = -fxscope -Wall -g -O2 -report
 #XCC_FLAGS += -D ERRONEOUS_DEVICE
 USED_MODULES = lib_device_control lib_mic_array_board_support
