@@ -4,9 +4,7 @@
 #include <xscope.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "xud.h"
-#include "usb_std_requests.h"
-#include "usb_device.h"
+#include "usb.h"
 #include "descriptors.h"
 #include "control.h"
 #include "mic_array_board_support.h"
@@ -28,8 +26,8 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   int handled;
   size_t len;
 
-  ep0_out = XUD_InitEp(c_ep0_out);
-  ep0_in = XUD_InitEp(c_ep0_in);
+  ep0_out = XUD_InitEp(c_ep0_out, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
+  ep0_in = XUD_InitEp(c_ep0_in, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
 
   control_init();
   control_register_resources(i_control, 1);
@@ -103,9 +101,6 @@ enum {
   NUM_EP_IN
 };
 
-XUD_EpType g_ep_table_out[NUM_EP_OUT] = { XUD_EPTYPE_CTL | XUD_STATUS_ENABLE };
-XUD_EpType g_ep_table_in[NUM_EP_IN] = { XUD_EPTYPE_CTL | XUD_STATUS_ENABLE };
-
 int main(void)
 {
   chan c_ep_out[NUM_EP_OUT], c_ep_in[NUM_EP_IN];
@@ -114,8 +109,7 @@ int main(void)
   par {
     on USB_TILE: par {
       endpoint0(c_ep_out[0], c_ep_in[0], i_control);
-      XUD_Manager(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null,
-        g_ep_table_out, g_ep_table_in, null, null, 1, XUD_SPEED_FS, XUD_PWR_BUS);
+      xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
     }
     on tile[0]: par {
       app(i_control[0], i_leds_buttons[0]);

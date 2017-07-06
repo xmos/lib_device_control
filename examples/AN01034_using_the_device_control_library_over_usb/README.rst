@@ -24,7 +24,7 @@ Required hardware
 .................
 
 The example code provided by this application has been implemented
-and tested to work on the Vocal Fusion board. It is also 
+and tested to work on the Vocal Fusion board. It is also
 know to work with other xCORE-200 based boards with a USB interface.
 
 Prerequisites

@@ -37,7 +37,7 @@ The application in this application note also uses the USB Core, Device and Shar
 the Mic Array Board Support library (``lib_mic_array_board_support``) for access to the buttons
 and LEDs on the hardware. So the Makefile also includes::
 
-  USED_MODULES = .. module_xud module_usb_device module_usb_shared lib_mic_array_board_support ..
+  USED_MODULES = .. lib_usb lib_mic_array_board_support ..
 
 
 Includes
@@ -50,9 +50,9 @@ This application requires the system header that defines XMOS xCORE specific def
    :end-before: include "app.h"
 
 The Device Control library library functions and types are defined in ``control.h``. This header must
-be included in your code to use the library. The low level USB device functionality is provided by ``xud.h``,
-``usb_std_requests.h`` and ``usb_device.h``. USB descriptor set is defined in ``decriptors.h``. Access
-to the Vocal Fusion board GPIO is provided by ``mic_array_board_support.h``.
+be included in your code to use the library. The low level USB device functionality is provided by ``usb.h`` 
+and the USB device functionality is provided by the API described in ``hid.h`` and it's associated descriptor
+set in ``decriptors.h``. Access to the xCORE Array Microphone board GPIO is provided by ``mic_array_board_support.h``.
 
 Allocating hardware resources
 .............................
