@@ -48,7 +48,7 @@ class device_control_endtoend_tester(xmostest.Tester):
 
         if not self.result:
             output['failures'] = ''.join(self.failures)
-        
+
         xmostest.set_test_result(self.product,
                                  self.group,
                                  self.test,
@@ -61,7 +61,7 @@ class device_control_endtoend_tester(xmostest.Tester):
 def runtest():
 
     # Check if the test is running in an environment with hardware resources
-    # i.e. if not running from usb audio view it will quit. lib_device_control 
+    # i.e. if not running from usb audio view it will quit. lib_device_control
     # is in the usb audio view so it will build
     args = xmostest.getargs()
     if not args.remote_resourcer:
@@ -80,7 +80,7 @@ def runtest():
     testlevel = 'smoke'
     tester.set_min_testlevel(testlevel)
 
-    board = 'uac2_xcore200_mc_testrig_os_x_11'
+    board = 'testrig_os_x_12'
 
     # Get the hardware resources to run the test on
     resources = None
@@ -94,11 +94,11 @@ def runtest():
     env = ""
 
     # Start the xCORE DUT
-    device_job = xmostest.run_on_xcore(resources['dut'], device_app_name,
+    device_job = xmostest.run_on_xcore(resources['uac2_xcore200_mc_dut'], device_app_name,
                                         do_xe_prebuild = True,
                                         tester = tester[0],
-                                        enable_xscope = True, 
-                                        xscope_handler = None, 
+                                        enable_xscope = True,
+                                        xscope_handler = None,
                                         timeout = 30,
                                         build_env = env)
 
@@ -108,5 +108,5 @@ def runtest():
                                      tester = tester[1],
                                      timeout = 30,
                                      initial_delay = 10) #Enough time for xtag to load firmware and host to enumerate device
-    
+
     xmostest.complete_all_jobs()
