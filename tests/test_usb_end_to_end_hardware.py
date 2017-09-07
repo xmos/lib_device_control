@@ -80,7 +80,7 @@ def runtest():
     testlevel = 'smoke'
     tester.set_min_testlevel(testlevel)
 
-    board = 'uac2_xcore200_mc_testrig_os_x_11'
+    board = 'testrig_os_x_12'
 
     # Get the hardware resources to run the test on
     resources = None
@@ -94,7 +94,7 @@ def runtest():
     env = ""
 
     # Start the xCORE DUT
-    device_job = xmostest.run_on_xcore(resources['dut'], device_app_name,
+    device_job = xmostest.run_on_xcore(resources['uac2_xcore200_mc_dut'], device_app_name,
                                         do_xe_prebuild = True,
                                         tester = tester[0],
                                         enable_xscope = True,
