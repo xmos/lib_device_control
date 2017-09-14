@@ -231,10 +231,10 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
   }
 
   libusb_device **devs = NULL;
-  libusb_get_device_list(NULL, &devs);
+  int num_dev = libusb_get_device_list(NULL, &devs);
 
   libusb_device *dev = NULL;
-  for (int i = 0; devs[i] != NULL; i++) {
+  for (int i = 0; i < num_dev; i++) {
     struct libusb_device_descriptor desc;
     libusb_get_device_descriptor(devs[i], &desc);
     if (desc.idVendor == vendor_id && desc.idProduct == product_id) {
