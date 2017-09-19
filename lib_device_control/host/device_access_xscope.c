@@ -72,6 +72,7 @@ void record_callback(unsigned int id, unsigned long long timestamp,
     last_response_struct = (struct control_xscope_response*)last_response;
     last_response_length = length;
     memcpy(last_response, databytes, length);
+    
     record_count++;
   }
 }

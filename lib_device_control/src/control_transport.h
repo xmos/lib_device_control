@@ -39,6 +39,7 @@ struct control_xscope_response {
 // hard limit of 256 bytes for xSCOPE uploads
 #define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * 4)
 #define XSCOPE_UPLOAD_MAX_WORDS 64
+// the number of bytes subtracted below has been found during testing
 #define XSCOPE_DATA_MAX_BYTES (XSCOPE_UPLOAD_MAX_BYTES - 9)
 
 #define I2C_TRANSACTION_MAX_BYTES 256
