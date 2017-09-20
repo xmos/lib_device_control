@@ -185,7 +185,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   }
 
   while (record_count == 0) { // wait for response on xSCOPE probe
-    // do nothing
+    pause_short();
   }
 
   DBG(printf("response: "));
@@ -215,7 +215,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   }
 
   while (record_count == 0) { // wait for response on xSCOPE probe
-    // do nothing
+    pause_short();
   }
 
   DBG(printf("response: "));
