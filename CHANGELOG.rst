@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+3.2.0
+-----
+
+  * Updated XSCOPE and USB protocols for host applications
+
 3.1.1
 -----
 
