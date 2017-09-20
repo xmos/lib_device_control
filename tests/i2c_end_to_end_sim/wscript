@@ -1,0 +1,22 @@
+def configure(conf):
+    conf.load('xwaf.compiler_xcc')
+
+
+def build(bld):
+    bld.env.TARGET_ARCH = 'XCORE-200-EXPLORER'
+    bld.env.XCC_FLAGS = ['-Wall', '-g', '-O2', '-report', '-DUSE_I2C=1']
+
+    depends_on = ['lib_logging', 'lib_device_control', 'lib_i2c']
+
+    root = bld.path.parent.parent.parent
+    ldc = root.find_dir('lib_device_control/lib_device_control')
+    includes = [ldc.find_dir('host')]
+
+    # Build our program
+    sources = bld.path.ant_glob(['src/**/*.xc']) + [
+        ldc.find_resource('host/device_access_i2c_xcore.xc')
+    ]
+    prog = bld.program(
+        source=sources,
+        depends_on=depends_on,
+        includes=includes)

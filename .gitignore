@@ -10,3 +10,6 @@ _build
 README.pdf
 doc/README/README.rst
 *.o
+.lock-waf_*
+.waf-*/
+build/

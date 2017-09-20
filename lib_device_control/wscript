@@ -1,0 +1,8 @@
+def use_module(bld):
+    source = bld.path.ant_glob('src/*.xc')
+    bld.env.append_value('XCC_FLAGS', ['-g', '-O3'])
+    bld.module(
+        source=source,
+        depends_on='lib_xassert(>=3.0.0) lib_logging(>=2.1.0)',
+        includes=['api'],
+        version='3.1.0')
