@@ -72,7 +72,7 @@ void record_callback(unsigned int id, unsigned long long timestamp,
     last_response_struct = (struct control_xscope_response*)last_response;
     last_response_length = length;
     memcpy(last_response, databytes, length);
-
+    
     record_count++;
   }
 }
@@ -126,7 +126,7 @@ control_ret_t control_query_version(control_version_t *version)
   }
 
   while (record_count == 0) { // wait for response on xSCOPE probe
-    pause_short();
+    // do nothing
   }
 
   DBG(printf("response: "));

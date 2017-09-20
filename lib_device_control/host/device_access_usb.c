@@ -29,13 +29,13 @@ static libusb_device_handle *devh = NULL;
 
 static const int sync_timeout_ms = 100;
 
-/* USB 2.0 section 5.5.3 */
-#define CONTROL_MAX_PAYLOAD_SIZE 64
+/* Control query transfers require smaller buffers */
+#define VERSION_MAX_PAYLOAD_SIZE 64
 
 control_ret_t control_query_version(control_version_t *version)
 {
   uint16_t windex, wvalue, wlength;
-  uint8_t request_data[CONTROL_MAX_PAYLOAD_SIZE];
+  uint8_t request_data[VERSION_MAX_PAYLOAD_SIZE];
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
     CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
@@ -70,20 +70,20 @@ control_ret_t control_query_version(control_version_t *version)
  * Ideally we would examine configuration descriptors and check for actual
  * wMaxPacketSize on given control endpoint.
  *
- * For now, just assume the greatest control transfer size, 64. Have host
+ * For now, just assume the greatest control transfer size, USB_TRANSACTION_MAX_BYTES. Have host
  * code only check payload size here. Device will not need any additional
  * checks. Device application code will set wMaxPacketSize in its
  * descriptors and take care of allocating a buffer for receiving control
- * requests of up to 64 bytes.
+ * requests of up to USB_TRANSACTION_MAX_BYTES bytes.
  *
  * Without checking, libusb would set wLength in header to any number and
  * only send 64 bytes of payload, truncating the rest.
  */
 static bool payload_len_exceeds_control_packet_size(size_t payload_len)
 {
-  if (payload_len > CONTROL_MAX_PAYLOAD_SIZE) {
+  if (payload_len > USB_TRANSACTION_MAX_BYTES) {
     printf("control transfer of %zd bytes requested\n", payload_len);
-    printf("maximum control packet size is %d\n", CONTROL_MAX_PAYLOAD_SIZE);
+    printf("maximum control packet size is %d\n", USB_TRANSACTION_MAX_BYTES);
     return true;
   }
   else {
@@ -231,10 +231,10 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
   }
 
   libusb_device **devs = NULL;
-  libusb_get_device_list(NULL, &devs);
+  int num_dev = libusb_get_device_list(NULL, &devs);
 
   libusb_device *dev = NULL;
-  for (int i = 0; devs[i] != NULL; i++) {
+  for (int i = 0; i < num_dev; i++) {
     struct libusb_device_descriptor desc;
     libusb_get_device_descriptor(devs[i], &desc);
     if (desc.idVendor == vendor_id && desc.idProduct == product_id) {

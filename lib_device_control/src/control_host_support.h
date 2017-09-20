@@ -22,7 +22,7 @@ control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
   p->resid = resid;
   p->cmd = cmd;
 
-  assert(payload_len < (1<<8) && "payload length can't be represented as a uint8_t");
+  assert(payload_len <= XSCOPE_DATA_MAX_BYTES && "payload length can't be represented as a uint8_t");
   p->payload_len = (uint8_t)payload_len;
 
   if (!IS_CONTROL_CMD_READ(cmd) && payload != NULL) {
