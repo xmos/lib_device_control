@@ -1,4 +1,4 @@
-// Copyright (c) 2016, XMOS Ltd, All rights reserved
+// Copyright (c) 2016-2017, XMOS Ltd, All rights reserved
 #ifndef __app_host_h__
 #define __app_host_h__
 
