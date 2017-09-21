@@ -1,4 +1,4 @@
-// Copyright (c) 2016, XMOS Ltd, All rights reserved
+// Copyright (c) 2016-2017, XMOS Ltd, All rights reserved
 #include <stdio.h>
 #ifdef _WIN32
 #include <windows.h>

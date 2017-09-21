@@ -1,4 +1,4 @@
-// Copyright (c) 2016, XMOS Ltd, All rights reserved
+// Copyright (c) 2016-2017, XMOS Ltd, All rights reserved
 #ifndef __resource_table_h__
 #define __resource_table_h__
 
