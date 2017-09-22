@@ -120,7 +120,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   num_commands++;
 
   if (ret != (int)payload_len) {
-    printf("libusb_control_transfer returned %s\n",  libusb_error_name(ret)));
+    printf("libusb_control_transfer returned %s\n",  libusb_error_name(ret));
     return CONTROL_ERROR;
   }
 
@@ -155,7 +155,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   num_commands++;
 
   if (ret != (int)payload_len) {
-    printf("libusb_control_transfer returned %s\n",  libusb_error_name(ret)));
+    printf("libusb_control_transfer returned %s\n",  libusb_error_name(ret));
     return CONTROL_ERROR;
   }
 
