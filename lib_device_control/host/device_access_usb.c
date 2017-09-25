@@ -249,7 +249,7 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
   }
 
   if (libusb_open(dev, &devh) < 0) {
-    fprintf(stderr, "failed to open device\n");
+    fprintf(stderr, "failed to open device. Ensure adequate permissions\n");
     return CONTROL_ERROR;
   }
 
