@@ -32,6 +32,17 @@ static const int sync_timeout_ms = 100;
 /* Control query transfers require smaller buffers */
 #define VERSION_MAX_PAYLOAD_SIZE 64
 
+control_ret_t debug_libusb_error(int ret_code)
+{
+#if defined _WIN32
+    printf("libusb_control_transfer returned %s\n", usb_strerror());
+#elif defined __APPLE__
+    printf("libusb_control_transfer returned %s\n", libusb_error_name(ret));
+#elif defined __linux
+    printf("libusb_control_transfer returned %d\n", ret);
+#endif
+}
+
 control_ret_t control_query_version(control_version_t *version)
 {
   uint16_t windex, wvalue, wlength;
@@ -56,7 +67,7 @@ control_ret_t control_query_version(control_version_t *version)
   num_commands++;
 
   if (ret != sizeof(control_version_t)) {
-    printf("libusb_control_transfer returned %s\n", libusb_error_name(ret));
+    debug_libusb_error(ret);
     return CONTROL_ERROR;
   }
 
@@ -120,7 +131,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   num_commands++;
 
   if (ret != (int)payload_len) {
-    printf("libusb_control_transfer returned %s\n",  libusb_error_name(ret));
+    debug_libusb_error(ret);
     return CONTROL_ERROR;
   }
 
@@ -155,7 +166,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   num_commands++;
 
   if (ret != (int)payload_len) {
-    printf("libusb_control_transfer returned %s\n",  libusb_error_name(ret));
+    debug_libusb_error(ret);
     return CONTROL_ERROR;
   }
 
