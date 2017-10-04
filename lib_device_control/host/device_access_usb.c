@@ -32,15 +32,17 @@ static const int sync_timeout_ms = 100;
 /* Control query transfers require smaller buffers */
 #define VERSION_MAX_PAYLOAD_SIZE 64
 
-control_ret_t debug_libusb_error(int ret_code)
+control_ret_t debug_libusb_error(int err_code)
 {
+      printf("libusb_control_transfer returned %s\n",
 #if defined _WIN32
-    printf("libusb_control_transfer returned %s\n", usb_strerror());
+                  usb_strerror()
 #elif defined __APPLE__
-    printf("libusb_control_transfer returned %s\n", libusb_error_name(ret));
+                  libusb_error_name(err_code)
 #elif defined __linux
-    printf("libusb_control_transfer returned %d\n", ret);
+                  err_code
 #endif
+      );
 }
 
 control_ret_t control_query_version(control_version_t *version)
