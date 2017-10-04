@@ -34,15 +34,14 @@ static const int sync_timeout_ms = 100;
 
 void debug_libusb_error(int err_code)
 {
-      printf("libusb_control_transfer returned %s\n",
 #if defined _WIN32
-                  usb_strerror()
+  printf("libusb_control_transfer returned %s\n", usb_strerror());
 #elif defined __APPLE__
-                  libusb_error_name(err_code)
+  printf("libusb_control_transfer returned %s\n", libusb_error_name(err_code));
 #elif defined __linux
-                  err_code
+  printf("libusb_control_transfer returned %d\n", err_code);
 #endif
-      );
+
 }
 
 control_ret_t control_query_version(control_version_t *version)
