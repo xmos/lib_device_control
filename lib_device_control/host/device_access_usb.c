@@ -32,7 +32,7 @@ static const int sync_timeout_ms = 100;
 /* Control query transfers require smaller buffers */
 #define VERSION_MAX_PAYLOAD_SIZE 64
 
-control_ret_t debug_libusb_error(int err_code)
+void debug_libusb_error(int err_code)
 {
       printf("libusb_control_transfer returned %s\n",
 #if defined _WIN32
