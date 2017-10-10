@@ -6,6 +6,7 @@ Device control library change log
 
   * Updated XSCOPE and USB protocols for host applications
   * Improved error messages in host applications
+  * Dummy LED OEN port in example applications
 
 3.1.1
 -----
