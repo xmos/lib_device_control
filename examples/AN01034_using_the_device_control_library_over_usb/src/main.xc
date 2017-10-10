@@ -13,7 +13,11 @@
 #define DEBUG_UNIT DEVICE
 #include "debug_print.h"
 
-on tile[0]: mabs_led_ports_t p_leds = MIC_BOARD_SUPPORT_LED_PORTS;
+//TODO use MIC_BOARD_SUPPORT_LED_PORTS in post 2.2.0 lib_mic_array_board_support
+on tile[0]: mabs_led_ports_t p_leds = {
+  PORT_LED0_TO_7, PORT_LED8, PORT_LED9, PORT_LED10_TO_12, XS1_PORT_1P
+};
+
 on tile[0]: in port p_buttons =  MIC_BOARD_SUPPORT_BUTTON_PORTS;
 
 void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_control[1])

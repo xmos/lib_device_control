@@ -9,8 +9,12 @@
 #include "mic_array_board_support.h"
 #include "app.h"
 
-on tile[0]: mabs_led_ports_t p_leds = MIC_BOARD_SUPPORT_LED_PORTS;
 on tile[0]: in port p_buttons =  MIC_BOARD_SUPPORT_BUTTON_PORTS;
+
+//TODO use MIC_BOARD_SUPPORT_LED_PORTS in post 2.2.0 lib_mic_array_board_support
+on tile[0]: mabs_led_ports_t p_leds = {
+  PORT_LED0_TO_7, PORT_LED8, PORT_LED9, PORT_LED10_TO_12, XS1_PORT_1P
+};
 
 void xscope_user_init(void)
 {
