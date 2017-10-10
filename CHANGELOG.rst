@@ -5,6 +5,7 @@ Device control library change log
 -----
 
   * Updated XSCOPE and USB protocols for host applications
+  * Improved error messages in host applications
 
 3.1.1
 -----
