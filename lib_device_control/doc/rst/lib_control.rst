@@ -199,6 +199,6 @@ API - Host side
 Known Issues
 ------------
 
-There are no known issues.
+- New installations of Windows 10 Anniversary (1607) and will not install the USB control driver without disabling attestation signing checks (lib_device_control #40)
 
 .. include:: ../../../CHANGELOG.rst
