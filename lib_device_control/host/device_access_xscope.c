@@ -129,7 +129,10 @@ control_ret_t control_query_version(control_version_t *version)
   }
 
   while (record_count == 0) { // wait for response on xSCOPE probe
+    // add a pause for Windows platforms only
+    #ifndef _WIN32
     pause_short();
+    #endif
   }
 
   DBG(printf("response: "));
