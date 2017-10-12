@@ -103,7 +103,7 @@ control_ret_t control_init_xscope(const char *host_str, const char *port_str)
   // wait for xSCOPE probe registration
   while (probe_id == -1) {
     // add a pause for Windows platforms only
-    #ifndef _WIN32
+    #ifdef _WIN32
     pause_short();
     #endif
   }
@@ -130,7 +130,7 @@ control_ret_t control_query_version(control_version_t *version)
 
   while (record_count == 0) { // wait for response on xSCOPE probe
     // add a pause for Windows platforms only
-    #ifndef _WIN32
+    #ifdef _WIN32
     pause_short();
     #endif
   }
