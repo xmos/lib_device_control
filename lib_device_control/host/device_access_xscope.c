@@ -20,8 +20,8 @@
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
-static unsigned int probe_id = 0xffffffff;
-static size_t record_count = 0;
+static volatile unsigned int probe_id = 0xffffffff;
+static volatile size_t record_count = 0;
 static unsigned char *last_response = NULL;
 static struct control_xscope_response *last_response_struct = NULL;
 static unsigned last_response_length = 0;
@@ -102,7 +102,7 @@ control_ret_t control_init_xscope(const char *host_str, const char *port_str)
 
   // wait for xSCOPE probe registration
   while (probe_id == -1) {
-    pause_short();
+    // do nothing, probe_id is a volatile variable
   }
 
   return CONTROL_SUCCESS;
@@ -124,9 +124,10 @@ control_ret_t control_query_version(control_version_t *version)
     printf("xscope_ep_request_upload failed\n");
     return CONTROL_ERROR;
   }
-
-  while (record_count == 0) { // wait for response on xSCOPE probe
-    pause_short();
+  
+  // wait for response on xSCOPE probe
+  while (record_count == 0) {
+    // do nothing
   }
 
   DBG(printf("response: "));
@@ -183,9 +184,9 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
     printf("xscope_ep_request_upload failed\n");
     return CONTROL_ERROR;
   }
-
-  while (record_count == 0) { // wait for response on xSCOPE probe
-    pause_short();
+  // wait for response on xSCOPE probe
+  while (record_count == 0) { 
+    // do nothing, record_count is a volatile variable
   }
 
   DBG(printf("response: "));
@@ -213,9 +214,10 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
     printf("xscope_ep_request_upload failed\n");
     return CONTROL_ERROR;
   }
-
-  while (record_count == 0) { // wait for response on xSCOPE probe
-    pause_short();
+  
+  // wait for response on xSCOPE probe
+  while (record_count == 0) {
+    // do nothing, record_count is a volatile variable
   }
 
   DBG(printf("response: "));
