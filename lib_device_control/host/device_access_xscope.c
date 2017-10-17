@@ -127,7 +127,7 @@ control_ret_t control_query_version(control_version_t *version)
   
   // wait for response on xSCOPE probe
   while (record_count == 0) {
-    // do nothing
+    pause_short();
   }
 
   DBG(printf("response: "));
