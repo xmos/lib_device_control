@@ -102,7 +102,7 @@ control_ret_t control_init_xscope(const char *host_str, const char *port_str)
 
   // wait for xSCOPE probe registration
   while (probe_id == -1) {
-    // do nothing, probe_id is a volatile variable
+    pause_short();
   }
 
   return CONTROL_SUCCESS;
@@ -186,7 +186,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   }
   // wait for response on xSCOPE probe
   while (record_count == 0) { 
-    // do nothing, record_count is a volatile variable
+    pause_short();
   }
 
   DBG(printf("response: "));
@@ -217,7 +217,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   
   // wait for response on xSCOPE probe
   while (record_count == 0) {
-    // do nothing, record_count is a volatile variable
+    pause_short();
   }
 
   DBG(printf("response: "));
