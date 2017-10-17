@@ -1,6 +1,10 @@
 Device control library change log
 =================================
 
+3.2.1
+-----
+  * Fixed XSCOPE hanging on Windows platforms
+
 3.2.0
 -----
 
