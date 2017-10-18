@@ -57,9 +57,9 @@ control_ret_t control_cleanup_i2c(void);
 #if USE_USB || __DOXYGEN__
 /** Initialize the USB host interface
  *
- *  \param vendor_id    Vendor ID of controlled USB device
- *  \param product_id   Product ID of controlled USB device
- *  \param interface    USB Control interface number of controlled device
+ *  \param vendor_id     Vendor ID of controlled USB device
+ *  \param product_id    Product ID of controlled USB device
+ *  \param interface_num USB Control interface number of controlled device
  *
  *  \returns           Whether the initialization was successful or not
  */
