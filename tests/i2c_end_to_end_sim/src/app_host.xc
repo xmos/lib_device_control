@@ -14,7 +14,7 @@ void host_app(client i2c_master_if i_i2c_host){
   const unsigned char payload_write[4] = {0x99, 0xed};
   unsigned char payload[4];
   int i;
-  printf("Start host app\n");
+  //printf("Start host app\n");
 
   if (control_init_i2c(I2C_ADDR) != CONTROL_SUCCESS) {
     printf("ERROR - control init failed\n");

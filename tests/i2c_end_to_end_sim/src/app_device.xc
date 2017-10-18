@@ -56,7 +56,7 @@ void app_device(server interface control i_control)
   unsigned num_commands;
   int i;
 
-  printf("Start device app\n");
+  //printf("Start device app\n");
 #ifdef ERRONEOUS_DEVICE
   printf("Generate errors\n");
 #endif
