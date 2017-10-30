@@ -3,8 +3,11 @@ Device control library change log
 
 3.2.1
 -----
-  * Fix XSCOPE hanging on Windows platforms
-  * Fix XSCOPE reconnection failure on Windows platforms 
+
+  * Fix an issue on Windows where xSCOPE connection hangs on
+    Windows (#17871)
+  * Fix an issue on Windows where first xSCOPE connection succeeds,
+    but subsequent ones fail with "socket reply error" (#47)
 
 3.2.0
 -----
