@@ -232,7 +232,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
 
 control_ret_t control_cleanup_xscope(void)
 {
-  #ifdef WIN32
+  #ifdef _WIN32
   // Bug in 14.1 means this is required on Windows but not OSX
   xscope_ep_disconnect();
   #endif
