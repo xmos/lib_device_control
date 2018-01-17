@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+3.2.2
+-----
+
+  * Use -Os for the whole library rather than -O3 (#45)
+
 3.2.1
 -----
 
