@@ -5,6 +5,7 @@ Device control library change log
 -----
 
   * Use -Os for the whole library rather than -O3 (#45)
+  * Fix return code of control_register_resources
 
 3.2.1
 -----
