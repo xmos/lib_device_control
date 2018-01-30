@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+3.2.3
+-----
+
+  * Preprocessor flag to send channel activity over xSCOPE for debugging
+
 3.2.2
 -----
 
