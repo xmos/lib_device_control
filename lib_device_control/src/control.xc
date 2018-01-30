@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <xscope.h>
 #include "control.h"
 #include "control_transport.h"
 #include "resource_table.h"
@@ -9,6 +10,15 @@
 
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
+
+static void debug_channel_activity(int ifnum, int value)
+{
+#if DEBUG_CHANNEL_ACTIVITY
+  // assume probe IDs are consecutive
+  int probe_id = CH_CONTROL_0 + ifnum;
+  xscope_int(probe_id, value);
+#endif
+}
 
 control_ret_t control_init(void)
 {
@@ -91,7 +101,10 @@ write_command(client interface control i[],
   }
   else {
     debug_printf("%d write command %d, %d, %d\n", ifnum, resid, cmd, payload_len);
-    return i[ifnum].write_command(resid, cmd, payload, payload_len);
+    debug_channel_activity(ifnum, 1);
+    control_ret_t ret = i[ifnum].write_command(resid, cmd, payload, payload_len);
+    debug_channel_activity(ifnum, 0);
+    return ret;
   }
 }
 
@@ -105,7 +118,10 @@ read_command(client interface control i[],
   }
   else {
     debug_printf("%d read command %d, %d, %d\n", ifnum, resid, cmd, payload_len);
-    return i[ifnum].read_command(resid, cmd, payload, payload_len);
+    debug_channel_activity(ifnum, 1);
+    control_ret_t ret = i[ifnum].read_command(resid, cmd, payload, payload_len);
+    debug_channel_activity(ifnum, 0);
+    return ret;
   }
 }
 
