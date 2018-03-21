@@ -179,7 +179,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
 
 #ifdef _WIN32
 
-static void find_xmos_device(int vendor_id, int product_id)
+static control_ret_t find_xmos_device(int vendor_id, int product_id)
 {
   for (struct usb_bus *bus = usb_get_busses(); bus && !devh; bus = bus->next) {
     for (struct usb_device *dev = bus->devices; dev; dev = dev->next) {
@@ -188,7 +188,7 @@ static void find_xmos_device(int vendor_id, int product_id)
         devh = usb_open(dev);
         if (!devh) {
           fprintf(stderr, "failed to open device\n");
-          exit(1);
+          return CONTROL_ERROR;
         }
         break;
       }
@@ -197,8 +197,10 @@ static void find_xmos_device(int vendor_id, int product_id)
 
   if (!devh) {
     fprintf(stderr, "could not find device\n");
-    exit(1);
+    return CONTROL_ERROR;
   }
+
+  return CONTROL_SUCCESS;
 }
 
 control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
@@ -207,7 +209,8 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
   usb_find_busses(); /* find all busses */
   usb_find_devices(); /* find all connected devices */
 
-  find_xmos_device(vendor_id, product_id);
+  if (find_xmos_device(vendor_id, product_id) != CONTROL_SUCCESS)
+      return CONTROL_ERROR;
 
   int r = usb_set_configuration(devh, 1);
   if (r < 0) {
