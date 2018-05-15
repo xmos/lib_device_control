@@ -55,6 +55,15 @@ control_ret_t control_init_i2c(unsigned char i2c_slave_address);
 control_ret_t control_cleanup_i2c(void);
 #endif
 #if USE_USB || __DOXYGEN__
+
+/** Print the list of the USB devices connected to the host machine
+ *
+ *  \param vendor_id   Vendor ID of USB devices to find
+ *
+ *  \returns           Whether any connected device is found
+ */
+control_ret_t list_connected_devices(int vendor_id);
+
 /** Initialize the USB host interface
  *
  *  \param vendor_id     Vendor ID of controlled USB device
