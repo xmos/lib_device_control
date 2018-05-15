@@ -235,6 +235,42 @@ control_ret_t control_cleanup_usb(void)
   return CONTROL_SUCCESS;
 }
 
+control_ret_t list_connected_devices(int vendor_id)
+{
+  uint8_t num_devices = 0;
+  uint32_t current_pid = 0;
+  usb_init();
+  usb_find_busses(); /* find all busses */
+  usb_find_devices(); /* find all connected devices */
+  /* Scan for connected devices with the given vendor_id*/
+  for (struct usb_bus *bus = usb_get_busses(); bus && !devh; bus = bus->next) {
+    for (struct usb_device *dev = bus->devices; dev; dev = dev->next) {
+      if (dev->descriptor.idVendor == vendor_id) {
+        devh = usb_open(dev);
+        if (!devh) {
+          fprintf(stderr, "Failed to open device with Product ID: %#06x\n", dev->descriptor.idProduct);
+          return CONTROL_ERROR;
+        }
+        /* If the PID is new, update current_pid and print it */
+        if (dev->descriptor.idProduct != current_pid) {
+          current_pid = dev->descriptor.idProduct;
+          printf("Found device with Product ID: %#06x\n", current_pid);
+          /* Increment num_devices */
+          num_devices++;
+        }
+      }
+    }
+  }
+  /* Print the number of connected devices */
+  if (!num_devices) {
+    fprintf(stderr, "No device is connected\n");
+    return CONTROL_ERROR;
+  } else {
+    printf("Found %d device(s)\n", num_devices);
+  }
+  return CONTROL_SUCCESS;
+}
+
 #else
 
 control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
@@ -278,6 +314,41 @@ control_ret_t control_cleanup_usb(void)
   libusb_close(devh);
   libusb_exit(NULL);
 
+  return CONTROL_SUCCESS;
+}
+
+
+control_ret_t list_connected_devices(int vendor_id)
+{
+  uint8_t num_devices = 0;
+  uint32_t current_pid = 0;
+
+  int ret = libusb_init(NULL);
+  if (ret < 0) {
+    fprintf(stderr, "failed to initialise libusb\n");
+    return CONTROL_ERROR;
+  }
+
+  libusb_device **devs = NULL;
+  int num_dev = libusb_get_device_list(NULL, &devs);
+  struct libusb_device_descriptor desc;
+  /* Scan for connected devices with the given vendor_id*/
+  for (int dev_idx=0; dev_idx<num_dev; dev_idx++) { 
+    libusb_get_device_descriptor(devs[dev_idx], &desc);
+    if (desc.idVendor == vendor_id) {
+      current_pid = desc.idProduct;
+      printf("Found device with Product ID: %#06x\n", current_pid);
+      /* Increment num_devices */
+      num_devices++;
+    }
+  }
+  /* Print the number of connected devices */
+  if (!num_devices) {
+    fprintf(stderr, "No device is connected\n");
+    return CONTROL_ERROR;
+  } else {
+    printf("Found %d device(s)\n", num_devices);
+  }
   return CONTROL_SUCCESS;
 }
 
