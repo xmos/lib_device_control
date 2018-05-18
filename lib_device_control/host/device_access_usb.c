@@ -33,6 +33,8 @@ static const int sync_timeout_ms = 100;
 void debug_libusb_error(int err_code)
 {
 #if defined _WIN32
+  /* err_code is not used in Windows platforms */
+  (void) err_code;
   printf("libusb_control_transfer returned %s\n", usb_strerror());
 #elif defined __APPLE__
   printf("libusb_control_transfer returned %s\n", libusb_error_name(err_code));
