@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+3.2.4
+-----
+
+  * Change to use lib_i2c 5.0.0
+
 3.2.3
 -----
 
