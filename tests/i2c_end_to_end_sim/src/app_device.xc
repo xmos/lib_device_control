@@ -41,12 +41,6 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
       case i_i2c.stop_bit(void):
         control_process_i2c_stop(i_control);
         break;
-
-      /* not using these */
-      case i_i2c.start_read_request(void): break;
-      case i_i2c.start_write_request(void): break;
-      case i_i2c.start_master_write(void): break;
-      case i_i2c.start_master_read(void): break;
     }
   }
 }
