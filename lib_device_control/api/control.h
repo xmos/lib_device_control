@@ -24,6 +24,7 @@ enum control_ret_values {  /*This looks odd but helps us force byte enum */
   CONTROL_BAD_COMMAND,
   CONTROL_DATA_LENGTH_ERROR,
   CONTROL_OTHER_TRANSPORT_ERROR,
+  CONTROL_DEVICE_ERROR,
   CONTROL_ERROR
 };
 
