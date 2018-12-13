@@ -37,7 +37,9 @@ pipeline {
             }
             dir('xscope') {
               dir('host') {
-                sh 'make -f Makefile.OSX'
+                viewEnv() {
+                  sh 'make -f Makefile.OSX'
+                }
               }
             }
           }
