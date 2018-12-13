@@ -48,17 +48,19 @@ pipeline {
     }
     stage('xCORE builds') {
       steps {
-        // xcoreAllAppsBuild('examples')
-        dir('examples') {
-          xcoreCompile('i2c')
-          dir('i2c') {
-            xcoreCompile('host_xcore')
-          }
-          xcoreCompile('xscope')
-        }
-        xcoreAllAppNotesBuild('examples')
         dir("${REPO}") {
-          runXdoc('doc')
+          // xcoreAllAppsBuild('examples')
+          dir('examples') {
+            xcoreCompile('i2c')
+            dir('i2c') {
+              xcoreCompile('host_xcore')
+            }
+            xcoreCompile('xscope')
+          }
+          xcoreAllAppNotesBuild('examples')
+          dir("${REPO}") {
+            runXdoc('doc')
+          }
         }
       }
     }
