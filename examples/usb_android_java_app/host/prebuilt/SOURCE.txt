@@ -1,0 +1,17 @@
+Compile libusb Github repository with pull request 242 applied
+
+    http://github.com/libusb
+    baseline f1e3853, 10 Apr 2019
+    merged with aae0184, 5 Dec 2018
+
+Follow instructions in android directory
+
+    cd android/jni
+    ndk-build APP_PLATFORM=android-24
+
+Extract libusb.h and compiled arm64-v8a binary
+
+    libusb/libusb.h
+    android/libs/arm64-v8a/libusb1.0.so
+
+NDK version R19 used
