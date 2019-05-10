@@ -22,10 +22,10 @@ public class DeviceControl extends Activity {
   }
 
   public native int get_ids();
-  public native int connect(int fd, int handle[]);
-  public native void disconnect(int handle);
-  public native int write_cmd(int handle, char value);
-  public native int read_cmd(int handle, char values[]);
+  public native int connect(int fd, long handle[]);
+  public native void disconnect(long handle);
+  public native int write_cmd(long handle, char value);
+  public native int read_cmd(long handle, char values[]);
 
   private UsbDevice device = null;
   private UsbDeviceConnection connection = null;
@@ -65,7 +65,7 @@ public class DeviceControl extends Activity {
 
       assert connection != null;
 
-      int handle[] = {0};
+      long handle[] = {0};
       int retVal = 0;
 
       int fileDescriptor = connection.getFileDescriptor();
@@ -80,25 +80,28 @@ public class DeviceControl extends Activity {
       }
       Log.i(TAG, "handle = " + handle[0]);
 
-      for (int i = 0; i < 12; i++) {
-        Log.i(TAG, "app::write_cmd(" + i + ")");
-        retVal = write_cmd(handle[0], (char)i);
-        Log.i(TAG, "app::write_cmd: " + retVal);
+      // light LED ring gradually several times over
+      for (int j = 0; j < 10; j++) {
+        for (int i = 0; i <= 12; i++) {
+          Log.i(TAG, "app::write_cmd(" + i + ")");
+          retVal = write_cmd(handle[0], (char)i);
+          Log.i(TAG, "app::write_cmd: " + retVal);
 
-        try {
-          Thread.sleep(100);
+          try {
+            Thread.sleep(100);
+          }
+          catch (InterruptedException e) {}
+
+          char buttonEvent[] = {0, 0};
+          Log.i(TAG, "app::read_cmd()");
+          read_cmd(handle[0], buttonEvent);
+          Log.i(TAG, "app::read_cmd: " + (int)buttonEvent[0] + " " + (int)buttonEvent[1]);
+
+          try {
+            Thread.sleep(100);
+          }
+          catch (InterruptedException e) {}
         }
-        catch (InterruptedException e) {}
-
-        char buttonEvent[] = {0, 0};
-        Log.i(TAG, "app::read_cmd()");
-        read_cmd(handle[0], buttonEvent);
-        Log.i(TAG, "app::read_cmd: " + buttonEvent[0] + " " + buttonEvent[1]);
-
-        try {
-          Thread.sleep(100);
-        }
-        catch (InterruptedException e) {}
       }
 
       disconnect(handle[0]);
@@ -113,6 +116,8 @@ public class DeviceControl extends Activity {
     registerReceiver(usbBroadcastReceiver, new IntentFilter(ACTION_USB_PERMISSION));
     UsbManager manager = (UsbManager)getApplicationContext().getSystemService(Context.USB_SERVICE);
     HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
+    Log.i(TAG, deviceList.size() + " devices");
+
     Iterator<UsbDevice> it = deviceList.values().iterator();
     while (it.hasNext()) {
       device = it.next();
