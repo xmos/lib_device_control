@@ -1,5 +1,6 @@
 @Library('xmos_jenkins_shared_library@master') _
-getApproval()pipeline {
+getApproval()
+pipeline {
   agent {
     label 'x86&&macOS&&Apps'
   }
