@@ -1,10 +1,16 @@
 VERSION = 3.2.4
 
-DEPENDENT_MODULES = lib_xassert(>=3.0.1) lib_logging(>=2.1.1)
+DEPENDENT_MODULES = lib_xassert(>=3.0.1) \
+                    lib_logging(>=2.1.1)
 
-MODULE_XCC_FLAGS = $(XCC_FLAGS) -Os
+MODULE_XCC_FLAGS = $(XCC_FLAGS) \
+                   -Os
 
-INCLUDE_DIRS = api src
+OPTIONAL_HEADERS +=
 
-# Ignore host dir
+EXPORT_INCLUDE_DIRS = api
+
+INCLUDE_DIRS = $(EXPORT_INCLUDE_DIRS) \
+               src
+
 SOURCE_DIRS = src
