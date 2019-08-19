@@ -13,3 +13,4 @@ doc/README/README.rst
 .lock-waf_*
 .waf-*/
 build/
+**/.venv/**
