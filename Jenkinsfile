@@ -65,19 +65,13 @@ pipeline {
     }
     stage('Host builds') {
       steps {
-        dir("${REPO}") {
-          dir('examples') {
-            dir('AN01034_using_the_device_control_library_over_usb') {
-              dir('host') {
-                sh 'make -f Makefile.OSX'
-              }
-            }
-            dir('xscope') {
-              dir('host') {
-                viewEnv() {
-                  sh 'make -f Makefile.OSX'
-                }
-              }
+        dir("${REPO}/examples") {
+          dir('AN01034_using_the_device_control_library_over_usb/host') {
+            sh 'make -f Makefile.OSX'
+          }
+          dir('xscope/host') {
+            viewEnv() {
+              sh 'make -f Makefile.OSX'
             }
           }
         }
