@@ -15,8 +15,25 @@
 #include "control_host_support.h"
 #include "util.h"
 
-//#define DBG(x) x
-#define DBG(x)
+#ifndef DEVICE_CONTROL_DEBUG
+    #define DEVICE_CONTROL_DEBUG 0
+#endif
+
+#ifndef DEVICE_CONTROL_VERBOSE
+    #define DEVICE_CONTROL_VERBOSE 1
+#endif
+
+#if DEVICE_CONTROL_DEBUG
+    #define DBG(x) x
+#else
+    #define DBG(x)
+#endif
+
+#if DEVICE_CONTROL_VERBOSE
+    #define VERBOSE(x) x
+#else
+    #define VERBOSE(x)
+#endif
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
@@ -80,17 +97,17 @@ void record_callback(unsigned int id, unsigned long long timestamp,
 control_ret_t control_init_xscope(const char *host_str, const char *port_str)
 {
   if (xscope_ep_set_print_cb(xscope_print) != XSCOPE_EP_SUCCESS) {
-    fprintf(stderr, "xscope_ep_set_print_cb failed\n");
+    VERBOSE(fprintf(stderr, "xscope_ep_set_print_cb failed\n");)
     return CONTROL_ERROR;
   }
 
   if (xscope_ep_set_register_cb(register_callback) != XSCOPE_EP_SUCCESS) {
-    fprintf(stderr, "xscope_ep_set_register_cb failed\n");
+    VERBOSE(fprintf(stderr, "xscope_ep_set_register_cb failed\n");)
     return CONTROL_ERROR;
   }
 
   if (xscope_ep_set_record_cb(record_callback) != XSCOPE_EP_SUCCESS) {
-    fprintf(stderr, "xscope_ep_set_record_cb failed\n");
+    VERBOSE(fprintf(stderr, "xscope_ep_set_record_cb failed\n");)
     return CONTROL_ERROR;
   }
 
@@ -121,7 +138,7 @@ control_ret_t control_query_version(control_version_t *version)
   record_count = 0;
 
   if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
-    printf("xscope_ep_request_upload failed\n");
+    VERBOSE(printf("xscope_ep_request_upload failed\n");)
     return CONTROL_ERROR;
   }
   
@@ -154,8 +171,8 @@ control_ret_t control_query_version(control_version_t *version)
 static bool upload_len_exceeds_xscope_limit(size_t len)
 {
   if (len > XSCOPE_UPLOAD_MAX_BYTES) {
-    printf("upload of %zd bytes requested\n", len);
-    printf("maximum upload size is %d\n", XSCOPE_UPLOAD_MAX_BYTES);
+    VERBOSE(printf("upload of %zd bytes requested\n", len);)
+    VERBOSE(printf("maximum upload size is %d\n", XSCOPE_UPLOAD_MAX_BYTES);)
     return true;
   }
   else {
@@ -181,7 +198,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   record_count = 0;
 
   if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
-    printf("xscope_ep_request_upload failed\n");
+    VERBOSE(printf("xscope_ep_request_upload failed\n");)
     return CONTROL_ERROR;
   }
   // wait for response on xSCOPE probe
@@ -211,7 +228,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   record_count = 0;
 
   if (xscope_ep_request_upload(len, (unsigned char*)b) != XSCOPE_EP_SUCCESS) {
-    printf("xscope_ep_request_upload failed\n");
+    VERBOSE(printf("xscope_ep_request_upload failed\n");)
     return CONTROL_ERROR;
   }
   

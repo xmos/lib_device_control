@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+3.3.0
+-----
+
+  * ADDED: DEVIE_CONTROL_DEBUG and DEVICE_CONTROL_VERBOSE build flags
+
 3.2.4
 -----
 

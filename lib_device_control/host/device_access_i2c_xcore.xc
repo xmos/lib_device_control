@@ -13,7 +13,16 @@
 #include "control_host.h"
 #include "control_host_support.h"
 
+#ifndef DEVICE_CONTROL_DEBUG
+    #define DEVICE_CONTROL_DEBUG 0
+#endif
+
+#ifndef DEVICE_CONTROL_VERBOSE
+    #define DEVICE_CONTROL_VERBOSE 1
+#endif
+
 #define DEBUG_UNIT DEVICE_ACCESS
+#define DEBUG_PRINT_ENABLE_DEVICE_ACCESS DEVICE_CONTROL_DEBUG
 #include "debug_print.h"
 
 static unsigned num_commands = 0;

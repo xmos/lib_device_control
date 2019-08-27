@@ -8,8 +8,25 @@
 #include "control_host_support.h"
 #include "bcm2835.h"
 
-//#define DBG(x) x
-#define DBG(x)
+#ifndef DEVICE_CONTROL_DEBUG
+    #define DEVICE_CONTROL_DEBUG 0
+#endif
+
+#ifndef DEVICE_CONTROL_VERBOSE
+    #define DEVICE_CONTROL_VERBOSE 1
+#endif
+
+#if DEVICE_CONTROL_DEBUG
+    #define DBG(x) x
+#else
+    #define DBG(x)
+#endif
+
+#if DEVICE_CONTROL_VERBOSE
+    #define VERBOSE(x) x
+#else
+    #define VERBOSE(x)
+#endif
 
 static unsigned delay_milliseconds;
 
@@ -26,7 +43,7 @@ control_init_spi_pi(spi_mode_t spi_mode, bcm2835SPIClockDivider clock_divider, u
 {
   if(!bcm2835_init() ||
      !bcm2835_spi_begin()) {
-    fprintf(stderr, "bcm2835 initialisation failed. Possibly not running as root\n");
+    VERBOSE(fprintf(stderr, "bcm2835 initialisation failed. Possibly not running as root\n");)
     return CONTROL_ERROR;
   }
 
