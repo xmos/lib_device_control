@@ -25,7 +25,7 @@ static usb_dev_handle *devh = NULL;
 static libusb_device_handle *devh = NULL;
 #endif
 
-static const int sync_timeout_ms = 100;
+static const int sync_timeout_ms = 500;
 
 /* Control query transfers require smaller buffers */
 #define VERSION_MAX_PAYLOAD_SIZE 64
