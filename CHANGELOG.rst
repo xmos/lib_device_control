@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+4.0.1
+-----
+
+  * CHANGED: Increase USB host timeout to 500ms
+
 4.0.0
 -----
 
