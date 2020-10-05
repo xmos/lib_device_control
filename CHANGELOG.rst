@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+4.0.2
+-----
+
+  * CHANGED: Pin Python package versions
+
 4.0.1
 -----
 
