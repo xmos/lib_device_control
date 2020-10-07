@@ -5,6 +5,7 @@ Device control library change log
 -----
 
   * CHANGED: Pin Python package versions
+  * REMOVED: not necessary cpanfile
 
 4.0.1
 -----
