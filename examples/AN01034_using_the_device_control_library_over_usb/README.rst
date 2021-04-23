@@ -2,8 +2,6 @@
 Using the Device Control Library over USB
 =========================================
 
-.. version:: 2.0.3
-
 Summary
 -------
 
@@ -15,10 +13,10 @@ Multiple transport layers are provided as part of the library including I2C, xSC
 This application note provides a worked example of using the USB transport layer to
 implement a control path that allows a host program to query and set GPIO on the device hardware.
 
-Required tools and libraries
-............................
+Software dependencies
+.....................
 
-.. appdeps::
+For a list of direct dependencies, look for USED_MODULES in the Makefile.
 
 Required hardware
 .................
