@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+4.1.0
+-----
+
+  * CHANGED: Use XMOS Public Licence Version 1
+
 4.0.2
 -----
 
