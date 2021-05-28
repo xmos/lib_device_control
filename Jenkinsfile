@@ -3,11 +3,11 @@ getApproval()
 
 pipeline {
   agent {
-    label 'x86_64&&brew&&macOS'
+    label 'test-catalina-jagent'
   }
   environment {
     REPO = 'lib_device_control'
-    VIEW = "${env.JOB_NAME.contains('PR-') ? REPO+'_'+env.CHANGE_TARGET : REPO+'_'+env.BRANCH_NAME}"
+    VIEW = "lib_device_control_develop"
   }
   options {
     skipDefaultCheckout()
