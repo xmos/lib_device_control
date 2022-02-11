@@ -26,6 +26,7 @@ Device control library change log
 -----
 
   * CHANGED: Build files updated to support new "xcommon" behaviour in xwaf.
+
 3.2.4
 -----
 
