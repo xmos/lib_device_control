@@ -4,7 +4,6 @@ Device control library change log
 4.2.0
 -----
 
-
   * CHANGED: XN files to support xflash in 15.0.0 tools
 
 4.1.0
@@ -27,7 +26,6 @@ Device control library change log
 -----
 
   * CHANGED: Build files updated to support new "xcommon" behaviour in xwaf.
-
 3.2.4
 -----
 
