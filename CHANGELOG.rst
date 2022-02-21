@@ -1,6 +1,11 @@
 Device control library change log
 =================================
 
+4.2.0
+-----
+
+  * CHANGED: XN files to support 15.x.x tools
+
 4.1.0
 -----
 
