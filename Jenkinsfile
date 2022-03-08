@@ -3,7 +3,7 @@ getApproval()
 
 pipeline {
   agent {
-    label 'x86_64&&brew&&macOS'
+    label 'x86_64&&macOS'
   }
   environment {
     REPO = 'lib_device_control'
