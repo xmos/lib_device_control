@@ -1,9 +1,9 @@
-@Library('xmos_jenkins_shared_library@v0.17.0') _
+@Library('xmos_jenkins_shared_library@v0.18.0') _
 getApproval()
 
 pipeline {
   agent {
-    label 'x86_64&&brew&&macOS'
+    label 'x86_64&&macOS'
   }
   environment {
     REPO = 'lib_device_control'
