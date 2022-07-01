@@ -34,11 +34,11 @@ static const int sync_timeout_ms = 500;
 void debug_libusb_error(int err_code)
 {
 #if defined _WIN32
-  printf("libusb_control_transfer returned %s\n", usb_strerror());
+  fprintf(stderr, "libusb_control_transfer returned %s\n", usb_strerror());
 #elif defined __APPLE__
-  printf("libusb_control_transfer returned %s\n", libusb_error_name(err_code));
+  fprintf(stderr, "libusb_control_transfer returned %s\n", libusb_error_name(err_code));
 #elif defined __linux
-  printf("libusb_control_transfer returned %d\n", err_code);
+  fprintf(stderr, "libusb_control_transfer returned %d\n", err_code);
 #endif
 
 }
@@ -93,8 +93,8 @@ control_ret_t control_query_version(control_version_t *version)
 static bool payload_len_exceeds_control_packet_size(size_t payload_len)
 {
   if (payload_len > USB_TRANSACTION_MAX_BYTES) {
-    printf("control transfer of %zd bytes requested\n", payload_len);
-    printf("maximum control packet size is %d\n", USB_TRANSACTION_MAX_BYTES);
+    fprintf(stderr, "control transfer of %zd bytes requested\n", payload_len);
+    fprintf(stderr, "maximum control packet size is %d\n", USB_TRANSACTION_MAX_BYTES);
     return true;
   }
   else {
