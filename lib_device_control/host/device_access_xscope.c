@@ -87,7 +87,7 @@ control_ret_t control_init_xscope(const char *host_str, const char *port_str)
   }
 
   if (xscope_ep_set_register_cb(register_callback) != XSCOPE_EP_SUCCESS) {
-    PRINT_ERROR("xscope_ep_set_register_cb failed\n"i;
+    PRINT_ERROR("xscope_ep_set_register_cb failed\n");
     return CONTROL_ERROR;
   }
 
