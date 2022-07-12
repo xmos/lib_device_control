@@ -156,8 +156,8 @@ control_ret_t control_query_version(control_version_t *version)
 static bool upload_len_exceeds_xscope_limit(size_t len)
 {
   if (len > XSCOPE_UPLOAD_MAX_BYTES) {
-    PRINT_ERROR("upload of %zd bytes requested\n", len);
-    PRINT_ERROR("maximum upload size is %d\n", XSCOPE_UPLOAD_MAX_BYTES);
+    PRINT_ERROR("Upload of %zd bytes requested\n", len);
+    PRINT_ERROR("Maximum upload size is %d\n", XSCOPE_UPLOAD_MAX_BYTES);
     return true;
   }
   else {

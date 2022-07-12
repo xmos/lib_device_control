@@ -75,7 +75,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
 	
   int written = write(fd, buffer_to_send, len);
   if (written != len){
-    PRINT_ERROR("Error writing to i2c. %d of %d bytes sent\n", written, len);
+    PRINT_ERROR("Failed to write to i2c. %d of %d bytes sent\n", written, len);
     return CONTROL_ERROR;
   }
 
@@ -91,7 +91,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   unsigned char read_hdr[I2C_TRANSACTION_MAX_BYTES];
   unsigned len = control_build_i2c_data(read_hdr, resid, cmd, payload, payload_len);
   if (len != 3){
-    PRINT_ERROR("Error building read command section of read_device. len should be 3 but is %d\n", len);
+    PRINT_ERROR("Failed to read command section of read_device. len should be 3 but is %d\n", len);
     return CONTROL_ERROR;
   }
 
@@ -122,8 +122,8 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   int errno = ioctl( fd, I2C_RDWR, &rdwr_data );
 
   if ( errno < 0 ) {
-    PRINT_ERROR("rdwr ioctl error %d: ", errno );
-    perror( "" );
+    PRINT_ERROR("Failed to transfer data, rdwr ioctl error number %d: ", errno );
+    perror( "Error  :" );
     return CONTROL_ERROR;
   }
 

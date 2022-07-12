@@ -28,7 +28,7 @@ control_init_spi_pi(spi_mode_t spi_mode, bcm2835SPIClockDivider clock_divider, u
 {
   if(!bcm2835_init() ||
      !bcm2835_spi_begin()) {
-    PRINT_ERROR("bcm2835 initialisation failed. Possibly not running as root\n");
+    PRINT_ERROR("BCM2835 initialisation failed. Possibly not running as root\n");
     return CONTROL_ERROR;
   }
 
