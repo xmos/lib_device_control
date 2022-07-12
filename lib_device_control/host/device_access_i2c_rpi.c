@@ -18,6 +18,7 @@
 
 //#define DBG(x) x
 #define DBG(x)
+#define PRINT_ERROR(...)   fprintf(stderr, "Error  : " __VA_ARGS__)
 
 /*Note there is an issue with RPI/Jessie where I2C repeated starts are not enabled by default.
 Try the following at the bash command line to enable them:
@@ -38,13 +39,13 @@ control_ret_t control_init_i2c(unsigned char i2c_slave_address)
   address = i2c_slave_address;
 
   if ((fd = open(devName, O_RDWR)) < 0) {          // Open port for reading and writing
-    fprintf(stderr, "Failed to open i2c port: ");
+    PRINT_ERROR("Failed to open i2c port: ");
     perror( "" );
     return CONTROL_ERROR;
   }
   
   if (ioctl(fd, I2C_SLAVE, address) < 0) {          // Set the port options and set the address of the device we wish to speak to
-    fprintf(stderr, "Unable to set i2c configuration at address 0x%x: ", address);
+    PRINT_ERROR("Unable to set i2c configuration at address 0x%x: ", address);
     perror( "" );
     return CONTROL_ERROR;
   }
@@ -74,7 +75,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
 	
   int written = write(fd, buffer_to_send, len);
   if (written != len){
-    fprintf(stderr, "Error writing to i2c. %d of %d bytes sent\n", written, len);
+    PRINT_ERROR("Error writing to i2c. %d of %d bytes sent\n", written, len);
     return CONTROL_ERROR;
   }
 
@@ -90,7 +91,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   unsigned char read_hdr[I2C_TRANSACTION_MAX_BYTES];
   unsigned len = control_build_i2c_data(read_hdr, resid, cmd, payload, payload_len);
   if (len != 3){
-    fprintf(stderr, "Error building read command section of read_device. len should be 3 but is %d\n", len);
+    PRINT_ERROR("Error building read command section of read_device. len should be 3 but is %d\n", len);
     return CONTROL_ERROR;
   }
 
@@ -121,7 +122,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   int errno = ioctl( fd, I2C_RDWR, &rdwr_data );
 
   if ( errno < 0 ) {
-    fprintf(stderr, "rdwr ioctl error %d: ", errno );
+    PRINT_ERROR("rdwr ioctl error %d: ", errno );
     perror( "" );
     return CONTROL_ERROR;
   }

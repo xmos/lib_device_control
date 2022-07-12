@@ -17,6 +17,7 @@
 
 //#define DBG(x) x
 #define DBG(x)
+#define PRINT_ERROR(...)   fprintf(stderr, "Error  : " __VA_ARGS__)
 
 static unsigned num_commands = 0;
 
@@ -34,11 +35,11 @@ static const int sync_timeout_ms = 500;
 void debug_libusb_error(int err_code)
 {
 #if defined _WIN32
-  fprintf(stderr, "libusb_control_transfer returned %s\n", usb_strerror());
+  PRINT_ERROR("libusb_control_transfer returned %s\n", usb_strerror());
 #elif defined __APPLE__
-  fprintf(stderr, "libusb_control_transfer returned %s\n", libusb_error_name(err_code));
+  PRINT_ERROR("libusb_control_transfer returned %s\n", libusb_error_name(err_code));
 #elif defined __linux
-  fprintf(stderr, "libusb_control_transfer returned %d\n", err_code);
+  PRINT_ERROR("libusb_control_transfer returned %d\n", err_code);
 #endif
 
 }
@@ -93,8 +94,8 @@ control_ret_t control_query_version(control_version_t *version)
 static bool payload_len_exceeds_control_packet_size(size_t payload_len)
 {
   if (payload_len > USB_TRANSACTION_MAX_BYTES) {
-    fprintf(stderr, "control transfer of %zd bytes requested\n", payload_len);
-    fprintf(stderr, "maximum control packet size is %d\n", USB_TRANSACTION_MAX_BYTES);
+    PRINT_ERROR("control transfer of %zd bytes requested\n", payload_len);
+    PRINT_ERROR("maximum control packet size is %d\n", USB_TRANSACTION_MAX_BYTES);
     return true;
   }
   else {
@@ -186,7 +187,7 @@ static control_ret_t find_xmos_device(int vendor_id, int product_id)
               (dev->descriptor.idProduct == product_id)) {
         devh = usb_open(dev);
         if (!devh) {
-          fprintf(stderr, "failed to open device\n");
+          PRINT_ERROR("failed to open device\n");
           return CONTROL_ERROR;
         }
         break;
@@ -195,7 +196,7 @@ static control_ret_t find_xmos_device(int vendor_id, int product_id)
   }
 
   if (!devh) {
-    fprintf(stderr, "could not find device\n");
+    PRINT_ERROR("could not find device\n");
     return CONTROL_ERROR;
   }
 
@@ -213,14 +214,14 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
 
   int r = usb_set_configuration(devh, 1);
   if (r < 0) {
-    fprintf(stderr, "Error setting config 1\n");
+    PRINT_ERROR("Error setting config 1\n");
     usb_close(devh);
     return CONTROL_ERROR;
   }
 
   r = usb_claim_interface(devh, interface_num);
   if (r < 0) {
-    fprintf(stderr, "Error claiming interface %d %d\n", interface_num, r);
+    PRINT_ERROR("Error claiming interface %d %d\n", interface_num, r);
     return CONTROL_ERROR;
   }
 
@@ -240,7 +241,7 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
 {
   int ret = libusb_init(NULL);
   if (ret < 0) {
-    fprintf(stderr, "failed to initialise libusb\n");
+    PRINT_ERROR("failed to initialise libusb\n");
     return CONTROL_ERROR;
   }
 
@@ -258,12 +259,12 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
   }
 
   if (dev == NULL) {
-    fprintf(stderr, "could not find device\n");
+    PRINT_ERROR("could not find device\n");
     return CONTROL_ERROR;
   }
 
   if (libusb_open(dev, &devh) < 0) {
-    fprintf(stderr, "failed to open device. Ensure adequate permissions\n");
+    PRINT_ERROR("failed to open device. Ensure adequate permissions\n");
     return CONTROL_ERROR;
   }
 
