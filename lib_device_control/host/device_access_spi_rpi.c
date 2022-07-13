@@ -1,4 +1,4 @@
-// Copyright 2017-2021 XMOS LIMITED.
+// Copyright 2017-2022 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #if USE_SPI && RPI
 
@@ -11,6 +11,7 @@
 
 //#define DBG(x) x
 #define DBG(x)
+#define PRINT_ERROR(...)   fprintf(stderr, "Error  : " __VA_ARGS__)
 
 static unsigned delay_milliseconds;
 
@@ -27,7 +28,7 @@ control_init_spi_pi(spi_mode_t spi_mode, bcm2835SPIClockDivider clock_divider, u
 {
   if(!bcm2835_init() ||
      !bcm2835_spi_begin()) {
-    fprintf(stderr, "bcm2835 initialisation failed. Possibly not running as root\n");
+    PRINT_ERROR("BCM2835 initialisation failed. Possibly not running as root\n");
     return CONTROL_ERROR;
   }
 
