@@ -1,6 +1,12 @@
 Device control library change log
 =================================
 
+4.2.1
+-----
+
+  * FIXED: Some errors were being printed to stdout, now all use stderr. Common
+    format also adopted
+
 4.2.0
 -----
 
