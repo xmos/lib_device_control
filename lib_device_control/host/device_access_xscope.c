@@ -6,9 +6,13 @@
 #include <string.h>
 #include <signal.h>
 #include <assert.h>
-#ifndef _WIN32
+
+#if !defined(_MSC_VER) || (_MSC_VER >= 1800) // !VS or >= VS2013
 #include <stdbool.h>
+#else
+typedef enum { false = 0, true = 1} bool;
 #endif
+
 #include <stdlib.h>
 #include <stdint.h>
 #include "xscope_endpoint.h"
