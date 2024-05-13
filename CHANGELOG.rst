@@ -1,6 +1,11 @@
-Device control library change log
-=================================
+lib_device_control Change Log
+=============================
 
+UNRELEASED
+----------
+
+  * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and stdbool.h.
+	
 4.2.1
 -----
 
@@ -118,4 +123,3 @@ Device control library change log
     - lib_logging: Added dependency 2.1.0
 
     - lib_xassert: Added dependency 2.0.1
-
