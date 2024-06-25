@@ -5,9 +5,6 @@
 
 #include "control.h"
 
-#define IS_CONTROL_CMD_READ(c) ((c) & 0x80)
-#define CONTROL_CMD_SET_READ(c) ((c) | 0x80)
-#define CONTROL_CMD_SET_WRITE(c) ((c) & ~0x80)
 
 struct control_xscope_packet {
   control_resid_t resid;
@@ -22,20 +19,6 @@ struct control_xscope_response {
   uint8_t payload_len;
   control_ret_t ret;
 };
-
-#define CONTROL_SPECIAL_RESID 0
-
-#define CONTROL_GET_VERSION CONTROL_CMD_SET_READ(0)
-#define CONTROL_GET_LAST_COMMAND_STATUS CONTROL_CMD_SET_READ(1)
-
-/* The max USB packet size is 64B (USB 2.0 section 5.5.3), 
- * but larger data transfers are fragmented into several packets.
- * During testing with full speed USB it has been reported that control transfers 
- * larger than 8kB cause glitches in the audio playback, since most of the transfer 
- * time is taken by the control data, limiting the time left for the audio data.
-*/
-#define USB_TRANSACTION_MAX_BYTES 2048
-#define USB_DATA_MAX_BYTES USB_TRANSACTION_MAX_BYTES
 
 // hard limit of 256 bytes for xSCOPE uploads
 #define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * 4)
