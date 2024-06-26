@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <xscope.h>
 #include "control.h"
-#include "control_transport.h"
+#include "control_shared.h"
 #include "resource_table.h"
 #include <string.h>
 
@@ -475,7 +475,7 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
                      spi.payload_len_from_header, spi.payload_len_transmitted);
         ret = CONTROL_ERROR;
       } else {
-        ret = write_command(i_ctl, spi.ifnum, spi.resid, spi.cmd, 
+        ret = write_command(i_ctl, spi.ifnum, spi.resid, spi.cmd,
                             spi.payload, spi.payload_len_transmitted);
       }
       break;
@@ -506,19 +506,19 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
 
 control_ret_t
 control_process_spi_master_requires_data(uint32_t &data, client interface control i_ctl[])
-{ 
+{
   control_ret_t ret = CONTROL_SUCCESS;
   data = 0;
 
   switch(spi.state) {
     case SPI_READ_DATA_START:
-      ret = read_command(i_ctl, spi.ifnum, spi.resid, spi.cmd, 
+      ret = read_command(i_ctl, spi.ifnum, spi.resid, spi.cmd,
                          spi.payload, spi.payload_len_from_header);
       spi.state = SPI_READ_DATA_WAIT;
       break;
 
     case SPI_READ_DATA:
-      if(spi.payload_len_transmitted < spi.payload_len_from_header && 
+      if(spi.payload_len_transmitted < spi.payload_len_from_header &&
          spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
         data = spi.payload[spi.payload_len_transmitted];
         ++spi.payload_len_transmitted;
@@ -531,7 +531,7 @@ control_process_spi_master_requires_data(uint32_t &data, client interface contro
 
 control_ret_t
 control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, client interface control i_ctl[])
-{ 
+{
   /* Debugging */
   // buffer[buffer_length] = (unsigned char) datum;
   // buffer_length++;
@@ -573,7 +573,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
         spi.state = SPI_WRITE_CMD_RECVD;
       }
       break;
-    
+
     case SPI_READ_CMD_RECVD:
       spi.payload_len_from_header = datum;
       spi.state = SPI_READ_DATA_START;
@@ -585,7 +585,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       break;
 
     case SPI_WRITE_DATA:
-      if(spi.payload_len_transmitted < spi.payload_len_from_header && 
+      if(spi.payload_len_transmitted < spi.payload_len_from_header &&
          spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
         spi.payload[spi.payload_len_transmitted] = datum;
       } else {

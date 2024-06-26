@@ -9,8 +9,6 @@
 #include <assert.h>
 #include "control.h"
 #include "control_shared.h"
-#include "control_transport.h"
-
 
 #if USE_XSCOPE
 

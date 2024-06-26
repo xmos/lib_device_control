@@ -4,9 +4,9 @@
 #define __control_host_h__
 
 #include "control.h"
-#include "control_transport.h"
+#include "control_shared.h"
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
