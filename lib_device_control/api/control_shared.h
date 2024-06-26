@@ -8,7 +8,7 @@
 #include <stddef.h>
 
 /**
- * \defgroup device_control_shared
+ * \defgroup control_shared
  *
  * The shared API for using the device control library on the device and host
  * @{

@@ -8,11 +8,31 @@
 #include <string.h>
 #include <assert.h>
 #include "control.h"
+#include "control_shared.h"
 #include "control_transport.h"
 
 
-#define I2C_TRANSACTION_MAX_BYTES 256
-#define I2C_DATA_MAX_BYTES (I2C_TRANSACTION_MAX_BYTES - 3)
+#if USE_XSCOPE
+
+// hard limit of 256 bytes for xSCOPE uploads
+#define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * 4)
+#define XSCOPE_UPLOAD_MAX_WORDS 64
+// subtract the header size from the total upload size
+#define XSCOPE_DATA_MAX_BYTES (XSCOPE_UPLOAD_MAX_BYTES - 4)
+
+struct control_xscope_packet {
+  control_resid_t resid;
+  control_cmd_t cmd;
+  uint8_t payload_len;
+  uint8_t pad;
+};
+
+struct control_xscope_response {
+  control_resid_t resid;
+  control_cmd_t cmd;
+  uint8_t payload_len;
+  control_ret_t ret;
+};
 
 static inline size_t
 control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
@@ -40,7 +60,17 @@ control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
     return header_size;
   }
 }
+#endif
 
+#if USE_USB
+/* The max USB packet size is 64B (USB 2.0 section 5.5.3),
+ * but larger data transfers are fragmented into several packets.
+ * During testing with full speed USB it has been reported that control transfers
+ * larger than 8kB cause glitches in the audio playback, since most of the transfer
+ * time is taken by the control data, limiting the time left for the audio data.
+*/
+#define USB_TRANSACTION_MAX_BYTES 2048
+#define USB_DATA_MAX_BYTES USB_TRANSACTION_MAX_BYTES
 static inline void
 control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
                         control_resid_t resid, control_cmd_t cmd, unsigned payload_len)
@@ -52,6 +82,12 @@ control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
   *wlength = (uint16_t)payload_len;
 }
 
+
+#endif
+
+#if USE_SPI
+#define SPI_TRANSACTION_MAX_BYTES 256
+#define SPI_DATA_MAX_BYTES (SPI_TRANSACTION_MAX_BYTES - 3)
 static inline size_t
 control_build_spi_data(uint8_t data[SPI_TRANSACTION_MAX_BYTES],
                        control_resid_t resid, control_cmd_t cmd,
@@ -71,7 +107,11 @@ control_build_spi_data(uint8_t data[SPI_TRANSACTION_MAX_BYTES],
 
   return 3 + payload_len;
 }
+#endif
 
+#if USE_I2C
+#define I2C_TRANSACTION_MAX_BYTES 256
+#define I2C_DATA_MAX_BYTES (I2C_TRANSACTION_MAX_BYTES - 3)
 static inline size_t
 control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
                        control_resid_t resid, control_cmd_t cmd,
@@ -93,5 +133,6 @@ control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
     return 3 + payload_len;
   }
 }
+#endif
 
 #endif // __control_host_support_h__
