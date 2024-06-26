@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "control_shared.h"
 
 /** Resource count limits. Sets the size of the arrays used for storing the mappings
  */
@@ -13,6 +14,21 @@
 #define IFNUM_RESERVED 255
 
 #define XSCOPE_CONTROL_PROBE "Control Probe"
+
+// hard limit of 256 bytes for xSCOPE uploads
+#define XSCOPE_UPLOAD_MAX_BYTES (XSCOPE_UPLOAD_MAX_WORDS * 4)
+#define XSCOPE_UPLOAD_MAX_WORDS 64
+// subtract the header size from the total upload size
+#define XSCOPE_DATA_MAX_BYTES (XSCOPE_UPLOAD_MAX_BYTES - 4)
+
+#define USB_TRANSACTION_MAX_BYTES 2048
+#define USB_DATA_MAX_BYTES USB_TRANSACTION_MAX_BYTES
+
+#define SPI_TRANSACTION_MAX_BYTES 256
+#define SPI_DATA_MAX_BYTES (SPI_TRANSACTION_MAX_BYTES - 3)
+
+#define I2C_TRANSACTION_MAX_BYTES 256
+#define I2C_DATA_MAX_BYTES (I2C_TRANSACTION_MAX_BYTES - 3)
 
 #ifdef __XC__
 /** This interface is used to communicate with the control library from the application
