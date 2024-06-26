@@ -12,20 +12,6 @@
 
 #if USE_XSCOPE
 
-struct control_xscope_packet {
-  control_resid_t resid;
-  control_cmd_t cmd;
-  uint8_t payload_len;
-  uint8_t pad;
-};
-
-struct control_xscope_response {
-  control_resid_t resid;
-  control_cmd_t cmd;
-  uint8_t payload_len;
-  control_ret_t ret;
-};
-
 static inline size_t
 control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
                                     control_cmd_t cmd, control_resid_t resid,

@@ -104,6 +104,21 @@ typedef enum {
  */
 #define CONTROL_GET_LAST_COMMAND_STATUS CONTROL_CMD_SET_READ(1)
 
+#if USE_XSCOPE
+struct control_xscope_packet {
+  control_resid_t resid;
+  control_cmd_t cmd;
+  uint8_t payload_len;
+  uint8_t pad;
+};
+
+struct control_xscope_response {
+  control_resid_t resid;
+  control_cmd_t cmd;
+  uint8_t payload_len;
+  control_ret_t ret;
+};
+#endif
 /**@}*/
 
 #endif /* CONTROL_SHARED_H_ */
