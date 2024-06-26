@@ -41,12 +41,6 @@ control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
 #endif
 
 #if USE_USB
-/* The max USB packet size is 64B (USB 2.0 section 5.5.3),
- * but larger data transfers are fragmented into several packets.
- * During testing with full speed USB it has been reported that control transfers
- * larger than 8kB cause glitches in the audio playback, since most of the transfer
- * time is taken by the control data, limiting the time left for the audio data.
-*/
 
 static inline void
 control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,

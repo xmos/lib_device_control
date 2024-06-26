@@ -19,15 +19,6 @@
 #define DBG(x)
 #define PRINT_ERROR(...)   fprintf(stderr, "Error  : " __VA_ARGS__)
 
-/* The max USB packet size is 64B (USB 2.0 section 5.5.3),
- * but larger data transfers are fragmented into several packets.
- * During testing with full speed USB it has been reported that control transfers
- * larger than 8kB cause glitches in the audio playback, since most of the transfer
- * time is taken by the control data, limiting the time left for the audio data.
-*/
-#define USB_TRANSACTION_MAX_BYTES 2048
-#define USB_DATA_MAX_BYTES USB_TRANSACTION_MAX_BYTES
-
 static unsigned num_commands = 0;
 
 #ifdef _WIN32

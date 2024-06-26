@@ -119,6 +119,7 @@ struct control_xscope_response {
   control_ret_t ret;
 };
 #endif
+
 /**@}*/
 
 #endif /* CONTROL_SHARED_H_ */
