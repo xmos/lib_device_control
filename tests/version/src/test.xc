@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "control.h"
 #include "control_shared.h"
+#include "control_transport_shared.h"
+
 #include "../../../lib_device_control/host/control_host_support.h"
 
 void test_xscope(client interface control i[1])

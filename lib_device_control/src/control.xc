@@ -6,6 +6,7 @@
 #include <xscope.h>
 #include "control.h"
 #include "control_shared.h"
+#include "control_transport_shared.h"
 #include "resource_table.h"
 #include <string.h>
 

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "control.h"
 #include "control_shared.h"
+#include "control_transport_shared.h"
 #include "control_host_support.h"
 #include "resource.h"
 #include "support.h"
