@@ -5,6 +5,7 @@
 
 #include "control.h"
 #include "control_shared.h"
+#include "control_transport_shared.h"
 
 #ifdef __cplusplus
 extern "C" {
