@@ -1,7 +1,7 @@
 #Note manual build file due to xcommon not wanting to pickup hosts directory in lib_device_control
 
 TARGET = XCORE-200-EXPLORER
-XCC_FLAGS = -Wall -g -O2 -report
+XCC_FLAGS = -Wall -g -O2 -report -DUSE_I2C=1
 MODULE_PATH = ../../../..
 
 all:
