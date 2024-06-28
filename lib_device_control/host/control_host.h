@@ -4,7 +4,6 @@
 #define __control_host_h__
 
 #include "control.h"
-#include "control_shared.h"
 #include "control_transport_shared.h"
 
 #ifdef __cplusplus

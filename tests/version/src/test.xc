@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "control.h"
-#include "control_shared.h"
 #include "control_transport_shared.h"
 
 #include "../../../lib_device_control/host/control_host_support.h"

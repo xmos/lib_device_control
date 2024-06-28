@@ -3,7 +3,6 @@
 #include <xs1.h>
 #include <stdio.h>
 #include "control.h"
-#include "control_shared.h"
 #include "control_transport_shared.h"
 #include "resource.h"
 #include "support.h"

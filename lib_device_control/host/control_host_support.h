@@ -8,7 +8,6 @@
 #include <string.h>
 #include <assert.h>
 #include "control.h"
-#include "control_shared.h"
 #include "control_transport_shared.h"
 
 #if USE_XSCOPE

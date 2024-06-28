@@ -4,7 +4,6 @@
 #define __resource_table_h__
 
 #include "control.h"
-#include "control_shared.h"
 
 void resource_table_init(control_resid_t reserved_id);
 
