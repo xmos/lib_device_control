@@ -10,8 +10,6 @@
 #include "control.h"
 #include "control_transport_shared.h"
 
-#if USE_XSCOPE
-
 static inline size_t
 control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
                                     control_cmd_t cmd, control_resid_t resid,
@@ -38,9 +36,6 @@ control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
     return header_size;
   }
 }
-#endif
-
-#if USE_USB
 
 static inline void
 control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
@@ -52,11 +47,6 @@ control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
   assert(payload_len < (1<<16) && "payload length can't be represented as a uint16_t");
   *wlength = (uint16_t)payload_len;
 }
-
-
-#endif
-
-#if USE_SPI
 
 static inline size_t
 control_build_spi_data(uint8_t data[SPI_TRANSACTION_MAX_BYTES],
@@ -77,9 +67,6 @@ control_build_spi_data(uint8_t data[SPI_TRANSACTION_MAX_BYTES],
 
   return 3 + payload_len;
 }
-#endif
-
-#if USE_I2C
 
 static inline size_t
 control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
@@ -102,6 +89,5 @@ control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
     return 3 + payload_len;
   }
 }
-#endif
 
 #endif // __control_host_support_h__

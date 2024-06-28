@@ -45,7 +45,6 @@ control_ret_t control_register_resources(client interface control i[n], unsigned
   return ret;
 }
 
-#if USE_I2C
 // I2C state
 static struct {
   enum {
@@ -68,7 +67,6 @@ static struct {
   unsigned payload_len_transmitted;
   uint8_t payload[I2C_DATA_MAX_BYTES];
 } i2c = { I2C_IDLE, 0, 0, 0, 0, 0, {0} };
-#endif
 
 static control_ret_t
 special_read_command(control_cmd_t cmd, uint8_t payload[], unsigned payload_len)
@@ -127,7 +125,6 @@ read_command(client interface control i[],
   }
 }
 
-#if USE_I2C
 control_ret_t
 control_process_i2c_write_start(client interface control i[])
 {
@@ -338,9 +335,7 @@ control_process_i2c_stop(client interface control i[])
 
   return ret;
 }
-#endif
 
-#if USE_USB
 control_ret_t
 control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 const uint8_t request_data[],
@@ -394,9 +389,7 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 
   return read_command(i, ifnum, resid, cmd, request_data, payload_len);
 }
-#endif
 
-#if USE_XSCOPE
 control_ret_t
 control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
                               unsigned length_in, unsigned &length_out,
@@ -431,9 +424,7 @@ control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
 
   return r->ret;
 }
-#endif
 
-#if USE_SPI
 /* SPI state */
 static struct {
   enum {
@@ -610,5 +601,3 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
 
   return ret;
 }
-
-#endif

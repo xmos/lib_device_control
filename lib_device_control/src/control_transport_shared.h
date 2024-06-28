@@ -76,7 +76,6 @@
 #define SPI_TRANSACTION_MAX_BYTES 256
 #define SPI_DATA_MAX_BYTES (SPI_TRANSACTION_MAX_BYTES - 3)
 
-#if USE_XSCOPE
 struct control_xscope_packet {
   control_resid_t resid;
   control_cmd_t cmd;
@@ -90,7 +89,6 @@ struct control_xscope_response {
   uint8_t payload_len;
   control_ret_t ret;
 };
-#endif
 
 /**@}*/
 
