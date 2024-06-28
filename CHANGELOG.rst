@@ -5,8 +5,7 @@ UNRELEASED
 ----------
 
   * CHANGED: Move the code shared between host and device side to separate files.
-  * CHANGED: Include guards in header files now use the format ABCDE_H_. This is
-    to comply with the C standard.
+  * FIXED: Include guards in header files comply with the C standard.
   * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and stdbool.h.
 
 4.2.1
