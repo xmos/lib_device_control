@@ -1,7 +1,7 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __pause_h__
-#define __pause_h__
+#ifndef PAUSE_H_
+#define PAUSE_H_
 
 #include <xs1.h>
 #include <timer.h>
@@ -16,4 +16,4 @@ static void pause_long(void)
   delay_milliseconds(1000);
 }
 
-#endif // __pause_h__
+#endif // PAUSE_H_

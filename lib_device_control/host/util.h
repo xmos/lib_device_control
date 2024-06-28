@@ -1,11 +1,11 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __util_h__
-#define __util_h__
+#ifndef UTIL_H_
+#define UTIL_H_
 
 void pause_short(void);
 void pause_long(void);
 
 void print_bytes(const unsigned char data[], int num_bytes);
 
-#endif // __util_h__
+#endif // UTIL_H_

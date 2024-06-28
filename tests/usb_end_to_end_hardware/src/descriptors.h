@@ -1,5 +1,8 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
+#ifndef DESCRIPTORS_H_
+#define DESCRIPTORS_H_
+
 #include "usb.h"
 
 #define EP0_MAX_PACKET_SIZE 64
@@ -89,3 +92,5 @@ unsafe
       "Config",                               // iConfiguration
   };
 }
+
+#endif // DESCRIPTORS_H_

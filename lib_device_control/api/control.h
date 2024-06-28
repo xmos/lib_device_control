@@ -1,7 +1,7 @@
 // Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __control_h__
-#define __control_h__
+#ifndef CONTROL_H_
+#define CONTROL_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -209,4 +209,4 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
 
 #endif // __XC__
 
-#endif // __control_h__
+#endif // CONTROL_H_

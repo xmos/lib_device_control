@@ -1,8 +1,8 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __debug_conf_h__
-#define __debug_conf_h__
+#ifndef DEBUG_CONF_H_
+#define DEBUG_CONF_H_
 
 #define DEBUG_PRINT_ENABLE_ALL 0
 
-#endif // __debug_conf_h__
+#endif // DEBUG_CONF_H_

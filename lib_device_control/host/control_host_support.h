@@ -1,7 +1,7 @@
 // Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __control_host_support_h__
-#define __control_host_support_h__
+#ifndef CONTROL_HOST_SUPPORT_H_
+#define CONTROL_HOST_SUPPORT_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -90,4 +90,4 @@ control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
   }
 }
 
-#endif // __control_host_support_h__
+#endif // CONTROL_HOST_SUPPORT_H_

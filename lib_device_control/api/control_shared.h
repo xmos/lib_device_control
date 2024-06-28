@@ -1,8 +1,8 @@
 // Copyright 2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
-#ifndef __control_shared_h__
-#define __control_shared_h__
+#ifndef CONTROL_SHARED_H_
+#define CONTROL_SHARED_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -45,4 +45,4 @@ enum control_ret_values { /*This looks odd but helps us force byte enum */
 
 /**@}*/
 
-#endif /* __control_shared_h__ */
+#endif /* CONTROL_SHARED_H_ */

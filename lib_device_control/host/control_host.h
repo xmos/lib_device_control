@@ -1,7 +1,7 @@
 // Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __control_host_h__
-#define __control_host_h__
+#ifndef CONTROL_HOST_H_
+#define CONTROL_HOST_H_
 
 #include "control.h"
 #include "control_transport_shared.h"
@@ -167,4 +167,4 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
 }
 #endif
 
-#endif // __control_host_h__
+#endif // CONTROL_HOST_H_

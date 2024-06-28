@@ -1,7 +1,7 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __support_inline_h__
-#define __support_inline_h__
+#ifndef SUPPORT_INLINE_H_
+#define SUPPORT_INLINE_H_
 
 #include "support.h"
 

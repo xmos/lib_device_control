@@ -1,7 +1,7 @@
 // Copyright 2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __control_transport_shared_h__
-#define __control_transport_shared_h__
+#ifndef CONTROL_TRANSPORT_SHARED_H_
+#define CONTROL_TRANSPORT_SHARED_H_
 
 #include "control_shared.h"
 
@@ -92,4 +92,4 @@ struct control_xscope_response {
 
 /**@}*/
 
-#endif // __control_transport_shared_h_
+#endif // CONTROL_TRANSPORT_SHARED_H_
