@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "control.h"
-#include "../../../lib_device_control/host/control_host_support.h"
+#include "control_host_support.h"
 #include "resource.h"
 #include "support.h"
 #include "support_inline.h"
