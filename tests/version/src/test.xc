@@ -1,10 +1,11 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <xs1.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "control.h"
-#include "control_transport.h"
+#include "control_transport_shared.h"
+
 #include "control_host_support.h"
 
 void test_xscope(client interface control i[1])

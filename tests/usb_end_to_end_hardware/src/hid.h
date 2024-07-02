@@ -1,5 +1,8 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
+#ifndef HID_H_
+#define HID_H_
+
 /*
  * @brief Defines from USB Device Class Definition for Human Interface Devices Specification
  */
@@ -21,3 +24,5 @@
 #define HID_SET_REPORT            0x09
 #define HID_SET_IDLE              0x0A
 #define HID_SET_PROTOCOL          0x0B           /* Required only for boot devices */
+
+#endif // HID_H_

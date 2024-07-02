@@ -1,32 +1,11 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __control_h__
-#define __control_h__
+#ifndef CONTROL_H_
+#define CONTROL_H_
 
 #include <stdint.h>
 #include <stddef.h>
-
-/** This is the version of control protocol. Used to check compatibility */
-#define CONTROL_VERSION 0x10
-
-/** These types are used in control functions to identify the resource id,
- *  command, version and return result.
- */
-typedef uint8_t control_resid_t;
-typedef uint8_t control_cmd_t;
-typedef uint8_t control_version_t;
-typedef uint8_t control_ret_t;
-
-/** This type enumerates the possible outcomes from a control transaction
- */
-enum control_ret_values {  /*This looks odd but helps us force byte enum */
-  CONTROL_SUCCESS = 0,
-  CONTROL_REGISTRATION_FAILED,
-  CONTROL_BAD_COMMAND,
-  CONTROL_DATA_LENGTH_ERROR,
-  CONTROL_OTHER_TRANSPORT_ERROR,
-  CONTROL_ERROR
-};
+#include "control_shared.h"
 
 /** Resource count limits. Sets the size of the arrays used for storing the mappings
  */
@@ -51,10 +30,10 @@ typedef interface control {
   void register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
                           unsigned &num_resources);
   /** Request from host to write to controllable resource in the device. The command consists of a resource ID,
-   *  command and a byte payload of length payload_len.  
+   *  command and a byte payload of length payload_len.
    *
    *  \param resid        Resource ID. Indicates which resource the command is intended for
-   *  \param cmd          Command code. Note that this will be in the range 0x80 to 0xFF 
+   *  \param cmd          Command code. Note that this will be in the range 0x80 to 0xFF
    *                      because bit 7 set indiciates a write command
    *  \param payload      Array of bytes which constitutes the data payload
    *  \param payload_len  Size of the payload in bytes
@@ -64,10 +43,10 @@ typedef interface control {
   control_ret_t write_command(control_resid_t resid, control_cmd_t cmd,
                               const uint8_t payload[payload_len], unsigned payload_len);
   /** Request from host to read a controllable resource in the device. The command consists of a resource ID,
-   *  command and a byte payload of length payload_len.  
+   *  command and a byte payload of length payload_len.
    *
    *  \param resid        Resource ID. Indicates which resource the command is intended for
-   *  \param cmd          Command code. Note that this will be in the range 0x00 to 0x7F 
+   *  \param cmd          Command code. Note that this will be in the range 0x00 to 0x7F
    *                      because bit 7 cleared indiciates a read command
    *  \param payload      Array of bytes which constitutes the data payload
    *  \param payload_len  Size of the payload in bytes
@@ -176,7 +155,7 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 
   /** Inform the control library that an xscope transfer has occured. Called from xscope handler.
    *  This function both reads and writes data in a single call.
-   *  The data return is device (control library) initiated. Note: Data requires word alignment 
+   *  The data return is device (control library) initiated. Note: Data requires word alignment
    *  so we can cast to struct.
    *
    *  \param buf              Array of bytes for read and write data.
@@ -204,7 +183,7 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[]);
 
   /** Inform the control library that the SPI master requires data. If the command
    *  was a read, then this is the point that a read command is emitted on the i_ctl interface.
-   *  The master will then end the transaction and pause. The data will be sent to the master 
+   *  The master will then end the transaction and pause. The data will be sent to the master
    *  on the next transaction.
    *
    *  \param data             The data to be sent over SPI
@@ -215,7 +194,7 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[]);
 control_ret_t
 control_process_spi_master_requires_data(uint32_t &data, client interface control i_ctl[]);
 
-  /** Inform the control library that the SPI master supplied data. 
+  /** Inform the control library that the SPI master supplied data.
    *  NOTE: It is assumed that the datum is 8 bits wide, i.e. spi_slave(...) is set up with
    *        SPI_TRANSFER_SIZE_8 as its last parameter.
    *
@@ -230,4 +209,4 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
 
 #endif // __XC__
 
-#endif // __control_h__
+#endif // CONTROL_H_

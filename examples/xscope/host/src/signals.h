@@ -1,11 +1,11 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __signals_h__
-#define __signals_h__
+#ifndef SIGNALS_H_
+#define SIGNALS_H_
 
 typedef void (*sigint_handler_t)(void);
 
 void signals_init(void);
 void signals_setup_int(sigint_handler_t handler);
 
-#endif // __signals_h__
+#endif // SIGNALS_H_

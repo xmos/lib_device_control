@@ -4,8 +4,10 @@ lib_device_control Change Log
 UNRELEASED
 ----------
 
+  * CHANGED: Move the code shared between host and device side to separate files.
+  * FIXED: Include guards in header files comply with the C standard.
   * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and stdbool.h.
-	
+
 4.2.1
 -----
 

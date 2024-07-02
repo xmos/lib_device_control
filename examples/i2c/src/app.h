@@ -1,7 +1,7 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef __app_h__
-#define __app_h__
+#ifndef APP_H_
+#define APP_H_
 
 #include "control.h"
 
@@ -9,4 +9,4 @@
 
 void app(server interface control i_control, client interface mabs_led_button_if i_leds_buttons);
 
-#endif // __app_h__
+#endif // APP_H_
