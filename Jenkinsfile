@@ -29,6 +29,9 @@ pipeline {
       }
     }
     stage('Host builds') {
+      agent {
+        label 'x86_64&&macOS'
+      }
       steps {
         dir("${REPO}/examples") {
           dir('AN01034_using_the_device_control_library_over_usb/host') {
