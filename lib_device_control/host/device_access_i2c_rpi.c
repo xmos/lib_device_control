@@ -43,7 +43,7 @@ control_ret_t control_init_i2c(unsigned char i2c_slave_address)
     perror( "" );
     return CONTROL_ERROR;
   }
-  
+
   if (ioctl(fd, I2C_SLAVE, address) < 0) {          // Set the port options and set the address of the device we wish to speak to
     PRINT_ERROR("Unable to set i2c configuration at address 0x%x: ", address);
     perror( "" );
@@ -67,21 +67,29 @@ control_ret_t
 control_write_command(control_resid_t resid, control_cmd_t cmd,
                       const uint8_t payload[], size_t payload_len)
 {
+  unsigned char command_status[1]; // status
   unsigned char buffer_to_send[I2C_TRANSACTION_MAX_BYTES + 3];
   int len = control_build_i2c_data(buffer_to_send, resid, cmd, payload, payload_len);
 
   DBG(printf("%u: send write command: ", num_commands));
   DBG(print_bytes((unsigned char*)buffer_to_send, payload_len));
-	
-  int written = write(fd, buffer_to_send, len);
-  if (written != len){
-    PRINT_ERROR("Failed to write to i2c. %d of %d bytes sent\n", written, len);
+
+  int numbytes = write(fd, buffer_to_send, len);
+  if (numbytes != len){
+    PRINT_ERROR("Failed to write to i2c. %d of %d bytes sent\n", numbytes, len);
     return CONTROL_ERROR;
   }
 
+  numbytes = read(fd, command_status, CONTROL_GET_LAST_COMMAND_STATUS);
+  if(numbytes < 0)
+  {
+    PRINT_ERROR("I2C read() returned error %d\n",numbytes);
+    perror("Error  :");
+    return CONTROL_ERROR;
+  }
   num_commands++;
 
-  return CONTROL_SUCCESS;
+  return command_status[0];
 }
 
 control_ret_t

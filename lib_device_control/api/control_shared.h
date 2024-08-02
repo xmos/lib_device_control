@@ -28,6 +28,8 @@ typedef uint8_t control_resid_t;
 typedef uint8_t control_cmd_t;
 typedef uint8_t control_version_t;
 typedef uint8_t control_ret_t;
+typedef uint8_t control_status_t;
+
 /**@}*/
 
 /**
