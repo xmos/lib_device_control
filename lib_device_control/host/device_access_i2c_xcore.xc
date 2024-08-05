@@ -32,23 +32,23 @@ control_ret_t control_special_command(const uint8_t cmd_id, const uint16_t paylo
   data_len = control_build_i2c_data(data, CONTROL_SPECIAL_RESID,
     cmd_id, payload, payload_size);
 
-  printf("%u: send read command\n", num_commands);
+  debug_printf("%u: send read command\n", num_commands);
 
   res = i_i2c.write(slave_address, data, data_len, num_bytes_sent, 0);
-  printf("after write\n");
+
   if (res != I2C_ACK) {
-    printf("slave sent NAK (write transfer)\n");
+    debug_printf("slave sent NAK (write transfer)\n");
     return CONTROL_ERROR;
   }
   else {
     if (num_bytes_sent != data_len) {
-      printf("write transfer %d bytes (%d bytes expected)\n", num_bytes_sent, data_len);
+      debug_printf("write transfer %d bytes (%d bytes expected)\n", num_bytes_sent, data_len);
       return CONTROL_ERROR;
     }
     else {
       res = i_i2c.read(slave_address, data, payload_size, 1);
       if (res != I2C_ACK) {
-        printf("slave sent NAK (read transfer)\n");
+        debug_printf("slave sent NAK (read transfer)\n");
 	      return CONTROL_ERROR;
       }
       else {
@@ -67,7 +67,7 @@ control_ret_t control_query_version(control_version_t *version,
 {
   control_ret_t ret = control_special_command(CONTROL_GET_VERSION, sizeof(control_version_t), version, i_i2c);
 
-  printf("version returned: 0x%X\n", *version);
+  debug_printf("version returned: 0x%X\n", *version);
 
   return ret;
 }
