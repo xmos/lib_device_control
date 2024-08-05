@@ -114,7 +114,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   num_commands++;
 
   // Read back write command status
-  control_command_status(&status);
+  control_command_status(&status, i_i2c);
 
   return status;
 }
