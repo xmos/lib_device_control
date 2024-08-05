@@ -59,12 +59,19 @@ void test_client(client interface control i[3], chanend c_user_task[3])
               tmr :> t;
               timeout = 0;
               par {
-                { if (o.read_cmd)
+                { if (o.read_cmd) {
                     d <: control_process_usb_get_request(windex, wvalue, wlength,
                       (uint8_t*)payload_ptr, i);
-                  else
-                    d <: control_process_usb_set_request(windex, wvalue, wlength,
+                  }
+                  else {
+                    control_process_usb_set_request(windex, wvalue, wlength,
                       (uint8_t*)payload_ptr, i);
+                    // Request control status for write command
+                    control_process_usb_get_request(CONTROL_SPECIAL_RESID,
+                      CONTROL_GET_LAST_COMMAND_STATUS, sizeof(control_status_t),
+                      (uint8_t*)payload_ptr, i);
+                    d <: payload_ptr[0];
+                  }
                 }
                 { select {
                     case drive_user_task_commands(c2, c1, c_user_task, o.read_cmd);
