@@ -381,8 +381,9 @@ control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
     debug_printf("read command code %d not expected in a SET request\n", cmd);
     ret = CONTROL_BAD_COMMAND;
   }
-
-  ret = write_command(i, ifnum, resid, cmd, request_data, payload_len);
+  if (ret != CONTROL_BAD_COMMAND) {
+    ret = write_command(i, ifnum, resid, cmd, request_data, payload_len);
+  }
   last_status = ret;
   return ret;
 }
