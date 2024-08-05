@@ -2,9 +2,12 @@
 # need to install libusb driver from libusb directory in this example
 # VID and PID in driver's INF file need to match this example's host code and corresponding device code
 
+# Define the variables
+ROOT=..\..\..
+
 all:
 	if not exist bin mkdir bin
-	CL.exe /DUSE_USB /D_CRT_SECURE_NO_WARNINGS /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt" /Ilibusb\Win32 /I..\..\..\lib_device_control\api /I..\..\..\lib_device_control\src /I..\..\..\lib_device_control\host /I..\..\..\lib_device_control\host /nologo /W4 /WX- /O2 /EHa /Fe"bin\usb_host_app.exe" /TP ..\..\..\lib_device_control\host\device_access_usb.c ..\..\..\lib_device_control\host\util.c src\host.c src\signals.c /link libusb\Win32\libusb.lib
+	CL.exe /DUSE_USB /D_CRT_SECURE_NO_WARNINGS /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt" /Ilibusb\Win32 /I$(ROOT)\lib_device_control\api /I$(ROOT)\lib_device_control\src /I$(ROOT)\lib_device_control\host /nologo /W4 /WX- /O2 /EHa /Fe"bin\usb_host_app.exe" /TP $(ROOT)\lib_device_control\host\device_access_usb.c $(ROOT)\lib_device_control\host\util.c src\host.c src\signals.c /link libusb\Win32\libusb.lib
 	del *.obj
 
 clean:
