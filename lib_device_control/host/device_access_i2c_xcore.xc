@@ -91,7 +91,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   i2c_res_t res;
   unsigned char data[I2C_TRANSACTION_MAX_BYTES];
   size_t data_len;
-  unsigned char command_status[1]; // status
+  uint8_t status;
 
   data_len = control_build_i2c_data(data, resid,
     CONTROL_CMD_SET_WRITE(cmd), payload, payload_len);
@@ -113,7 +113,10 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
 
   num_commands++;
 
-  return CONTROL_SUCCESS;
+  // Read back write command status
+  control_command_status(&status);
+
+  return status;
 }
 
 control_ret_t

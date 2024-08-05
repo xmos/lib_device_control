@@ -126,6 +126,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
                       const uint8_t payload[], size_t payload_len)
 {
   uint16_t windex, wvalue, wlength;
+  uint8_t status;
 
   if (payload_len_exceeds_control_packet_size(payload_len))
     return CONTROL_DATA_LENGTH_ERROR;
@@ -155,8 +156,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   }
 
   // Read back write command status
-  uint8_t status;
-  control_command_status(&status;)
+  control_command_status(&status);
 
   return status;
 }
