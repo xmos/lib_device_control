@@ -44,15 +44,15 @@ void debug_libusb_error(int err_code)
 
 }
 
-control_ret_t control_query_version(control_version_t *version)
-{
+
+control_ret_t control_special_command(const uint8_t cmd_id, const uint16_t payload_size, uint8_t* payload) {
   uint16_t windex, wvalue, wlength;
   uint8_t request_data[VERSION_MAX_PAYLOAD_SIZE];
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
-    CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
+    CONTROL_SPECIAL_RESID, cmd_id, payload_size);
 
-  DBG(printf("%u: send version command: 0x%04x 0x%04x 0x%04x\n",
+  DBG(printf("%u: send control command: 0x%04x 0x%04x 0x%04x\n",
     num_commands, windex, wvalue, wlength));
 
 #ifdef _WIN32
@@ -72,10 +72,28 @@ control_ret_t control_query_version(control_version_t *version)
     return CONTROL_ERROR;
   }
 
-  memcpy(version, request_data, sizeof(control_version_t));
-  DBG(printf("version returned: 0x%X\n", *version));
+  memcpy(payload, request_data, payload_size);
 
   return CONTROL_SUCCESS;
+
+}
+
+control_ret_t control_query_version(control_version_t *version)
+{
+  control_ret_t ret = control_special_command(CONTROL_GET_VERSION, sizeof(control_version_t), version);
+
+  DBG(printf("version returned: 0x%X\n", *version));
+
+  return ret;
+}
+
+control_ret_t control_command_status(control_status_t *status)
+{
+  control_ret_t ret = control_special_command(CONTROL_GET_LAST_COMMAND_STATUS, sizeof(control_status_t), status);
+
+  DBG(printf("status returned: 0x%X\n", *status));
+
+  return ret;
 }
 
 /*
@@ -138,17 +156,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
 
   // Read back write command status
   uint8_t status;
-  control_usb_fill_header(&windex, &wvalue, &wlength,
-    resid, CONTROL_CMD_SET_WRITE(cmd), CONTROL_GET_LAST_COMMAND_STATUS);
-
-  ret = libusb_control_transfer(devh,
-    LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
-    0, wvalue, windex, &status, wlength, sync_timeout_ms);
-
-  if (ret != (int)1) {
-    debug_libusb_error(ret);
-    return CONTROL_ERROR;
-  }
+  control_command_status(&status;)
 
   return status;
 }

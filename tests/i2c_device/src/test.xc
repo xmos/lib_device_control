@@ -50,8 +50,8 @@ void test_client(client interface control i[3], chanend c_user_task[3])
             /* make a sequence of processing calls, catch the result and record it */
             unsafe {
               payload_size = c1.payload_size;
-              if (o.read_cmd)
-                payload_ptr = c2.payload;
+              // pointer to payload used for read commands, including CONTROL_GET_LAST_COMMAND_STATUS
+              payload_ptr = c2.payload;
 
               tmr :> t;
               timeout = 0;
@@ -68,6 +68,18 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                       ret |= control_process_i2c_read_data(payload_ptr[j], i);
                     }
                   }
+                  // Request control status for write command
+                  if (!o.read_cmd) {
+                    buf_len = control_build_i2c_data(buf, CONTROL_SPECIAL_RESID, CONTROL_CMD_SET_READ(CONTROL_GET_LAST_COMMAND_STATUS), c1.payload, sizeof(control_status_t));
+                    ret |= control_process_i2c_write_start(i);
+                    for (j = 0; j < buf_len; j++) {
+                      ret |= control_process_i2c_write_data(buf[j], i);
+                    }
+                    ret |= control_process_i2c_read_start(i);
+                    ret |= control_process_i2c_read_data(payload_ptr[0], i);
+                    ret |= payload_ptr[0];
+                  }
+
                   ret |= control_process_i2c_stop(i);
                   d <: ret;
                 }
