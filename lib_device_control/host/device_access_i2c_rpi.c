@@ -80,14 +80,14 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
     return CONTROL_ERROR;
   }
 
-  numbytes = read(fd, command_status, CONTROL_GET_LAST_COMMAND_STATUS);
-  if(numbytes < 0)
-  {
-    PRINT_ERROR("I2C read() returned error %d\n",numbytes);
-    perror("Error  :");
+  num_commands++;
+
+  // Read control status of the last command
+  control_ret_t ret = control_read_command(CONTROL_SPECIAL_RESID, CONTROL_GET_LAST_COMMAND_STATUS, command_status, sizeof(control_status_t));
+  if (ret != CONTROL_SUCCESS){
+    PRINT_ERROR("Failed to read command status\n");
     return CONTROL_ERROR;
   }
-  num_commands++;
 
   return command_status[0];
 }
@@ -142,6 +142,16 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
 
   return CONTROL_SUCCESS;
 }
+
+control_ret_t control_query_version(control_version_t *version)
+{
+  control_ret_t ret = control_read_command(CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, version, sizeof(control_version_t));
+
+  DBG(printf("version returned: 0x%X\n", *version));
+
+  return ret;
+}
+
 
 control_ret_t control_cleanup_i2c(void)
 {
