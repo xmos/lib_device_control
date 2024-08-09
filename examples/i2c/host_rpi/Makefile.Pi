@@ -1,0 +1,7 @@
+ROOT = ../../../..
+
+all:
+	mkdir -p bin
+	cd src ; gcc -Wall -g -DUSE_I2C=1 -DRPI=1 -o ../bin/i2c_host_app.out -I $(ROOT)/lib_device_control/api -I $(ROOT)/lib_device_control/src -I $(ROOT)/lib_device_control/host $(ROOT)/lib_device_control/host/device_access_i2c_rpi.c $(ROOT)/lib_device_control/host/util.c host.c signals.c -lpthread
+clean:
+	rm -rf bin
