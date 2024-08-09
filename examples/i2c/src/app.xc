@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include <assert.h>
 #include "control.h"
-#include "mic_array_board_support.h"
+//#include "mic_array_board_support.h"
 #include "app.h"
 
-void app(server interface control i_control, client interface mabs_led_button_if i_leds_buttons)
+void app(server interface control i_control/*, client interface mabs_led_button_if i_leds_buttons*/)
 {
   unsigned num_commands;
   int i;
@@ -18,7 +18,7 @@ void app(server interface control i_control, client interface mabs_led_button_if
 #endif
 
   num_commands = 0;
-
+  uint8_t test_value = 0;
   while (1) {
     select {
       case i_control.register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
@@ -44,10 +44,7 @@ void app(server interface control i_control, client interface mabs_led_button_if
           ret = CONTROL_ERROR;
           break;
         }
-        for (i = 0; i < MIC_BOARD_SUPPORT_LED_COUNT; i++){
-          if (i < payload[0]) i_leds_buttons.set_led_brightness(i, 255);
-          else i_leds_buttons.set_led_brightness(i, 0);
-        }
+        test_value = payload[0];
         ret = CONTROL_SUCCESS;
         break;
 
@@ -64,19 +61,12 @@ void app(server interface control i_control, client interface mabs_led_button_if
           ret = CONTROL_ERROR;
           break;
         }
-        if (payload_len != 4) {
-          printf("expecting 4 read bytes, not %d\n", payload_len);
+        if (payload_len != 1) {
+          printf("expecting 1 read byte, not %d\n", payload_len);
           ret = CONTROL_ERROR;
           break;
         }
-        unsigned button;
-        mabs_button_state_t button_state;
-        i_leds_buttons.get_button_event(button, button_state);
-        printf("button, button_state= %d, %d\n", button, button_state);
-        payload[0] = button;
-        payload[1] = button_state;
-        payload[2] = 0x56;
-        payload[3] = 0x78;
+        payload[0] = test_value;
         ret = CONTROL_SUCCESS;
         break;
     }

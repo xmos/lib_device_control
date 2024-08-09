@@ -87,7 +87,7 @@ special_read_command(control_cmd_t cmd, uint8_t payload[], unsigned payload_len)
     }
   }
   else if (cmd == CONTROL_GET_LAST_COMMAND_STATUS) {
-    debug_printf("read last command status %d\n", last_status);
+    printf("read last command status %d\n", last_status);
     if (payload_len != sizeof(control_status_t)) {
       debug_printf("wrong payload size %d for last command status command, need %d\n",
       payload_len, sizeof(control_status_t));
@@ -131,6 +131,7 @@ read_command(client interface control i[],
              unsigned char ifnum, control_resid_t resid, control_cmd_t cmd,
              uint8_t payload[], unsigned payload_len)
 {
+  printf("Read command %d %d\n", resid, cmd);
   if (resid == CONTROL_SPECIAL_RESID) {
     return special_read_command(cmd, payload, payload_len);
   }
