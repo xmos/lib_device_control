@@ -24,7 +24,7 @@ int main(void)
   signals_init();
   signals_setup_int(shutdown);
 
-  if (control_init_spi_pi(SPI_MODE_3, BCM2835_SPI_CLOCK_DIVIDER_8192, 2) != CONTROL_SUCCESS) {
+  if (control_init_spi_pi(SPI_MODE_3, BCM2835_SPI_CLOCK_DIVIDER_1024, 2) != CONTROL_SUCCESS) {
     printf("control init failed\n");
     exit(1);
   }

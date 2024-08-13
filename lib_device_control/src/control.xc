@@ -594,7 +594,9 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       break;
 
     case SPI_RES_RECVD:
-      spi.cmd = datum & 0x7F; // 0111 1111
+      // TODO check why this value was masked
+      // spi.cmd = datum & 0x7F; // 0111 1111
+      spi.cmd = datum;
       if(IS_CONTROL_CMD_READ(datum)) {
         spi.state = SPI_READ_CMD_RECVD;
       } else {
