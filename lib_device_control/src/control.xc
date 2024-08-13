@@ -69,10 +69,12 @@ static struct {
   unsigned payload_len_transmitted;
   uint8_t payload[I2C_DATA_MAX_BYTES];
 } i2c = { I2C_IDLE, 0, 0, 0, 0, 0, {0} };
-
+#include "print.h"
 static control_ret_t
 special_read_command(control_cmd_t cmd, uint8_t payload[], unsigned payload_len)
 {
+  printintln(cmd);
+  printintln(CONTROL_GET_VERSION);
   if (cmd == CONTROL_GET_VERSION) {
     debug_printf("read version\n");
     if (payload_len != sizeof(control_version_t)) {
@@ -82,6 +84,7 @@ special_read_command(control_cmd_t cmd, uint8_t payload[], unsigned payload_len)
       return CONTROL_BAD_COMMAND;
     }
     else {
+      printintln(CONTROL_VERSION);
       *((control_version_t*)payload) = CONTROL_VERSION;
       return CONTROL_SUCCESS;
     }

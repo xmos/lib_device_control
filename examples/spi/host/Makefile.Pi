@@ -1,0 +1,9 @@
+ROOT = ../../../..
+SPI_DRIVER_PATH = $(ROOT)/examples/spi/host/spi_driver
+
+all:
+	mkdir -p bin
+	cd src ; gcc -Wall -g -D RPI=1 -D USE_SPI=1 -o ../bin/spi_host_app.out -I $(SPI_DRIVER_PATH) -I $(ROOT)/lib_device_control/api -I $(ROOT)/lib_device_control/src -I $(ROOT)/lib_device_control/host -L $(SPI_DRIVER_PATH) $(ROOT)/lib_device_control/host/device_access_spi_rpi.c $(ROOT)/lib_device_control/host/util.c host.c signals.c -l:$(SPI_DRIVER_PATH)/libbcm2835.a -lpthread
+
+clean:
+	rm -rf bin

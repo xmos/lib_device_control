@@ -48,11 +48,19 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
                       const uint8_t payload[], size_t payload_len)
 {
   uint8_t data_sent_received[SPI_TRANSACTION_MAX_BYTES];
+  unsigned char command_status[1]; // status
 
   int data_len = control_build_spi_data(data_sent_received, resid, cmd, payload, payload_len);
   bcm2835_spi_transfern((char *)data_sent_received, data_len);
 
-  return CONTROL_SUCCESS;
+  // Read control status of the last command
+  control_ret_t ret = control_read_command(CONTROL_SPECIAL_RESID, CONTROL_GET_LAST_COMMAND_STATUS, command_status, sizeof(control_status_t));
+  if (ret != CONTROL_SUCCESS){
+    PRINT_ERROR("Failed to read command status\n");
+    return CONTROL_ERROR;
+  }
+
+  return command_status[0];
 }
 
 control_ret_t
@@ -77,6 +85,15 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   memcpy(payload, data_sent_received, payload_len);
 
   return CONTROL_SUCCESS;
+}
+
+control_ret_t control_query_version(control_version_t *version)
+{
+  control_ret_t ret = control_read_command(CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, version, sizeof(control_version_t));
+
+  DBG(printf("version returned: 0x%X\n", *version));
+
+  return ret;
 }
 
 control_ret_t
