@@ -5,7 +5,7 @@
 #include <xscope.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "usb.h"
+#include "xud_device.h"
 #include "hid.h"
 #include "descriptors.h"
 #include "control.h"

@@ -1,4 +1,4 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,9 +16,9 @@ void shutdown(void)
 
 int main(void)
 {
-  control_version_t version;
+  control_version_t version = 0xFF;
   unsigned char payload[4];
-  int i;
+  uint8_t i;
 
   signals_init();
   signals_setup_int(shutdown);
@@ -40,27 +40,26 @@ int main(void)
 
   printf("started\n");
 
-  while (!done) {
-    for (i = 0; !done && i < 4; i++) {
-      printf("Enter number of LEDs to be lit: ");
-      int num_leds;
-      scanf("%d", &num_leds);
-      payload[0] = (unsigned char)num_leds;
-      if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 1) != CONTROL_SUCCESS) {
-        printf("control write command failed\n");
-        exit(1);
-      }
-      fflush(stdout);
-
-      pause_short();
-
-      if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, 2) != CONTROL_SUCCESS) {
-        printf("control read command failed\n");
-        exit(1);
-      }
-      printf("Last button event: %c, value: %d\n", 'A' + payload[0], payload[1]);
-      fflush(stdout);
+  for (i = 0; i < 4; i++) {
+    payload[0] = i;
+    if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 1) != CONTROL_SUCCESS) {
+      printf("control write command failed\n");
+      exit(1);
     }
+    fflush(stdout);
+
+    pause_short();
+
+    if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, 1) != CONTROL_SUCCESS) {
+      printf("control read command failed\n");
+      exit(1);
+    }
+
+    if (payload[0] != i) {
+      printf("control read command returned the wrong value, expected %d, returned %d\n", i, payload[0]);
+      exit(1);
+    }
+    fflush(stdout);
   }
 
   control_cleanup_usb();

@@ -69,12 +69,10 @@ static struct {
   unsigned payload_len_transmitted;
   uint8_t payload[I2C_DATA_MAX_BYTES];
 } i2c = { I2C_IDLE, 0, 0, 0, 0, 0, {0} };
-#include "print.h"
+
 static control_ret_t
 special_read_command(control_cmd_t cmd, uint8_t payload[], unsigned payload_len)
 {
-  printintln(cmd);
-  printintln(CONTROL_GET_VERSION);
   if (cmd == CONTROL_GET_VERSION) {
     debug_printf("read version\n");
     if (payload_len != sizeof(control_version_t)) {
@@ -84,13 +82,12 @@ special_read_command(control_cmd_t cmd, uint8_t payload[], unsigned payload_len)
       return CONTROL_BAD_COMMAND;
     }
     else {
-      printintln(CONTROL_VERSION);
       *((control_version_t*)payload) = CONTROL_VERSION;
       return CONTROL_SUCCESS;
     }
   }
   else if (cmd == CONTROL_GET_LAST_COMMAND_STATUS) {
-    printf("read last command status %d\n", last_status);
+    debug_printf("read last command status %d\n", last_status);
     if (payload_len != sizeof(control_status_t)) {
       debug_printf("wrong payload size %d for last command status command, need %d\n",
       payload_len, sizeof(control_status_t));
@@ -134,7 +131,7 @@ read_command(client interface control i[],
              unsigned char ifnum, control_resid_t resid, control_cmd_t cmd,
              uint8_t payload[], unsigned payload_len)
 {
-  printf("Read command %d %d\n", resid, cmd);
+  debug_printf("Read command %d %d\n", resid, cmd);
   if (resid == CONTROL_SPECIAL_RESID) {
     return special_read_command(cmd, payload, payload_len);
   }

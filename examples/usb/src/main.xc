@@ -1,25 +1,18 @@
 // Copyright 2016-2021 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
+
+#include "xud_device.h"
 #include <platform.h>
 #include <assert.h>
 #include <xscope.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "usb.h"
 #include "descriptors.h"
 #include "control.h"
-#include "mic_array_board_support.h"
 #include "app.h"
 
 #define DEBUG_UNIT DEVICE
 #include "debug_print.h"
-
-//TODO use MIC_BOARD_SUPPORT_LED_PORTS in post 2.2.0 lib_mic_array_board_support
-on tile[0]: mabs_led_ports_t p_leds = {
-  PORT_LED0_TO_7, PORT_LED8, PORT_LED9, PORT_LED10_TO_12, XS1_PORT_1P
-};
-
-on tile[0]: in port p_buttons =  MIC_BOARD_SUPPORT_BUTTON_PORTS;
 
 void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_control[1])
 {
@@ -31,8 +24,8 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   int handled;
   size_t len;
 
-  ep0_out = XUD_InitEp(c_ep0_out, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
-  ep0_in = XUD_InitEp(c_ep0_in, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
+  ep0_out = XUD_InitEp(c_ep0_out);
+  ep0_in = XUD_InitEp(c_ep0_in);
 
   control_init();
   control_register_resources(i_control, 1);
@@ -96,29 +89,28 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   }
 }
 
-enum {
-  EP_OUT_ZERO,
-  NUM_EP_OUT
-};
+/* USB Endpoint Defines */
+#define XUD_EP_COUNT_OUT   1    //Includes EP0 (1 OUT EP0)
+#define XUD_EP_COUNT_IN    1    //Includes EP0 (1 IN EP0)
 
-enum {
-  EP_IN_ZERO,
-  NUM_EP_IN
-};
+
+XUD_EpType epTypeTableOut[XUD_EP_COUNT_OUT] = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_BUL};
+XUD_EpType epTypeTableIn[XUD_EP_COUNT_IN] =   {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE, XUD_EPTYPE_INT, XUD_EPTYPE_BUL};
 
 int main(void)
 {
-  chan c_ep_out[NUM_EP_OUT], c_ep_in[NUM_EP_IN];
+  chan c_ep_out[XUD_EP_COUNT_OUT], c_ep_in[XUD_EP_COUNT_IN];
   interface control i_control[1];
-  interface mabs_led_button_if i_leds_buttons[1];
   par {
     on USB_TILE: par {
       endpoint0(c_ep_out[0], c_ep_in[0], i_control);
-      xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
+      //xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
+      XUD_Main(c_ep_out, XUD_EP_COUNT_OUT, c_ep_in, XUD_EP_COUNT_IN,
+                      null, epTypeTableOut, epTypeTableIn,
+                      XUD_SPEED_HS, XUD_PWR_BUS);
     }
     on tile[0]: par {
-      app(i_control[0], i_leds_buttons[0]);
-      mabs_button_and_led_server(i_leds_buttons, 1, p_leds, p_buttons);
+      app(i_control[0]);
     }
   }
   return 0;

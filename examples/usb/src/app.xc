@@ -4,13 +4,20 @@
 #include <stdint.h>
 #include <assert.h>
 #include "control.h"
-#include "mic_array_board_support.h"
 #include "app.h"
 
-void app(server interface control i_control, client interface mabs_led_button_if i_leds_buttons)
+void app(server interface control i_control)
 {
-  printf("started\n");
+  unsigned num_commands;
+  int i;
 
+  printf("started\n");
+#ifdef ERRONEOUS_DEVICE
+  printf("generate errors\n");
+#endif
+
+  num_commands = 0;
+  uint8_t test_value = 0;
   while (1) {
     select {
       case i_control.register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
@@ -21,8 +28,13 @@ void app(server interface control i_control, client interface mabs_led_button_if
 
       case i_control.write_command(control_resid_t resid, control_cmd_t cmd,
                                    const uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
-        printf("W: %d %d %d,", resid, cmd, payload_len);
-        for (int i = 0; i < payload_len; i++) {
+        num_commands++;
+#ifdef ERRONEOUS_DEVICE
+        if ((num_commands % 3) == 0)
+          resid += 1;
+#endif
+        printf("%u: W %d %d %d,", num_commands, resid, cmd, payload_len);
+        for (i = 0; i < payload_len; i++) {
           printf(" %02x", payload[i]);
         }
         printf("\n");
@@ -31,31 +43,29 @@ void app(server interface control i_control, client interface mabs_led_button_if
           ret = CONTROL_ERROR;
           break;
         }
-        for (int i = 0; i < MIC_BOARD_SUPPORT_LED_COUNT; i++){
-          if (i < payload[0]) i_leds_buttons.set_led_brightness(i, 255);
-          else i_leds_buttons.set_led_brightness(i, 0);
-        }
+        test_value = payload[0];
         ret = CONTROL_SUCCESS;
         break;
 
       case i_control.read_command(control_resid_t resid, control_cmd_t cmd,
                                   uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
-        printf("R: %d %d %d\n", resid, cmd, payload_len);
+        num_commands++;
+#ifdef ERRONEOUS_DEVICE
+        if ((num_commands % 3) == 0)
+          resid += 1;
+#endif
+        printf("%u: R %d %d %d\n", num_commands, resid, cmd, payload_len);
         if (resid != RESOURCE_ID) {
           printf("unrecognised resource ID %d\n", resid);
           ret = CONTROL_ERROR;
           break;
         }
-        if (payload_len != 2) {
-          printf("expecting 2 read bytes, not %d\n", payload_len);
+        if (payload_len != 1) {
+          printf("expecting 1 read byte, not %d\n", payload_len);
           ret = CONTROL_ERROR;
           break;
         }
-        unsigned button;
-        mabs_button_state_t button_state;
-        i_leds_buttons.get_button_event(button, button_state);
-        payload[0] = button;
-        payload[1] = button_state;
+        payload[0] = test_value;
         ret = CONTROL_SUCCESS;
         break;
     }

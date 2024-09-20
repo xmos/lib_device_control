@@ -5,7 +5,7 @@
 Overview
 --------
 
-The application uses a total of four logical cores which can be seen in the diagram below. Two logical cores take care of implementing USB stack 
+The application uses a total of four logical cores which can be seen in the diagram below. Two logical cores take care of implementing USB stack
 (one for low level transactions and one for handling Endpoint 0 control requests). One further logical core is used to run the button and LED server task.
 The fourth logical core runs the application and communicates with both the button/LED server task and EP0 from where
 it receives and sends and receives commands over the Device Control API from the host.
@@ -19,7 +19,7 @@ Block diagram
    Application core diagram
 
 When implementing a USB device, a device class must be specified. The Device Control protocol is device class agnostic
-and instead of using class request type a vendor request type (bmRequestType) is used. For the purpose of 
+and instead of using class request type a vendor request type (bmRequestType) is used. For the purpose of
 this example a vendor specific device class/subclass/protocol of value 0xff/0xff/0xff is used. This allows the host to enumerate the device
 which is required if vendor requests are to be made.
 
@@ -50,14 +50,14 @@ This application requires the system header that defines XMOS xCORE specific def
    :end-before: include "app.h"
 
 The Device Control library library functions and types are defined in ``control.h``. This header must
-be included in your code to use the library. The low level USB device functionality is provided by ``usb.h`` 
+be included in your code to use the library. The low level USB device functionality is provided by ``usb.h``
 and the USB device functionality is provided by the API described in ``hid.h`` and it's associated descriptor
-set in ``decriptors.h``. Access to the xCORE Array Microphone board GPIO is provided by ``mic_array_board_support.h``.
+set in ``descriptors.h``. Access to the xCORE Array Microphone board GPIO is provided by ``mic_array_board_support.h``.
 
 Allocating hardware resources
 .............................
 
-On an xCORE the pins are controlled by ``ports``. The Device Control library itself requires no ports. 
+On an xCORE the pins are controlled by ``ports``. The Device Control library itself requires no ports.
 However the application uses USB and GPIO. The USB I/O resources are implicitly defined by including the USB library
 whereas the buttons and LEDs ports are explicitly passed to the I/O server task. The specific resource IDs are
 defined in ``mic_array_board_support.h`` which themselves are defined in the platform file ``vfspk_base.xn``:
@@ -87,7 +87,7 @@ When the host requests a read from a controlled resource, endpoint 0 receives a 
    :end-on: res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
 
 The Device Control ``control_process_usb_get_request()`` function takes the USB parameters
-``wIndex``, ``wValue`` and ``wLength`` along with a reference to the data buffer and converts it into a 
+``wIndex``, ``wValue`` and ``wLength`` along with a reference to the data buffer and converts it into a
 method call across the interface ``i_control``. A call to the ``read_command()`` method is subsequently made on the server side control interface which is then handled by the application. Once the application has filled the buffer with data and completed it's ``select`` case, the data buffer reference is returned to xud by EP0 and the USB control transaction is completed. If the application does not indicate a successful filling of the buffer then the vendor request transaction is stalled to indicate failure to the host.
 
 .. literalinclude:: app.xc
@@ -105,7 +105,7 @@ which is a host-to-device vendor request.
    :end-on: res = XUD_DoSetRequestStatus(ep0_in);
 
 The Device Control ``control_process_usb_get_request()`` function takes the USB parameters
-``wIndex``, ``wValue`` and ``wLength`` along with a reference to the data buffer and converts it into an 
+``wIndex``, ``wValue`` and ``wLength`` along with a reference to the data buffer and converts it into an
 method call across the interface ``i_control``. The call to the ``write_command()`` method is subsequently made on the control interface which is then handled by server side in the application. Once the application has handled the passed data and has completed it's ``select`` case a return code is returned. The USB transaction is then either be acknowledged or stalled by the EP0 handler to indicate success or failure to the host.
 
 .. literalinclude:: app.xc
@@ -119,15 +119,15 @@ The application main() function
 The ``main()`` function sets up the tasks within the application.
 
 Firstly, the ``interfaces`` and ``channels`` are declared. xC channels provide a simple way of
-passing data tokens between concurrent tasks, without the need to worry about switch route setup 
-or the low level control token protocol. ``XUD`` is written using a channel interface and so uses 
+passing data tokens between concurrent tasks, without the need to worry about switch route setup
+or the low level control token protocol. ``XUD`` is written using a channel interface and so uses
 this method of communicating.
 
 .. literalinclude:: main.xc
    :start-on: chan c_ep_out[NUM_EP_OUT], c_ep_in[NUM_EP_IN];
    :end-before: interface control i_control[1];
 
-xC Interfaces also provide a means of concurrent tasks communicating with each other. 
+xC Interfaces also provide a means of concurrent tasks communicating with each other.
 Interfaces add high level language features on top of the channels and allow remote
 calling of methods while passing parameters and returning values, all with the benefit of type checking.
 
@@ -144,7 +144,7 @@ The rest of the ``main()`` function starts all the tasks in parallel using the x
    :start-on: par
    :end-before: return 0
 
-Note that ``xud()`` and ``endpoint0()`` are placed on ``USB_TILE`` which is ``tile[1]`` (as defined in the Makefile) leaving 
+Note that ``xud()`` and ``endpoint0()`` are placed on ``USB_TILE`` which is ``tile[1]`` (as defined in the Makefile) leaving
 ``tile[0]`` completely free for the application. The ``mabs_button_and_led_server()`` task needs
 to be placed on ``tile[0]`` because the GPIO connected to the LEDs and buttons reside on that
 tile. The Application task app() may be place on either tile.
@@ -156,7 +156,7 @@ The application app() task
 
 The application here is simple. It consists of a while(1) select{} block containing three cases.
 These cases are outlined above and handle registration, reading and writing events triggered by the control library.
-It waits for calls to these cases from the client side (Endpoint 0) and handles them accordingly by registering the controlled 
+It waits for calls to these cases from the client side (Endpoint 0) and handles them accordingly by registering the controlled
 resource, setting LEDs or reading the buttons.
 
 Please see the source code listing app_listing_ for more details.
@@ -179,7 +179,7 @@ and plug the xTAG to the board and connect the xTAG USB cable to your developmen
 Launching the demo application
 ------------------------------
 
-Once the demo example has been built either from the command line using xmake from the project directory 
+Once the demo example has been built either from the command line using xmake from the project directory
 wherer the Makefile can be found or via the build mechanism of xTIMEcomposer studio it can be executed on the Vocal Fusion board.
 
 Once built there will be a ``bin/`` directory within the project which contains
@@ -233,7 +233,7 @@ or for OSX::
 
 The build will result in a binary being compiled into bin/a.out.
 
-When running under a Windows platform, additionally a driver will be required to fully enumerate the USB device. See 
+When running under a Windows platform, additionally a driver will be required to fully enumerate the USB device. See
 the ``Intsalling the Driver on Windows`` section driver_ for details.
 
 Running the host application
@@ -267,8 +267,8 @@ indicates that the last button event was button C being released::
 Installing the Driver on Windows
 ................................
 
-The test vendor specific device used in this application which requires a driver on Windows. The driver is installed 
-by finding the device when the application is running and connected to the host PC. Select :menuitem:`Control Panel,Device Manager`    
+The test vendor specific device used in this application which requires a driver on Windows. The driver is installed
+by finding the device when the application is running and connected to the host PC. Select :menuitem:`Control Panel,Device Manager`
 
 .. figure:: images/driver_1.png
    :width: 40%

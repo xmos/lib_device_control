@@ -4,10 +4,9 @@
 #include <stdint.h>
 #include <assert.h>
 #include "control.h"
-//#include "mic_array_board_support.h"
 #include "app.h"
 
-void app(server interface control i_control/*, client interface mabs_led_button_if i_leds_buttons*/)
+void app(server interface control i_control)
 {
   unsigned num_commands;
   int i;
