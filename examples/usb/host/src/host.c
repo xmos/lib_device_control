@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "control_host.h"
-#include "resource.h"
 #include "util.h"
+#include "resource.h"
 
 int done = 0;
 
@@ -55,6 +55,7 @@ int main(void)
       printf("control read command returned the wrong value, expected %d, returned %d\n", i, payload[0]);
       exit(1);
     }
+    printf("Written and read back command with payload: 0x%0.2X\n", payload[0]);
     fflush(stdout);
   }
 
