@@ -7,24 +7,7 @@
 #include <xscope.h>
 #include <stdint.h>
 #include "control.h"
-#include "mic_array_board_support.h"
 #include "app.h"
-
-on tile[0]: in port p_buttons =  MIC_BOARD_SUPPORT_BUTTON_PORTS;
-
-//TODO use MIC_BOARD_SUPPORT_LED_PORTS in post 2.2.0 lib_mic_array_board_support
-on tile[0]: mabs_led_ports_t p_leds = {
-  PORT_LED0_TO_7, PORT_LED8, PORT_LED9, PORT_LED10_TO_12, XS1_PORT_1P
-};
-
-void xscope_user_init(void)
-{
-  xscope_register(1, XSCOPE_CONTINUOUS, XSCOPE_CONTROL_PROBE, XSCOPE_INT, "byte");
-
-  /* without "xscope_config_io(XSCOPE_IO_BASIC)",
-   * JTAG is used for console I/O (bug 17287)
-   */
-}
 
 [[combinable]]
 void xscope_client(chanend c_xscope, client interface control i_control[1])
@@ -56,13 +39,11 @@ int main(void)
 {
   chan c_xscope;
   interface control i_control[1];
-  interface mabs_led_button_if i_leds_buttons[1];
 
   par {
     xscope_host_data(c_xscope);
     on tile[0]: xscope_client(c_xscope, i_control);
-    on tile[0]: app(i_control[0], i_leds_buttons[0]);
-    on tile[0]: mabs_button_and_led_server(i_leds_buttons, 1, p_leds, p_buttons);
+    on tile[0]: app(i_control[0]);
   }
   return 0;
 }

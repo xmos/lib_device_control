@@ -20,8 +20,8 @@ typedef enum { false = 0, true = 1} bool;
 #include "control_host_support.h"
 #include "util.h"
 
-//#define DBG(x) x
-#define DBG(x)
+#define DBG(x) x
+//m#define DBG(x)
 #define PRINT_ERROR(...)   fprintf(stderr, "Error  : " __VA_ARGS__)
 
 #define UNUSED_PARAMETER(x) (void)(x)
@@ -45,7 +45,7 @@ void register_callback(unsigned int id, unsigned int type,
   UNUSED_PARAMETER(unit);
   UNUSED_PARAMETER(data_type);
   UNUSED_PARAMETER(data_name);
-
+  printf("REGISTER!\n\n\n");
   if (strcmp((char*)name, XSCOPE_CONTROL_PROBE) == 0) {
     probe_id = id;
     DBG(printf("registered probe %d\n", id));
@@ -67,6 +67,7 @@ void xscope_print(unsigned long long timestamp,
 void record_callback(unsigned int id, unsigned long long timestamp,
   unsigned int length, unsigned long long dataval, unsigned char *databytes)
 {
+  printf("RECORD!!!\n\n\n");
   UNUSED_PARAMETER(timestamp);
   UNUSED_PARAMETER(dataval);
 
@@ -78,7 +79,7 @@ void record_callback(unsigned int id, unsigned long long timestamp,
     last_response_struct = (struct control_xscope_response*)last_response;
     last_response_length = length;
     memcpy(last_response, databytes, length);
-    
+
     record_count++;
   }
 }
@@ -130,7 +131,7 @@ control_ret_t control_query_version(control_version_t *version)
     PRINT_ERROR("xscope_ep_request_upload failed\n");
     return CONTROL_ERROR;
   }
-  
+
   // wait for response on xSCOPE probe
   while (record_count == 0) {
     pause_short();
@@ -142,7 +143,7 @@ control_ret_t control_query_version(control_version_t *version)
   *version = *(control_version_t*)(last_response + sizeof(struct control_xscope_response));
 
   num_commands++;
-  return CONTROL_SUCCESS + last_response_struct->ret;
+  return last_response[0];
 }
 
 /*
@@ -191,15 +192,15 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
     return CONTROL_ERROR;
   }
   // wait for response on xSCOPE probe
-  while (record_count == 0) { 
+  while (record_count == 0) {
     pause_short();
   }
 
   DBG(printf("response: "));
-  DBG(print_bytes(last_response, XSCOPE_HEADER_BYTES));
+  DBG(print_bytes(last_response, last_response_length));
 
   num_commands++;
-  return CONTROL_SUCCESS + last_response_struct->ret;
+  return last_response[0];
 }
 
 control_ret_t
@@ -211,7 +212,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   size_t len = control_xscope_create_upload_buffer(b,
     CONTROL_CMD_SET_READ(cmd), resid, NULL, payload_len);
 
-  DBG(printf("%d: send read command: ", num_commands));
+  DBG(printf("%d: send read command, len %d: ", num_commands, len));
   DBG(print_bytes((unsigned char*)b, len));
 
   record_count = 0;
@@ -220,20 +221,20 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
     PRINT_ERROR("xscope_ep_request_upload failed\n");
     return CONTROL_ERROR;
   }
-  
+
   // wait for response on xSCOPE probe
   while (record_count == 0) {
     pause_short();
   }
 
-  DBG(printf("response: "));
+  DBG(printf("response: length %d: ", last_response_length));
   DBG(print_bytes(last_response, last_response_length));
 
   // ignore returned payload length, use one supplied in request
-  memcpy(payload, last_response + sizeof(struct control_xscope_response), payload_len);
+  memcpy(payload, last_response, payload_len);
 
   num_commands++;
-  return CONTROL_SUCCESS + last_response_struct->ret;
+  return CONTROL_SUCCESS;
 }
 
 control_ret_t control_cleanup_xscope(void)
