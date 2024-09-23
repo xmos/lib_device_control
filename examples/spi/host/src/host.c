@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "control_host.h"
-#include "signals.h"
 #include "resource.h"
 #include "util.h"
 #include <bcm2835.h>
@@ -20,9 +19,6 @@ int main(void)
   control_version_t version = 0xFF;
   unsigned char payload[4];
   uint8_t i;
-
-  signals_init();
-  signals_setup_int(shutdown);
 
   if (control_init_spi_pi(SPI_MODE_3, BCM2835_SPI_CLOCK_DIVIDER_1024, 2) != CONTROL_SUCCESS) {
     printf("control init failed\n");

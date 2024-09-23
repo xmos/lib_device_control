@@ -25,7 +25,7 @@ static void pause_long(void)
 
 static void pause_short(void)
 {
-  usleep(100000);
+  usleep(1000);
 }
 
 static void pause_long(void)

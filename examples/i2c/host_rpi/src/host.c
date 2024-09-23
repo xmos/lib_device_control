@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "control_host.h"
-#include "signals.h"
 #include "resource.h"
 #include "util.h"
 
@@ -19,9 +18,6 @@ int main(void)
   control_version_t version = 0xFF;
   unsigned char payload[4];
   uint8_t i;
-
-  signals_init();
-  signals_setup_int(shutdown);
 
   if (control_init_i2c(0x2C) != CONTROL_SUCCESS) {
     printf("control init failed\n");
