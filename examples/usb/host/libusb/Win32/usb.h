@@ -313,7 +313,7 @@ typedef struct usb_dev_handle usb_dev_handle;
 #include <poppack.h>
 
 
-#ifdef __cplusplus
+#if defined(__cplusplus) || defined(__XC__)
 extern "C" {
 #endif
 
@@ -405,7 +405,7 @@ extern "C" {
   int usb_free_async(void **context);
 
 
-#ifdef __cplusplus
+#if defined(__cplusplus) || defined(__XC__)
 }
 #endif
 
