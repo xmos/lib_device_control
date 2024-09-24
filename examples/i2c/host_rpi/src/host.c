@@ -55,6 +55,7 @@ int main(void)
       printf("control read command returned the wrong value, expected %d, returned %d\n", i, payload[0]);
       exit(1);
     }
+    printf("Written and read back command with payload: 0x%2X\n", payload[0]);
     fflush(stdout);
   }
 
