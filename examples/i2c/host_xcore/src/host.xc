@@ -52,7 +52,7 @@ int main(void)
 
           pause_short();
 
-          if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), i_i2c[0], payload, 4) != CONTROL_SUCCESS) {
+          if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), i_i2c[0], payload, 1) != CONTROL_SUCCESS) {
             printf("control read command failed\n");
             exit(1);
           }
@@ -60,6 +60,12 @@ int main(void)
           fflush(stdout);
 
           pause_long();
+
+          if (payload[0] != i) {
+            printf("control read command returned the wrong value, expected %d, returned %d\n", i, payload[0]);
+            exit(1);
+          }
+          printf("Written and read back command with payload: 0x%02X\n", payload[0]);
         }
       }
 
