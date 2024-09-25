@@ -8,7 +8,7 @@ DRIVERS_PATH=$(ROOT)\examples\AN01034_using_the_device_control_library_over_usb\
 
 all:
     if not exist bin mkdir bin
-    CL.exe /DUSE_USB /D_CRT_SECURE_NO_WARNINGS /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt" /I$(DRIVERS_PATH) /I$(ROOT)\lib_device_control\api /I$(ROOT)\lib_device_control\src /I$(ROOT)\lib_device_control\host /nologo /W4 /WX- /O2 /EHa /Fe"bin\usb_host_app.exe" /TP $(ROOT)\lib_device_control\host\device_access_usb.c $(ROOT)\lib_device_control\host\util.c src\host.c src\signals.c /link $(DRIVERS_PATH)\libusb.lib
+    CL.exe /DUSE_USB /D_CRT_SECURE_NO_WARNINGS /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt" /I$(DRIVERS_PATH) /I$(ROOT)\lib_device_control\api /I$(ROOT)\lib_device_control\src /I$(ROOT)\lib_device_control\host /nologo /W4 /WX- /O2 /EHa /Fe"bin\usb_host_app.exe" /TP $(ROOT)\lib_device_control\host\device_access_usb.c $(ROOT)\lib_device_control\host\util.c src\host.c /link $(DRIVERS_PATH)\libusb.lib
     del *.obj
 
 clean:
