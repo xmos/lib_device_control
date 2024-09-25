@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "control.h"
-//#include "mic_array_board_support.h"
 #include "app.h"
 
 #define DEBUG_UNIT DEVICE
@@ -50,23 +49,16 @@ void spi_ctrl(client interface control i_control[1])
   }
 }
 
-//TODO use MIC_BOARD_SUPPORT_LED_PORTS in post 2.2.0 lib_mic_array_board_support
-/*on tile[0]: mabs_led_ports_t p_leds = {
-  PORT_LED0_TO_7, PORT_LED8, PORT_LED9, PORT_LED10_TO_12, XS1_PORT_1P
-};*/
-
 
 int main(void)
 {
   interface control i_control[1];
-  //interface mabs_led_button_if i_leds_buttons[1];
   par {
     on tile[SPI_TILE]: par {
       spi_ctrl(i_control);
     }
     on tile[0]: par {
-      app(i_control[0]/*, i_leds_buttons[0]*/);
-      //mabs_button_and_led_server(i_leds_buttons, 1, p_leds, p_buttons);
+      app(i_control[0]);
     }
   }
   return 0;

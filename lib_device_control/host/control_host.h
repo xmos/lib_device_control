@@ -17,7 +17,6 @@ extern "C" {
 
 #if USE_SPI
 /* Taken from spi.h in lib_spi. Not included as it's an XC header */
-/* TODO: Wrap spi.h in #ifdef __XC__ */
 typedef enum spi_mode_t {
   SPI_MODE_0, /**< SPI Mode 0 - Polarity = 0, Clock Edge = 1 */
   SPI_MODE_1, /**< SPI Mode 1 - Polarity = 0, Clock Edge = 0 */

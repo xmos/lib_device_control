@@ -6,15 +6,10 @@
 #include <timer.h>
 #include "i2c.h"
 #include "control.h"
-#include "mic_array_board_support.h"
 #include "app.h"
 
 on tile[0]: port p_scl = PORT_I2C_SCL;
 on tile[0]: port p_sda = PORT_I2C_SDA;
-//on tile[1]: out port p_eth_phy_reset = XS1_PORT_4F; /* X1D29, bit 1 of port 4F */
-
-//on tile[0]: mabs_led_ports_t p_leds = on tile[0]: MIC_BOARD_SUPPORT_LED_PORTS;
-//on tile[0]: in port p_buttons = MIC_BOARD_SUPPORT_BUTTON_PORTS;
 
 const char i2c_device_addr = 0x2C;
 
@@ -71,16 +66,12 @@ int main(void)
 {
   i2c_slave_callback_if i_i2c;
   interface control i_control[1];
-  //interface mabs_led_button_if i_leds_buttons[1];
 
   par {
     on tile[1]: par {
-      app(i_control[0]/*, i_leds_buttons[0]*/);
-      //mabs_button_and_led_server(i_leds_buttons, 1, p_leds, p_buttons);
+      app(i_control[0]);
       }
     on tile[0]: {
-      /* hold Ethernet PHY in reset to ensure it is not driving clock */
-      //p_eth_phy_reset <: 0;
       control_init();
       control_register_resources(i_control, 1);
 
