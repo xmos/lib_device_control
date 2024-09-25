@@ -51,9 +51,10 @@ pipeline {
             dir('i2c') {
               xcoreCompile('host_xcore')
             }
+            xcoreCompile('spi')
+            xcoreCompile('usb')
             xcoreCompile('xscope')
           }
-          xcoreAllAppNotesBuild('examples')
           dir("${REPO}") {
             runXdoc('doc')
           }
