@@ -9,6 +9,7 @@
 #include "i2c.h"
 #include "control_host.h"
 #include "resource.h"
+#include "util.h"
 
 port p_scl = on tile[0]: XS1_PORT_1E; /* XE232 board J5 pin 13 */
 port p_sda = on tile[0]: XS1_PORT_1F; /* J5 pin 14 */
