@@ -8,6 +8,12 @@
 
 int done = 0;
 
+static void exit_error(void)
+{
+  control_cleanup_xscope();
+  exit(1);
+}
+
 void shutdown(void)
 {
   done = 1;
@@ -21,46 +27,46 @@ int main(void)
 
   if (control_init_xscope("localhost", "10101") != CONTROL_SUCCESS) {
     printf("control init failed\n");
-    exit(1);
+    exit_error();
   }
 
-  printf("device found\n");
+  printf("[HOST] device found\n");
 
   if (control_query_version(&version) != CONTROL_SUCCESS) {
     printf("control query version failed\n");
-    exit(1);
+    exit_error();
   }
   if (version != CONTROL_VERSION) {
     printf("version expected 0x%X, received 0x%X\n", CONTROL_VERSION, version);
   }
 
-  printf("started\n");
+  printf("[HOST] started\n");
 
   for (i = 0; i < 4; i++) {
     payload[0] = i;
     if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 1) != CONTROL_SUCCESS) {
-      printf("control write command failed\n");
-      exit(1);
+      printf("[HOST] control write command failed\n");
+      exit_error();
     }
     fflush(stdout);
 
     pause_short();
 
     if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, 1) != CONTROL_SUCCESS) {
-      printf("control read command failed\n");
-      exit(1);
+      printf("[HOST] control read command failed\n");
+      exit_error();
     }
 
     if (payload[0] != i) {
-      printf("control read command returned the wrong value, expected %d, returned %d\n", i, payload[0]);
-      exit(1);
+      printf("[HOST] control read command returned the wrong value, expected %d, returned %d\n", i, payload[0]);
+      exit_error();
     }
-    printf("Written and read back command with payload: 0x%02X\n", payload[0]);
+    printf("[HOST] Written and read back command with payload: 0x%02X\n", payload[0]);
     fflush(stdout);
   }
 
   control_cleanup_xscope();
-  printf("done\n");
+  printf("[HOST] done\n");
 
   return 0;
 }

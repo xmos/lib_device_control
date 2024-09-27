@@ -15,7 +15,7 @@
 
 void pause_short(void)
 {
-  Sleep(0);
+  Sleep(10);
 }
 
 void pause_long(void)

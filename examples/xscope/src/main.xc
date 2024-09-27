@@ -9,6 +9,9 @@
 #include "control.h"
 #include "app.h"
 
+#define DEBUG_UNIT DEVICE
+#include "debug_print.h"
+
 [[combinable]]
 void xscope_client(chanend c_xscope, client interface control i_control[1])
 {
