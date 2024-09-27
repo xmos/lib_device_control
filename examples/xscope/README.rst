@@ -1,7 +1,13 @@
 Example: Xscope
 ===============
 
-//TODO document this example
+The Device Control library provides an API and a set of communication layers that 
+provide a host to device control path which is agnostic of the actual transport used.
+
+Multiple transport layers are provided as part of the library including I2C, xSCOPE and USB.
+This example demonstrates the use of the xSCOPE transport layer.
+The host application sends commands to the device application which processes the commands and sends a response back to the host.
+There are simple checks to verify the correctness of the commands and the responses.
 
 Build example
 -------------
@@ -34,4 +40,5 @@ Running example
 Output
 ------
 
-//TODO document the output
+If the run is successful, the host application will display "Done", otherwise it will display an error.
+Errors indicate that the device application did not respond correctly to the commands sent by the host application.
