@@ -1,0 +1,4 @@
+<xSCOPEconfig ioMode="basic" enabled="true">
+    <Probe name="Control Probe" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
+    <Probe name="Status Probe" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
+</xSCOPEconfig>
