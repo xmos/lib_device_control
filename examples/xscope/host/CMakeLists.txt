@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
 
+# Check if XMOS_TOOL_PATH is defined
+if(NOT DEFINED ENV{XMOS_TOOL_PATH})
+    message(FATAL_ERROR "XMOS_TOOL_PATH must be defined.")
+endif()
+
 # Compile for x86_64 on Mac as we can't support the M1 ARM architecture yet
 set(CMAKE_OSX_ARCHITECTURES
     "x86_64"
@@ -28,12 +33,12 @@ target_include_directories(
 )
 
 # Properties and options
-target_compile_options(xscope_host_app PRIVATE /D USE_XSCOPE)
+target_compile_options(xscope_host_app PRIVATE -D USE_XSCOPE -O2)
 
 # Find and link libraries
 find_library(
   XSCOPE_ENDPOINT_LIB
-  NAMES xscope_endpoint.so xscope_endpoint.lib
+  NAMES xscope_endpoint.so xscope_endpoint.dylib xscope_endpoint.lib
   PATHS $ENV{XMOS_TOOL_PATH}/lib)
 
 target_link_libraries(xscope_host_app PRIVATE ${XSCOPE_ENDPOINT_LIB})

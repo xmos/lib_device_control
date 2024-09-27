@@ -36,7 +36,8 @@ pipeline {
           }
           dir('xscope/host') {
             viewEnv() {
-              sh 'make -f Makefile.OSX'
+              sh 'cmake -G Ninja -B build'
+              sh 'ninja -C build'
             }
           }
         }
