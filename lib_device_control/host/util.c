@@ -39,7 +39,7 @@ void pause_long(void)
 
 void pause_short(void)
 {
-  usleep(0);
+  usleep(10);
 }
 
 void pause_long(void)

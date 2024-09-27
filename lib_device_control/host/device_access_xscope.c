@@ -143,7 +143,7 @@ control_ret_t control_query_version(control_version_t *version)
   *version = *(control_version_t*)(last_response + sizeof(struct control_xscope_response));
 
   num_commands++;
-  return last_response[0];
+  return CONTROL_SUCCESS + last_response_struct->ret;
 }
 
 /*
@@ -200,7 +200,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
   DBG(print_bytes(last_response, last_response_length));
 
   num_commands++;
-  return last_response[0];
+  return CONTROL_SUCCESS + last_response_struct->ret;
 }
 
 control_ret_t
@@ -231,10 +231,10 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   DBG(print_bytes(last_response, last_response_length));
 
   // ignore returned payload length, use one supplied in request
-  memcpy(payload, last_response, payload_len);
+  memcpy(payload, last_response + sizeof(struct control_xscope_response), payload_len);
 
   num_commands++;
-  return CONTROL_SUCCESS;
+  return CONTROL_SUCCESS + last_response_struct->ret;
 }
 
 control_ret_t control_cleanup_xscope(void)
