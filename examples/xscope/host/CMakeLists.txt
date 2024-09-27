@@ -1,0 +1,42 @@
+cmake_minimum_required(VERSION 3.21)
+
+# Compile for x86_64 on Mac as we can't support the M1 ARM architecture yet
+set(CMAKE_OSX_ARCHITECTURES
+    "x86_64"
+    CACHE INTERNAL "")
+
+set(CMAKE_BUILD_TYPE "Release")
+project(xscope_host_app)
+
+# Define source files
+set(SOURCES
+    "../../../lib_device_control/host/device_access_xscope.c"
+    "../../../lib_device_control/host/util.c"
+    "src/host.c"
+)
+add_executable(xscope_host_app ${SOURCES})
+
+# Directories
+target_include_directories(
+  xscope_host_app 
+    PRIVATE 
+    src
+    ../../../lib_device_control/host
+    ../../../lib_device_control/api
+    ../../../lib_device_control/src
+    $ENV{XMOS_TOOL_PATH}/include
+)
+
+# Properties and options
+target_compile_options(xscope_host_app PRIVATE /D USE_XSCOPE)
+
+# Find and link libraries
+find_library(
+  XSCOPE_ENDPOINT_LIB
+  NAMES xscope_endpoint.so xscope_endpoint.lib
+  PATHS $ENV{XMOS_TOOL_PATH}/lib)
+
+target_link_libraries(xscope_host_app PRIVATE ${XSCOPE_ENDPOINT_LIB})
+
+# Set output directory
+set_target_properties(xscope_host_app PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
