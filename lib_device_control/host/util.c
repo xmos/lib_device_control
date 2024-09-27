@@ -15,12 +15,12 @@
 
 void pause_short(void)
 {
-  Sleep(10);
+  Sleep(100); // Unit is ms
 }
 
 void pause_long(void)
 {
-  Sleep(1000);
+  Sleep(1000); // Unit is ms
 }
 
 #elif __xcore__
@@ -39,12 +39,12 @@ void pause_long(void)
 
 void pause_short(void)
 {
-  usleep(10);
+  usleep(100000); // Unit is us
 }
 
 void pause_long(void)
 {
-  sleep(1);
+  sleep(1); // Unit is second
 }
 
 #endif // _WIN32
