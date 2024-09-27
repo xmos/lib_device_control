@@ -1,4 +1,12 @@
 @Library('xmos_jenkins_shared_library@v0.32.0') _
+
+def buildApps(appList) {
+  appList.each { app ->
+    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
+    sh "xmake -C ${app}/build"
+  }
+}
+
 getApproval()
 
 pipeline {
@@ -43,7 +51,7 @@ pipeline {
         }
       }
     }
-    stage('xCORE builds') {
+    stage('xCORE builds (A)') {
       steps {
         dir("${REPO}") {
           // xcoreAllAppsBuild('examples')
@@ -54,7 +62,7 @@ pipeline {
             }
             xcoreCompile('spi')
             xcoreCompile('usb')
-            xcoreCompile('xscope')
+            // xcoreCompile('xscope') // included in builds (B)
           }
           dir("${REPO}") {
             runXdoc('doc')
@@ -62,6 +70,14 @@ pipeline {
         }
       }
     }
+  
+    stage('xCORE builds (B)') {
+        steps{
+          dir("${REPO}") { withTools("15.3.0") { withVenv {
+            buildApps(['examples/xscope']) //TODO ideally migrate the rest of the apps to this method
+          } } } // venv, tools, dir
+        } // steps
+      } // build
   }
   post {
     success {
