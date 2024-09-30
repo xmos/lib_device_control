@@ -23,6 +23,7 @@ You need to activate the appropriate environment for the `cl` compiler before pr
 .. code-block:: console
 
   # The following commands apply to Windows, Linux, and macOS.
+  cd host
   cmake -G Ninja -B build
   ninja -C build
 
@@ -46,9 +47,9 @@ Running example
     xrun --xscope-port localhost:10101 bin/xscope.xe
     # Host: run the xscope host application
     # (Windows)
-    call "bin/xscope_host_app.exe"
+    call "host/bin/xscope_host_app.exe"
     # (Linux, MacOS)
-    ./bin/xscope_host_app
+    ./host/bin/xscope_host_app
 
 Output
 ------

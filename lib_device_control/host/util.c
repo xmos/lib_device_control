@@ -15,7 +15,7 @@
 
 void pause_short(void)
 {
-  Sleep(100); // Unit is ms
+  Sleep(10); // Unit is ms
 }
 
 void pause_long(void)
@@ -27,7 +27,7 @@ void pause_long(void)
 
 void pause_short(void)
 {
-  delay_milliseconds(100);
+  delay_milliseconds(10);
 }
 
 void pause_long(void)
@@ -39,7 +39,7 @@ void pause_long(void)
 
 void pause_short(void)
 {
-  usleep(100000); // Unit is us
+  usleep(10000); // Unit is us
 }
 
 void pause_long(void)

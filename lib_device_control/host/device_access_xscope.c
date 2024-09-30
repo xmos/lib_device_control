@@ -45,7 +45,6 @@ void register_callback(unsigned int id, unsigned int type,
   UNUSED_PARAMETER(unit);
   UNUSED_PARAMETER(data_type);
   UNUSED_PARAMETER(data_name);
-  printf("[HOST] REGISTER!\n\n\n");
   if (strcmp((char*)name, XSCOPE_CONTROL_PROBE) == 0) {
     probe_id = id;
     DBG(printf("[HOST] registered probe %d\n", id));
@@ -67,7 +66,6 @@ void xscope_print(unsigned long long timestamp,
 void record_callback(unsigned int id, unsigned long long timestamp,
   unsigned int length, unsigned long long dataval, unsigned char *databytes)
 {
-  printf("[HOST] RECORD!\n\n\n");
   UNUSED_PARAMETER(timestamp);
   UNUSED_PARAMETER(dataval);
 
