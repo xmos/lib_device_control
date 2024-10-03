@@ -1,22 +1,5 @@
 @Library('xmos_jenkins_shared_library@v0.32.0') _
 
-def buildApps(appList) {
-  appList.each { app ->
-    dir(app)  {
-      sh "cmake -G 'Unix Makefiles' -B build"
-      sh "xmake -C build"
-    }
-  }
-}
-
-def buildHostApps(appList) {
-  appList.each { app ->
-    dir(app) {
-      sh "cmake -G Ninja -B build"
-      sh "ninja -C build"
-    }
-  }
-}
 getApproval()
 
 pipeline {
@@ -53,9 +36,8 @@ pipeline {
         }
         script {
           hostAppList.each { app ->
-            viewEnv() {
+            viewEnv() { // Virtual environment needed for XMOS_TOOL_PATH
               dir("${REPO}/examples/${app}") {
-                sh 'ls -la'
                 sh "cmake -G Ninja -B build"
                 sh "ninja -C build"
               }
