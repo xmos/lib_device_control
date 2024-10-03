@@ -22,6 +22,9 @@ pipeline {
   environment {
     REPO = 'lib_device_control'
     VIEW = getViewName(REPO)
+    appList = ['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']
+    hostAppList = ['usb/host', 'xscope/host']
+
   }
   options {
     skipDefaultCheckout()
@@ -44,19 +47,22 @@ pipeline {
     }
     stage('Host builds') {
       steps {
-        appList = ['usb/host', 'xscope/host']
         dir("${REPO}/examples") {
-          buildHostApps(appList)
+          buildHostApps(hostAppList)
         }
       }
     }
 
     stage('xCORE builds') {
         steps{
-          appList = ['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']
-          dir("${REPO}/examples") { withTools("15.3.0") { withVenv {
-            buildApps(appList)
-          } } } // venv, tools, dir
+
+          dir("${REPO}/examples") {
+            withTools("15.3.0") {
+              withVenv {
+                buildApps(appList)
+              }
+            }
+          }
         } // steps
       } // build
   }
