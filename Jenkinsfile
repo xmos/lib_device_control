@@ -2,15 +2,19 @@
 
 def buildApps(appList) {
   appList.each { app ->
-    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
-    sh "xmake -C ${app}/build"
+    dir(app)  {
+      sh "cmake -G 'Unix Makefiles' -B build"
+      sh "xmake -C build"
+    }
   }
 }
 
 def buildHostApps(appList) {
   appList.each { app ->
-    sh "cmake -G Ninja -B build"
-    sh "ninja -C build"
+    dir(app) {
+      sh "cmake -G Ninja -B build"
+      sh "ninja -C build"
+    }
   }
 }
 getApproval()
@@ -22,9 +26,6 @@ pipeline {
   environment {
     REPO = 'lib_device_control'
     VIEW = getViewName(REPO)
-    appList = ['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']
-    hostAppList = ['usb/host', 'xscope/host']
-
   }
   options {
     skipDefaultCheckout()
@@ -47,24 +48,41 @@ pipeline {
     }
     stage('Host builds') {
       steps {
-        dir("${REPO}/examples") {
-          buildHostApps(hostAppList)
+        script {
+          hostAppList = ['usb/host', 'xscope/host']
         }
-      }
-    }
-
-    stage('xCORE builds') {
-        steps{
-
-          dir("${REPO}/examples") {
-            withTools("15.3.0") {
-              withVenv {
-                buildApps(appList)
+        script {
+          hostAppList.each { app ->
+            viewEnv() {
+              dir("${REPO}/examples/${app}") {
+                sh 'ls -la'
+                sh "cmake -G Ninja -B build"
+                sh "ninja -C build"
               }
             }
           }
-        } // steps
-      } // build
+        }
+      }
+    }
+    stage('xCORE builds') {
+      steps {
+        script {
+          appList = ['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']
+        }
+        script {
+          appList.each { app ->
+            dir("${REPO}/examples/${app}") {
+              withTools("15.3.0") {
+                withVenv {
+                  sh 'cmake -G "Unix Makefiles" -B build'
+                  sh "xmake -C build"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
   post {
     success {
