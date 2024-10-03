@@ -22,11 +22,15 @@ You need to activate the appropriate environment for the `cl` compiler before pr
 
 .. code-block:: console
 
-  # The following commands apply to Windows, Linux, and macOS.
+  # (Windows)
   cd host
   cmake -G Ninja -B build
   ninja -C build
 
+  # (Linux, MacOS)
+  cd host
+  cmake -B build
+  make -C build
 
 Build firmware application
 --------------------------
@@ -41,10 +45,18 @@ Run the following command from the example folder:
 Running example
 ---------------
 
+To run the example, follow the instructions below.
+On a terminal with the XTC tools enabled, run the following commands:
+
 .. code-block:: console
 
     # Device: run the xscope device application
     xrun --xscope-port localhost:10101 bin/xscope.xe
+
+
+On a different terminal, run the following commands:
+.. code-block:: console
+
     # Host: run the xscope host application
     # (Windows)
     call "host/bin/xscope_host_app.exe"

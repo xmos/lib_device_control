@@ -13,22 +13,25 @@ set(CMAKE_OSX_ARCHITECTURES
 set(CMAKE_BUILD_TYPE "Release")
 project(xscope_host_app)
 
+# Define path to lib_device_control
+set(DEVICE_CONTROL_PATH ${CMAKE_CURRENT_LIST_DIR}/../../../lib_device_control)
+
 # Define source files
 set(SOURCES
-    "../../../lib_device_control/host/device_access_xscope.c"
-    "../../../lib_device_control/host/util.c"
+    "${DEVICE_CONTROL_PATH}/host/device_access_xscope.c"
+    "${DEVICE_CONTROL_PATH}/host/util.c"
     "src/host.c"
 )
 add_executable(xscope_host_app ${SOURCES})
 
 # Directories
 target_include_directories(
-  xscope_host_app 
-    PRIVATE 
+  xscope_host_app
+    PRIVATE
     src
-    ../../../lib_device_control/host
-    ../../../lib_device_control/api
-    ../../../lib_device_control/src
+    ${DEVICE_CONTROL_PATH}/host
+    ${DEVICE_CONTROL_PATH}/api
+    ${DEVICE_CONTROL_PATH}/src
     $ENV{XMOS_TOOL_PATH}/include
 )
 
