@@ -47,7 +47,6 @@ target_include_directories(
     ${DEVICE_CONTROL_PATH}/host
     ${DEVICE_CONTROL_PATH}/api
     ${DEVICE_CONTROL_PATH}/src
-    $ENV{XMOS_TOOL_PATH}/include
     ${libusb-1.0_INCLUDE_DIRS}
 )
 
