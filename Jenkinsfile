@@ -7,6 +7,12 @@ def buildApps(appList) {
   }
 }
 
+def buildHostApps(appList) {
+  appList.each { app ->
+    sh "cmake -G Ninja -B build"
+    sh "ninja -C build"
+  }
+}
 getApproval()
 
 pipeline {
@@ -38,43 +44,18 @@ pipeline {
     }
     stage('Host builds') {
       steps {
+        appList = ['usb/host', 'xscope/host']
         dir("${REPO}/examples") {
-          dir('usb/host') {
-            sh 'make -f Makefile.OSX'
-          }
-          dir('xscope/host') {
-            viewEnv() {
-              sh 'cmake -G Ninja -B build'
-              sh 'ninja -C build'
-            }
-          }
+          buildHostApps(appList)
         }
       }
     }
-    stage('xCORE builds (A)') {
-      steps {
-        dir("${REPO}") {
-          // xcoreAllAppsBuild('examples')
-          dir('examples') {
-            xcoreCompile('i2c')
-            dir('i2c') {
-              xcoreCompile('host_xcore')
-            }
-            xcoreCompile('spi')
-            xcoreCompile('usb')
-            // xcoreCompile('xscope') // included in builds (B)
-          }
-          dir("${REPO}") {
-            runXdoc('doc')
-          }
-        }
-      }
-    }
-  
-    stage('xCORE builds (B)') {
+
+    stage('xCORE builds') {
         steps{
-          dir("${REPO}") { withTools("15.3.0") { withVenv {
-            buildApps(['examples/xscope']) //TODO ideally migrate the rest of the apps to this method
+          appList = ['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']
+          dir("${REPO}/examples") { withTools("15.3.0") { withVenv {
+            buildApps(appList)
           } } } // venv, tools, dir
         } // steps
       } // build
