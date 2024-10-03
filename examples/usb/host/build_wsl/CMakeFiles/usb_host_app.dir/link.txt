@@ -1,1 +1,0 @@
-/usr/bin/cc -O3 -DNDEBUG CMakeFiles/usb_host_app.dir/mnt/c/Users/lucianom/lib_device_control_sb/lib_device_control/lib_device_control/host/device_access_usb.c.o CMakeFiles/usb_host_app.dir/mnt/c/Users/lucianom/lib_device_control_sb/lib_device_control/lib_device_control/host/util.c.o CMakeFiles/usb_host_app.dir/src/host.c.o -o ../bin/usb_host_app  -lusb-1.0 

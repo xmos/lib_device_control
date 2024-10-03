@@ -1,3 +1,0 @@
-/mnt/c/Users/lucianom/lib_device_control_sb/lib_device_control/examples/usb/host/build_wsl/CMakeFiles/usb_host_app.dir
-/mnt/c/Users/lucianom/lib_device_control_sb/lib_device_control/examples/usb/host/build_wsl/CMakeFiles/edit_cache.dir
-/mnt/c/Users/lucianom/lib_device_control_sb/lib_device_control/examples/usb/host/build_wsl/CMakeFiles/rebuild_cache.dir
