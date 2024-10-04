@@ -35,7 +35,7 @@ pipeline {
       parallel {
         stage('Library checks, tests and Mac x86_64 host builds') {
           agent {
-            label 'x86_64&&macOS'
+            label 'macOS&&x86_64'
           }
           stages {
             stage('Get view') {
@@ -213,13 +213,4 @@ pipeline {
       } // parallel
     } // Cross-platform Builds & Tests
   } // stages
-
-  post {
-    success {
-      updateViewfiles()
-    }
-    cleanup {
-      xcoreCleanSandbox()
-    }
-  }
 }
