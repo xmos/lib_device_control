@@ -53,7 +53,7 @@ pipeline {
                 runXmostest("${REPO}", 'tests')
               }
             }
-            stage('Host builds') {
+            stage('Mac x86_64 host builds') {
               steps {
                 // build all the supported host applications
                 runForEach(['usb', 'xscope']) { app ->
@@ -88,7 +88,7 @@ pipeline {
            }
           }
         }
-        stage('RPI Host builds') {
+        stage('RPI host builds') {
           agent {
             label 'armv7l&&raspian'
           }

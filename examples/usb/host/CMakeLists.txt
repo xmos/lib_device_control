@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
 
-# Compile for x86_64 on Mac as we can't support the M1 ARM architecture yet
-set(CMAKE_OSX_ARCHITECTURES
-    "x86_64"
-    CACHE INTERNAL "")
-
 set(CMAKE_BUILD_TYPE "Release")
 project(usb_host_app)
 
