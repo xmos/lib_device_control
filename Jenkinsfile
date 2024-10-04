@@ -55,7 +55,7 @@ pipeline {
                   hostAppList = ['usb/host', 'xscope/host']
                 }
                 script {
-                  viewEnv() { // Virtual environment needed for XMOS_TOOL_PATH
+                  withTools(params.TOOLS_VERSION) {
                     hostAppList.each { app ->
                       dir("${REPO}/examples/${app}") {
                         sh "cmake -B build"
@@ -135,14 +135,12 @@ pipeline {
 
                 script {
                   withTools(params.TOOLS_VERSION) {
-                    viewEnv() { // Virtual environment needed for XMOS_TOOL_PATH
                       hostAppList = ['usb/host', 'xscope/host']
                       hostAppList.each { app ->
                         dir("examples/${app}") {
                           sh "cmake -B build"
                           sh "make -C build"
                         }
-                      }
                     }
                   }
                 }
@@ -168,7 +166,6 @@ pipeline {
 
                 script {
                   withTools(params.TOOLS_VERSION) {
-                    viewEnv() { // Virtual environment needed for XMOS_TOOL_PATH
                       hostAppList = ['usb/host', 'xscope/host']
                       hostAppList.each { app ->
                         dir("examples/${app}") {
@@ -176,7 +173,6 @@ pipeline {
                           sh "make -C build"
                         }
                       }
-                    }
                   }
                 }
               }
