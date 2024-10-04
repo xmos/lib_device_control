@@ -7,6 +7,10 @@ def runningOn(machine) {
     println machine
 }
 
+def runForEach(folders, Closure body) {
+  folders.each { app -> body(app) }
+}
+
 pipeline {
   agent none
 
@@ -51,16 +55,12 @@ pipeline {
             }
             stage('Host builds') {
               steps {
-                script {
-                  hostAppList = ['usb/host', 'xscope/host']
-                }
-                script {
-                  withTools(params.TOOLS_VERSION) {
-                    hostAppList.each { app ->
-                      dir("${REPO}/examples/${app}") {
-                        sh "cmake -B build"
-                        sh "make -C build"
-                      }
+                // build all the supported host applications
+                runForEach(['usb', 'xscope']) { app ->
+                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                    dir("${REPO}/examples/${app}/host") {
+                      sh "cmake -B build"
+                      sh "make -C build"
                     }
                   }
                 }
@@ -68,18 +68,12 @@ pipeline {
             }
             stage('xCORE builds') {
               steps {
-                script {
-                  appList = ['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']
-                }
-                script {
-                  appList.each { app ->
+                // build all the supported firmware applications
+                runForEach(['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']) { app ->
+                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
                     dir("${REPO}/examples/${app}") {
-                      withTools(params.TOOLS_VERSION) {
-                        withVenv {
                           sh 'cmake -G "Unix Makefiles" -B build'
                           sh "xmake -C build"
-                        }
-                      }
                     }
                   }
                 }
@@ -102,15 +96,13 @@ pipeline {
             stage('Build') {
               steps {
                 runningOn(env.NODE_NAME)
+                // clone the repo and checkout the changes
                 checkout scm
-
-                script {
-                  hostAppList = ['i2c/host_rpi', 'spi/host']
-                  hostAppList.each { app ->
-                    dir("examples/${app}") {
+                // build all the supported host applications
+                runForEach(['i2c/host_rpi', 'spi/host']) { app ->
+                  dir("examples/${app}") {
                       sh "cmake -B build"
                       sh "make -C build"
-                    }
                   }
                 }
               }
@@ -131,16 +123,14 @@ pipeline {
             stage('Build') {
               steps {
                 runningOn(env.NODE_NAME)
+                // clone the repo and checkout the changes
                 checkout scm
-
-                script {
-                  withTools(params.TOOLS_VERSION) {
-                      hostAppList = ['usb/host', 'xscope/host']
-                      hostAppList.each { app ->
-                        dir("examples/${app}") {
-                          sh "cmake -B build"
-                          sh "make -C build"
-                        }
+                // build all the supported host applications
+                runForEach(['usb', 'xscope']) { app ->
+                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                    dir("examples/${app}/host") {
+                      sh "cmake -B build"
+                      sh "make -C build"
                     }
                   }
                 }
@@ -162,17 +152,15 @@ pipeline {
             stage('Build') {
               steps {
                 runningOn(env.NODE_NAME)
+                // clone the repo and checkout the changes
                 checkout scm
-
-                script {
-                  withTools(params.TOOLS_VERSION) {
-                      hostAppList = ['usb/host', 'xscope/host']
-                      hostAppList.each { app ->
-                        dir("examples/${app}") {
-                          sh "cmake -B build"
-                          sh "make -C build"
-                        }
-                      }
+                // build all the supported host applications
+                runForEach(['usb', 'xscope']) { app ->
+                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                    dir("examples/${app}/host") {
+                      sh "cmake -B build"
+                      sh "make -C build"
+                    }
                   }
                 }
               }
@@ -193,23 +181,22 @@ pipeline {
              stage('Build') {
               steps {
                 runningOn(env.NODE_NAME)
+                // clone the repo and checkout the changes
                 checkout scm
 
-                script {
-                  // Build the USB host example for 32 bit as libusb is 32 bit
-                  withVS('vcvars32.bat') {
-                    dir("examples/usb/host") {
+                // Build the USB host example for 32 bit as libusb is 32 bit
+                withVS('vcvars32.bat') {
+                  dir("examples/usb/host") {
+                    sh "cmake -G Ninja -B build"
+                    sh "ninja -C build"
+                  }
+                }
+                // Build the XCOPE host example for 64 bit as XTC tools  32 bit
+                withVS('vcvars64.bat') {
+                  withTools(params.TOOLS_VERSION) {
+                    dir("examples/xscope/host") {
                       sh "cmake -G Ninja -B build"
                       sh "ninja -C build"
-                    }
-                  }
-                  // Build the XCOPE host example for 64 bit as XTC tools  32 bit
-                  withVS('vcvars64.bat') {
-                    withTools(params.TOOLS_VERSION) {
-                      dir("examples/xscope/host") {
-                        sh "cmake -G Ninja -B build"
-                        sh "ninja -C build"
-                      }
                     }
                   }
                 }
