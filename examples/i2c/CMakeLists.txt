@@ -6,8 +6,8 @@ project(i2c)
 set(XMOS_SANDBOX_DIR ${CMAKE_SOURCE_DIR}/../../..)
 
 # target: choose the target platform
-# set(APP_HW_TARGET src/XK_VOICE_L71.xn)
-set(APP_HW_TARGET src/XCORE-VISION-EXPLORER.xn)
+set(APP_HW_TARGET src/XK_VOICE_L71.xn)
+# set(APP_HW_TARGET src/XCORE-VISION-EXPLORER.xn)
 if(APP_HW_TARGET STREQUAL "src/XCORE-VISION-EXPLORER.xn")
     set(I2C_TILE_VAL 1)
 else()
