@@ -26,8 +26,10 @@
             <Port Location="XS1_PORT_1H"  Name="PORT_BUTTON"/>
             <Port Location="XS1_PORT_1L"  Name="PORT_MIC_CLK"/>
             <Port Location="XS1_PORT_1J"  Name="PORT_MIC_DATA"/>
-            <Port Location="XS1_PORT_4E"  Name="PORT_I2C"/> <!-- SDA: bit 0, SCL: bit 1 -->
+            <Port Location="XS1_PORT_4E"  Name="PORT_I2C"/>     <!-- SDA: bit 0, SCL: bit 1 -->
             <Port Location="XS1_PORT_32A" Name="PORT_LED"/>
+            <Port Location="XS1_PORT_1O"  Name="PORT_I2C_SCL"/> <!-- pin 5 to pin 29 for SCL -->
+            <Port Location="XS1_PORT_1K"  Name="PORT_I2C_SDA"/> <!-- pin 3 to pin 32 for SDA -->
           </Tile>
         </Node>
       </Nodes>
