@@ -143,3 +143,4 @@ lib_device_control Change Log
     - lib_logging: Added dependency 2.1.0
 
     - lib_xassert: Added dependency 2.0.1
+
