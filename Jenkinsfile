@@ -45,7 +45,7 @@ pipeline {
             }
             stage('Library checks') {
               steps {
-                runLibraryChecks("${REPO}")
+                runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
               }
             }
             stage('Tests') {
