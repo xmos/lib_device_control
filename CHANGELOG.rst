@@ -1,4 +1,4 @@
-lib_device_control Change Log
+lib_device_control change log
 =============================
 
 5.0.0
