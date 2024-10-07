@@ -4,6 +4,15 @@ lib_device_control Change Log
 UNRELEASED
 ----------
 
+  * ADDED: Support for XTC Tools 15.3.0.
+  * ADDED: Support for xcommon_cmake in library and examples.
+  * CHANGED: Replace makefiles in examples with CMakeLists.txt files.
+  * CHANGED: Update examples to support XCORE-VOICE-L71 board.
+  * ADDED: Example with SPI slave interface.
+  * CHANGED: Replace lib_usb with lib_xud in examples and tests.
+  * CHANGED: Tidy-up libusb drivers.
+  * REMOVED: Project files for xTIMEcomposer.
+  * ADDED: Driver for SPI interface on Raspberry Pi.
   * CHANGED: Move the code shared between host and device side to separate files.
   * FIXED: Include guards in header files comply with the C standard.
   * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and stdbool.h.
