@@ -14,9 +14,16 @@ lib_device_control Change Log
   * REMOVED: Project files for xTIMEcomposer.
   * ADDED: Support for status check of write operations.
   * ADDED: Driver for SPI interface on Raspberry Pi.
-  * CHANGED: Move the code shared between host and device side to separate files.
+  * CHANGED: Move the code shared between host and device side to separate
+    files.
   * FIXED: Include guards in header files comply with the C standard.
-  * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and stdbool.h.
+  * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and
+    stdbool.h.
+
+  * Changes to dependencies:
+
+    - lib_logging: 2.1.0 -> 3.2.0
+    - lib_xassert: 2.0.1 -> 4.2.0
 
 4.2.1
 -----
