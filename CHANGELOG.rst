@@ -1,8 +1,8 @@
 lib_device_control Change Log
 =============================
 
-UNRELEASED
-----------
+5.0.0
+-----
 
   * ADDED: Support for XTC Tools 15.3.0.
   * ADDED: Support for xcommon_cmake in library and examples.
