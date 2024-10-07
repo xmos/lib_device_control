@@ -12,6 +12,7 @@ UNRELEASED
   * CHANGED: Replace lib_usb with lib_xud in examples and tests.
   * CHANGED: Tidy-up libusb drivers.
   * REMOVED: Project files for xTIMEcomposer.
+  * ADDED: Support for status check of write operations.
   * ADDED: Driver for SPI interface on Raspberry Pi.
   * CHANGED: Move the code shared between host and device side to separate files.
   * FIXED: Include guards in header files comply with the C standard.
