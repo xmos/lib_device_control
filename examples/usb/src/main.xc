@@ -104,7 +104,6 @@ int main(void)
   par {
     on USB_TILE: par {
       endpoint0(c_ep_out[0], c_ep_in[0], i_control);
-      //xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
       XUD_Main(c_ep_out, XUD_EP_COUNT_OUT, c_ep_in, XUD_EP_COUNT_IN,
                       null, epTypeTableOut, epTypeTableIn,
                       XUD_SPEED_HS, XUD_PWR_BUS);

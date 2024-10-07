@@ -23,8 +23,8 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
   int handled;
   size_t len;
 
-  ep0_out = XUD_InitEp(c_ep0_out, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
-  ep0_in = XUD_InitEp(c_ep0_in, XUD_EPTYPE_CTL | XUD_STATUS_ENABLE);
+  ep0_out = XUD_InitEp(c_ep0_out);
+  ep0_in = XUD_InitEp(c_ep0_in);
 
   control_init();
   control_register_resources(i_control, 1);
@@ -95,24 +95,24 @@ void setup_hw(void){
   p_usb_mux <: 0xC;
 }
 
-enum {
-  EP_OUT_ZERO,
-  NUM_EP_OUT
-};
+/* USB Endpoint Defines */
+#define XUD_EP_COUNT_OUT   1    //Includes EP0 (1 OUT EP0)
+#define XUD_EP_COUNT_IN    1    //Includes EP0 (1 IN EP0)
 
-enum {
-  EP_IN_ZERO,
-  NUM_EP_IN
-};
+
+XUD_EpType epTypeTableOut[XUD_EP_COUNT_OUT] = {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE};
+XUD_EpType epTypeTableIn[XUD_EP_COUNT_IN] =   {XUD_EPTYPE_CTL | XUD_STATUS_ENABLE};
 
 int main(void)
 {
-  chan c_ep_out[NUM_EP_OUT], c_ep_in[NUM_EP_IN];
+  chan c_ep_out[XUD_EP_COUNT_OUT], c_ep_in[XUD_EP_COUNT_IN];
   interface control i_control[1];
   par {
     on tile[1]: par {
       endpoint0(c_ep_out[0], c_ep_in[0], i_control);
-      xud(c_ep_out, NUM_EP_OUT, c_ep_in, NUM_EP_IN, null, XUD_SPEED_HS, XUD_PWR_SELF);
+      XUD_Main(c_ep_out, XUD_EP_COUNT_OUT, c_ep_in, XUD_EP_COUNT_IN,
+                      null, epTypeTableOut, epTypeTableIn,
+                      XUD_SPEED_HS, XUD_PWR_BUS);
     }
     on tile[0]: par {
       setup_hw();
