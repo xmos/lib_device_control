@@ -37,7 +37,31 @@ pipeline {
           agent {
             label 'macOS&&x86_64'
           }
+
           stages {
+            stage("Clone library")
+            {
+              steps {
+                runningOn(env.NODE_NAME)
+                dir("${REPO}") {
+                  // clone the repo and checkout the changes
+                  checkout scm
+                }
+              }
+            }
+            stage('xCORE builds') {
+              steps {
+                // build all the supported firmware applications
+                runForEach(['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']) { app ->
+                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                    dir("${REPO}/examples/${app}") {
+                          sh 'cmake -G "Unix Makefiles" -B build'
+                          sh "xmake -C build"
+                    }
+                  }
+                }
+              }
+            }
             stage('Library checks') {
               steps {
                 runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
@@ -56,19 +80,6 @@ pipeline {
                     dir("${REPO}/examples/${app}/host") {
                       sh "cmake -B build"
                       sh "make -C build"
-                    }
-                  }
-                }
-              }
-            }
-            stage('xCORE builds') {
-              steps {
-                // build all the supported firmware applications
-                runForEach(['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']) { app ->
-                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
-                    dir("${REPO}/examples/${app}") {
-                          sh 'cmake -G "Unix Makefiles" -B build'
-                          sh "xmake -C build"
                     }
                   }
                 }
