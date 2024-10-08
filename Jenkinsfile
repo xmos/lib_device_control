@@ -38,11 +38,6 @@ pipeline {
             label 'macOS&&x86_64'
           }
           stages {
-            stage('Get view') {
-              steps {
-                xcorePrepareSandbox("${VIEW}", "${REPO}")
-              }
-            }
             stage('Library checks') {
               steps {
                 runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
