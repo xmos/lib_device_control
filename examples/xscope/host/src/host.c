@@ -6,7 +6,7 @@
 #include "util.h"
 #include "resource.h"
 
-int done = 0;
+#define INVALID_CONTROL_VERSION 0xFF
 
 static void exit_error(void)
 {
@@ -14,10 +14,6 @@ static void exit_error(void)
   exit(1);
 }
 
-void shutdown(void)
-{
-  done = 1;
-}
 
 int main(void)
 {

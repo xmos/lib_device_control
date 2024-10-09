@@ -6,16 +6,11 @@
 #include "util.h"
 #include "resource.h"
 
-int done = 0;
-
-void shutdown(void)
-{
-  done = 1;
-}
+#define INVALID_CONTROL_VERSION 0xFF
 
 int main(void)
 {
-  control_version_t version = 0xFF;
+  control_version_t version = INVALID_CONTROL_VERSION;
   unsigned char payload[4];
   uint8_t i;
 

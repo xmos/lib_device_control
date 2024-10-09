@@ -20,12 +20,6 @@ UNRELEASED
   * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and
     stdbool.h.
 
-  * Changes to dependencies:
-
-    - lib_logging: 2.1.0 -> 3.2.0
-
-    - lib_xassert: 2.0.1 -> 4.2.0
-
 4.2.1
 -----
 

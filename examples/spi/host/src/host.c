@@ -7,16 +7,11 @@
 #include "util.h"
 #include <bcm2835.h>
 
-int done = 0;
-
-void shutdown(void)
-{
-  done = 1;
-}
+#define INVALID_VERSION 0xFF
 
 int main(void)
 {
-  control_version_t version = 0xFF;
+  control_version_t version = INVALID_VERSION;
   unsigned char payload[4];
   uint8_t i;
 
