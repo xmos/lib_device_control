@@ -37,7 +37,6 @@ int main(void)
       printf("control write command failed\n");
       exit(1);
     }
-    fflush(stdout);
 
     pause_short();
 
@@ -51,7 +50,7 @@ int main(void)
       exit(1);
     }
     printf("Written and read back command with payload: 0x%02X\n", payload[0]);
-    fflush(stdout);
+
   }
 
   control_cleanup_usb();

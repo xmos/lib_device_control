@@ -41,14 +41,14 @@ void host_app(client i2c_master_if i_i2c_host){
       _Exit(1);
     }
     printf("Host written successfully\n");
-    fflush(stdout);
+
 
     if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), i_i2c_host, payload, 4) != CONTROL_SUCCESS) {
       printf("ERROR - control read command failed\n");
       _Exit(1);
     }
     printf("Host read successfully: 0x%x, 0x%x, 0x%x, 0x%x\n", payload[0], payload[1], payload[2], payload[3]);
-    fflush(stdout);
+
   }
   control_cleanup_i2c();
   printf("Success!!\n");

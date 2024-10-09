@@ -49,7 +49,6 @@ int main(void)
             exit(1);
           }
           printf("W");
-          fflush(stdout);
 
           pause_short();
 
@@ -58,7 +57,6 @@ int main(void)
             exit(1);
           }
           printf("R");
-          fflush(stdout);
 
           pause_long();
 
