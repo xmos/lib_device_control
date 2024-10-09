@@ -14,7 +14,7 @@ products:
 
 documentation:
   title: Device Control Library
-  root_doc: index.rst
+  root_doc: doc/index.rst
   exclude_patterns_path: doc/exclude_patterns.inc
   substitutions_path: doc/substitutions.inc
   linkcheck_ignore_regex:
@@ -30,11 +30,6 @@ documentation:
   latex_toc_depth: 3
   latex_secnum_depth: 3
   enable_latex_index: false
-  custom_ref_directives:
-    my-special-thing: A special thing for a special project
-  cognidox_part_number: XM-015034-PC
-  run_before: |
-    python doc/autogen.py
   extra_sphinx_opts: [-W]
   use_numpydoc: true
 
