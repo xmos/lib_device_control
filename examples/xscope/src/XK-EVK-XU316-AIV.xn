@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.xmos.com http://www.xmos.com">
   <Type>Board</Type>
-  <Name>xcore.ai Vision Explorer Kit</Name>
+  <Name>xcore.ai Vision Development Kit</Name>
 
   <Declarations>
     <Declaration>tileref tile[2]</Declaration>
@@ -22,7 +22,6 @@
             <Port Location="XS1_PORT_4B"  Name="PORT_SQI_SIO"/>
           </Tile>
           <Tile Number="1" Reference="tile[1]">
-            <Port Location="XS1_PORT_1C"  Name="PORT_UART_TX"/>
             <Port Location="XS1_PORT_1H"  Name="PORT_BUTTON"/>
             <Port Location="XS1_PORT_1L"  Name="PORT_MIC_CLK"/>
             <Port Location="XS1_PORT_1J"  Name="PORT_MIC_DATA"/>
