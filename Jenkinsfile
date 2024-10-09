@@ -93,7 +93,20 @@ pipeline {
                 }
               }
             }
-            stage('Build documentation') {
+          }
+          post {
+            cleanup {
+              xcoreCleanSandbox()
+            }
+          }
+        }
+
+        stage('Build documentation') {
+          agent {
+            label 'documentation'
+          }
+          stages {
+            stage('Docs') {
               steps {
                 createVenv("requirements.txt")
                 withVenv {
@@ -109,6 +122,7 @@ pipeline {
             }
           }
         }
+
         stage('RPI host builds') {
           agent {
             label 'armv7l&&raspian'

@@ -1,4 +1,4 @@
-.. include:: ../../../README.rst
+.. include:: ../README.rst
 
 Device Control Library
 ----------------------
@@ -6,7 +6,7 @@ Device Control Library
 Introduction
 ............
 
-The Device Control Library handles the routing of control messages between a host and one or 
+The Device Control Library handles the routing of control messages between a host and one or
 many controllable resources within the controlled device.
 
 
@@ -48,7 +48,7 @@ all commands. All other tasks that have resources connect to this transport task
 
 |newpage|
 
-Tasks *register* their resources and these get bound to the tasks' xC interface. When commands are 
+Tasks *register* their resources and these get bound to the tasks' xC interface. When commands are
 received by the transport task they forwarded over the matching xC interface.
 
 
@@ -58,13 +58,13 @@ received by the transport task they forwarded over the matching xC interface.
    Mapping between resource IDs and xC interfaces
 
 
-This means multiple tasks residing in different cores or even tiles on the device can be easily 
+This means multiple tasks residing in different cores or even tiles on the device can be easily
 controlled using a single instance of the Device Control library and a single control interface to the host.
 
 Commands have a result code to indicate success or failure. The result is propagated to host so
-host can indicate error to the user.  
+host can indicate error to the user.
 
-The control library supports USB (device is USB device), I2C (device is I2C slave) and xSCOPE 
+The control library supports USB (device is USB device), I2C (device is I2C slave) and xSCOPE
 (device is target connected via xTAG debug adapter) as physical protocols. The maximum data packet size for
 each of the trasport types is as follows:
 
@@ -78,13 +78,13 @@ each of the trasport types is as follows:
    - 253 Bytes
    - Arbitrary
  * - USB
-   - 64 Bytes 
+   - 64 Bytes
    - USB control transfer specification
  * - xSCOPE
    - 256 Bytes
    - Arbitrary
 
-It would be straightforward to add support for additional physical protocols such as UART, SPI or 
+It would be straightforward to add support for additional physical protocols such as UART, SPI or
 TCP/UDP over Ethernet or add additional control hosts where the hardware and operating system supports it.
 
 |newpage|
