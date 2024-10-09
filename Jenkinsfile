@@ -21,13 +21,18 @@ pipeline {
 
   environment {
     REPO = 'lib_device_control'
-    VIEW = getViewName(REPO)
-  }
+  } // environment
+
   parameters {
     string(
       name: 'TOOLS_VERSION',
         defaultValue: '15.3.0',
         description: 'The XTC tools version'
+    )
+    string(
+      name: 'XMOSDOC_VERSION',
+        defaultValue: 'v5.5.1',
+        description: 'The XMOSDOC version'
     )
   }
   stages {
@@ -52,6 +57,12 @@ pipeline {
             stage('xCORE builds') {
               steps {
                 // build all the supported firmware applications
+                sh 'pwd'
+                sh "ls -la"
+                sh "ls -la ${REPO}"
+                //sh 'ls -la lib_xassert/lib_xassert'
+                //sh 'ls -la lib_logging/lib_logging'
+
                 runForEach(['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']) { app ->
                   withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
                     dir("${REPO}/examples/${app}") {
@@ -67,11 +78,12 @@ pipeline {
                 runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
               }
             }
-            stage('Tests') {
-              steps {
-                runXmostest("${REPO}", 'tests')
-              }
-            }
+            // TODO: Re-enable tests when xmostest is replaced with pytest
+            //stage('Tests') {
+            //  steps {
+            //    runXmostest("${REPO}", 'tests')
+            //  }
+            //}
             stage('Mac x86_64 host builds') {
               steps {
                 // build all the supported host applications
@@ -87,11 +99,17 @@ pipeline {
             }
             stage('Build documentation') {
               steps {
-                dir("${REPO}/${REPO}") {
-                  runXdoc('doc')
+                withVenv {
+                  sh "pip install git+ssh://git@github.com/xmos/xmosdoc@${XMOSDOC_VERSION}"
+                  sh 'xmosdoc'
                 }
               }
-           }
+            }
+          }
+          post {
+            cleanup {
+              xcoreCleanSandbox()
+            }
           }
         }
         stage('RPI host builds') {
