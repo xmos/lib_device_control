@@ -17,9 +17,9 @@ documentation:
   root_doc: index.rst
   exclude_patterns_path: doc/exclude_patterns.inc
   substitutions_path: doc/substitutions.inc
-  linkcheck_ignore_regex: 
+  linkcheck_ignore_regex:
     - ".*127\\.0\\.0\\.1.*"
-    - ".*lib_audio_dsp"  # this repo is private
+    - ".*lib_device_control"
   doc_dirname: doc
   build_path: doc/_build
   output_path: doc/_out
@@ -37,25 +37,8 @@ documentation:
     python doc/autogen.py
   extra_sphinx_opts: [-W]
   use_numpydoc: true
-  doxygen_projects:
-    lib_audio_dsp:
-      doxyfile_path: doc/Doxyfile.inc
-      doxy_overrides: |
-        GENERATE_HTML = yes
-        GENERATE_LATEX = yes
-        WARN_AS_ERROR = yes
-        WARN_IF_UNDOCUMENTED = no
 
   pdfs:
-    doc/tool_user_guide/index:
-      pdf_title: '{{product}} - Tool User Guide'
-      pdf_filename: '{{product}}_tool_user_guide_v{{version}}'
-    doc/dsp_components/index:
-      pdf_title: '{{product}} - DSP Components'
-      pdf_filename: '{{product}}_dsp_components_v{{version}}'
-    doc/design_guide/index:
-      pdf_title: '{{product}} - DSP Design Guide'
-      pdf_filename: '{{product}}_design_guide_v{{version}}'
-    doc/run_time_control_guide/index:
-      pdf_title: '{{product}} - DSP Run-time Control guide'
-      pdf_filename: '{{product}}_run_time_control_guide_v{{version}}'
+    doc/index:
+      pdf_title: '{{product}} - User Guide'
+      pdf_filename: '{{product}}__user_guide_v{{version}}'
