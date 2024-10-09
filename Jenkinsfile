@@ -95,6 +95,7 @@ pipeline {
             }
             stage('Build documentation') {
               steps {
+                createVenv("requirements.txt")
                 withVenv {
                   sh "pip install git+ssh://git@github.com/xmos/xmosdoc@${XMOSDOC_VERSION}"
                   sh 'xmosdoc'
