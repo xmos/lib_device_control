@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#pragma once
+
 /**
  * \defgroup control_shared
  *

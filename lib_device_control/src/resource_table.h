@@ -5,6 +5,8 @@
 
 #include "control.h"
 
+#pragma once
+
 void resource_table_init(control_resid_t reserved_id);
 
 int resource_table_add(const control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],

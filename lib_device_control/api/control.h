@@ -7,6 +7,8 @@
 #include <stddef.h>
 #include "control_shared.h"
 
+#pragma once
+
 /** Resource count limits. Sets the size of the arrays used for storing the mappings
  */
 #define MAX_RESOURCES_PER_INTERFACE 64

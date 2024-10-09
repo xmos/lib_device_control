@@ -5,6 +5,8 @@
 
 #include "control_shared.h"
 
+#pragma once
+
 /**
  * \defgroup control_transport_shared
  *
