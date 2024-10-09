@@ -21,6 +21,7 @@ pipeline {
 
   environment {
     REPO = 'lib_device_control'
+    XMOSDOC_VERSION = 'v5.5.1'
   } // environment
 
   parameters {
@@ -28,11 +29,6 @@ pipeline {
       name: 'TOOLS_VERSION',
         defaultValue: '15.3.0',
         description: 'The XTC tools version'
-    )
-    string(
-      name: 'XMOSDOC_VERSION',
-        defaultValue: 'v5.5.1',
-        description: 'The XMOSDOC version'
     )
   }
   stages {
