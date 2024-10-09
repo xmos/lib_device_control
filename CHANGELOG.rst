@@ -1,8 +1,8 @@
 lib_device_control change log
 =============================
 
-UNRELEASED
-----------
+5.0.0
+-----
 
   * ADDED: Support for XTC Tools 15.3.0.
   * ADDED: Support for xcommon_cmake in library and examples.
@@ -19,6 +19,12 @@ UNRELEASED
   * FIXED: Include guards in header files comply with the C standard.
   * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and
     stdbool.h.
+
+  * Changes to dependencies:
+
+    - lib_logging: 2.1.0 -> 3.2.0
+
+    - lib_xassert: 2.0.1 -> 4.2.0
 
 4.2.1
 -----
