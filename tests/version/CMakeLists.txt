@@ -17,5 +17,5 @@ set(APP_COMPILER_FLAGS
   -Wall
 )
 
-set(APP_DEPENDENT_MODULES lib_device_control lib_i2c)
+set(APP_DEPENDENT_MODULES lib_device_control)
 XMOS_REGISTER_APP()
