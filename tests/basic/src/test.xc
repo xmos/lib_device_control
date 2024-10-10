@@ -7,10 +7,12 @@
 
 int main(void)
 {
-  if (control_init() != CONTROL_SUCCESS)
+  if (control_init() != CONTROL_SUCCESS) {
     printf("ERROR on control_init\n");
+    exit(1);
+  }
   else
     printf("Success!\n");
 
-  return 1;
+  return 0;
 }
