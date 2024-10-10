@@ -1,4 +1,4 @@
-.. include:: ../../README.rst
+.. include:: ../README.rst
 
 |newpage|
 
@@ -161,7 +161,7 @@ resource, setting LEDs or reading the buttons.
 
 Please see the source code listing app_listing_ for more details.
 
-|appendix|
+.. |appendix|
 
 Demo Hardware Setup
 -------------------
@@ -180,7 +180,7 @@ Launching the demo application
 ------------------------------
 
 Once the demo example has been built either from the command line using xmake from the project directory
-wherer the Makefile can be found or via the build mechanism of xTIMEcomposer studio it can be executed on the Vocal Fusion board.
+where the Makefile can be found or via the build mechanism of xTIMEcomposer studio it can be executed on the Vocal Fusion board.
 
 Once built there will be a ``bin/`` directory within the project which contains
 the binary for the xCORE device. The xCORE binary has a XMOS standard .xe extension.
@@ -332,15 +332,15 @@ Full source code listing
 Source code for main.xc
 .......................
 
-.. literalinclude:: main.xc
-  :largelisting:
+.. literalinclude:: ../src/main.xc
+  :language: c
 
 .. _app_listing:
 
 Source code for app.xc
 .......................
 
-.. literalinclude:: app.xc
-  :largelisting:
+.. literalinclude:: ../src/app.xc
+  :language: c
 
 |newpage|
