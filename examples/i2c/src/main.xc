@@ -17,7 +17,6 @@ on tile[I2C_TILE]: port p_sda = PORT_I2C_SDA;
 
 const char i2c_device_addr = 0x2C;
 
-[[combinable]]
 void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_control[1])
 {
   while (1) {

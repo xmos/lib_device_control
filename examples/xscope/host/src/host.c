@@ -6,7 +6,7 @@
 #include "util.h"
 #include "resource.h"
 
-int done = 0;
+#define INVALID_CONTROL_VERSION 0xFF
 
 static void exit_error(void)
 {
@@ -14,14 +14,10 @@ static void exit_error(void)
   exit(1);
 }
 
-void shutdown(void)
-{
-  done = 1;
-}
 
 int main(void)
 {
-  control_version_t version = 0xFF;
+  control_version_t version = INVALID_CONTROL_VERSION;
   unsigned char payload[4];
   uint8_t i;
 
@@ -48,7 +44,6 @@ int main(void)
       printf("[HOST] control write command failed\n");
       exit_error();
     }
-    fflush(stdout);
 
     pause_short();
 
@@ -62,7 +57,7 @@ int main(void)
       exit_error();
     }
     printf("[HOST] Written and read back command with payload: 0x%02X\n", payload[0]);
-    fflush(stdout);
+
   }
 
   control_cleanup_xscope();

@@ -7,16 +7,11 @@
 #include "util.h"
 #include <bcm2835.h>
 
-int done = 0;
-
-void shutdown(void)
-{
-  done = 1;
-}
+#define INVALID_CONTROL_VERSION 0xFF
 
 int main(void)
 {
-  control_version_t version = 0xFF;
+  control_version_t version = INVALID_CONTROL_VERSION;
   unsigned char payload[4];
   uint8_t i;
 
@@ -43,7 +38,6 @@ int main(void)
       printf("control write command failed\n");
       exit(1);
     }
-    fflush(stdout);
 
     pause_short();
 
@@ -57,7 +51,7 @@ int main(void)
       exit(1);
     }
     printf("Written and read back command with payload: 0x%02X\n", payload[0]);
-    fflush(stdout);
+
   }
 
   control_cleanup_spi();

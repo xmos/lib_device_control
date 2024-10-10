@@ -6,7 +6,7 @@ project(host_i2c_xcore)
 set(XMOS_SANDBOX_DIR ${CMAKE_SOURCE_DIR}/../../../..)
 
 # target: choose the target platform
-set(APP_HW_TARGET XCORE-AI-EXPLORER)
+set(APP_HW_TARGET XK-EVK-XU316)
 
 set(APP_INCLUDES src)
 

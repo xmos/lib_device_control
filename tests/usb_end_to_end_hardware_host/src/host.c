@@ -1,4 +1,4 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +53,6 @@ int main(void)
       exit(1);
     }
     printf("Written payload\t= %2x, %2x, %2x, %2x\n", payload[0], payload[1], payload[2], payload[3]);
-    fflush(stdout);
 
     pause_short();
 
@@ -64,10 +63,10 @@ int main(void)
     printf("Read payload\t= %2x, %2x, %2x, %2x\n", payload[0], payload[1], payload[2], payload[3]);
     if (memcmp(rx_expected_payload, payload, 4)) {
       printf("ERROR - incorrect payload received from device\n");
-      printf("Expecting \t= %2x, %2x, %2x, %2x\n", rx_expected_payload[0], rx_expected_payload[1], 
+      printf("Expecting \t= %2x, %2x, %2x, %2x\n", rx_expected_payload[0], rx_expected_payload[1],
         rx_expected_payload[2], rx_expected_payload[3]);
     }
-    fflush(stdout);
+
 
     pause_long();
   }
