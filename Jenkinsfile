@@ -74,7 +74,7 @@ pipeline {
             //    runXmostest("${REPO}", 'tests')
             //  }
             //}
-            stage('Mac x86_64 host builds') {
+            stage('Linux x86_64 host builds') {
               steps {
                 // build all the supported host applications
                 runForEach(['usb', 'xscope']) { app ->

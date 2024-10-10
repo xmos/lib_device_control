@@ -161,6 +161,7 @@ resource, setting LEDs or reading the buttons.
 
 Please see the source code listing app_listing_ for more details.
 
+.. TODO: Check how the substitution below worked and update it.
 .. |appendix|
 
 Demo Hardware Setup
@@ -332,6 +333,7 @@ Full source code listing
 Source code for main.xc
 .......................
 
+.. TODO: Check if the language below is correct.
 .. literalinclude:: ../src/main.xc
   :language: c
 
@@ -340,6 +342,7 @@ Source code for main.xc
 Source code for app.xc
 .......................
 
+.. TODO: Check if the language below is correct.
 .. literalinclude:: ../src/app.xc
   :language: c
 
