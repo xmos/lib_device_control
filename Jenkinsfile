@@ -68,12 +68,19 @@ pipeline {
                 runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
               }
             }
-            // TODO: Re-enable tests when xmostest is replaced with pytest
-            //stage('Tests') {
-            //  steps {
-            //    runXmostest("${REPO}", 'tests')
-            //  }
-            //}
+            stage('Tests') {
+              steps {
+                withVenv {
+                  dir("test/") {
+
+                    catchError{
+                      sh "python -m pytest --junitxml=pytest_result.xml -rA -vvv --durations=0 -o junit_logging=all"
+                    }
+                    junit "pytest_result.xml"
+                  }
+                }
+              }
+            }
             stage('Linux x86_64 host builds') {
               steps {
                 // build all the supported host applications
