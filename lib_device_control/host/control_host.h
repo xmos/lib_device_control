@@ -1,7 +1,6 @@
 // Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef CONTROL_HOST_H_
-#define CONTROL_HOST_H_
+#pragma once
 
 #include "control.h"
 #include "control_transport_shared.h"
@@ -17,7 +16,6 @@ extern "C" {
 
 #if USE_SPI
 /* Taken from spi.h in lib_spi. Not included as it's an XC header */
-/* TODO: Wrap spi.h in #ifdef __XC__ */
 typedef enum spi_mode_t {
   SPI_MODE_0, /**< SPI Mode 0 - Polarity = 0, Clock Edge = 1 */
   SPI_MODE_1, /**< SPI Mode 1 - Polarity = 0, Clock Edge = 0 */
@@ -166,5 +164,3 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
 #ifdef __cplusplus
 }
 #endif
-
-#endif // CONTROL_HOST_H_

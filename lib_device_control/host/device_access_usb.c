@@ -35,6 +35,7 @@ static const int sync_timeout_ms = 500;
 void debug_libusb_error(int err_code)
 {
 #if defined _WIN32
+  (void)(err_code);
   PRINT_ERROR("libusb_control_transfer returned %s\n", usb_strerror());
 #elif defined __APPLE__
   PRINT_ERROR("libusb_control_transfer returned %s\n", libusb_error_name(err_code));
@@ -44,15 +45,15 @@ void debug_libusb_error(int err_code)
 
 }
 
-control_ret_t control_query_version(control_version_t *version)
-{
+
+control_ret_t control_special_command(const uint8_t cmd_id, const uint16_t payload_size, uint8_t* payload) {
   uint16_t windex, wvalue, wlength;
   uint8_t request_data[VERSION_MAX_PAYLOAD_SIZE];
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
-    CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
+    CONTROL_SPECIAL_RESID, cmd_id, payload_size);
 
-  DBG(printf("%u: send version command: 0x%04x 0x%04x 0x%04x\n",
+  DBG(printf("%u: send control command: 0x%04x 0x%04x 0x%04x\n",
     num_commands, windex, wvalue, wlength));
 
 #ifdef _WIN32
@@ -72,10 +73,28 @@ control_ret_t control_query_version(control_version_t *version)
     return CONTROL_ERROR;
   }
 
-  memcpy(version, request_data, sizeof(control_version_t));
-  DBG(printf("version returned: 0x%X\n", *version));
+  memcpy(payload, request_data, payload_size);
 
   return CONTROL_SUCCESS;
+
+}
+
+control_ret_t control_query_version(control_version_t *version)
+{
+  control_ret_t ret = control_special_command(CONTROL_GET_VERSION, sizeof(control_version_t), version);
+
+  DBG(printf("version returned: 0x%X\n", *version));
+
+  return ret;
+}
+
+control_ret_t control_command_status(control_status_t *status)
+{
+  control_ret_t ret = control_special_command(CONTROL_GET_LAST_COMMAND_STATUS, sizeof(control_status_t), status);
+
+  DBG(printf("status returned: 0x%X\n", *status));
+
+  return ret;
 }
 
 /*
@@ -108,6 +127,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
                       const uint8_t payload[], size_t payload_len)
 {
   uint16_t windex, wvalue, wlength;
+  uint8_t status;
 
   if (payload_len_exceeds_control_packet_size(payload_len))
     return CONTROL_DATA_LENGTH_ERROR;
@@ -136,7 +156,10 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
     return CONTROL_ERROR;
   }
 
-  return CONTROL_SUCCESS;
+  // Read back write command status
+  control_command_status(&status);
+
+  return status;
 }
 
 control_ret_t

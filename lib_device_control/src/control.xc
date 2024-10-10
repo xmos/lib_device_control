@@ -12,6 +12,8 @@
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
 
+control_status_t last_status;
+
 static void debug_channel_activity(int ifnum, int value)
 {
 #if DEBUG_CHANNEL_ACTIVITY
@@ -84,6 +86,19 @@ special_read_command(control_cmd_t cmd, uint8_t payload[], unsigned payload_len)
       return CONTROL_SUCCESS;
     }
   }
+  else if (cmd == CONTROL_GET_LAST_COMMAND_STATUS) {
+    debug_printf("read last command status %d\n", last_status);
+    if (payload_len != sizeof(control_status_t)) {
+      debug_printf("wrong payload size %d for last command status command, need %d\n",
+      payload_len, sizeof(control_status_t));
+
+      return CONTROL_BAD_COMMAND;
+      }
+    else {
+      *((control_status_t*) payload) = last_status;
+      return CONTROL_SUCCESS;
+    }
+  }
   else {
     debug_printf("unrecognised special resource command %d\n", cmd);
     return CONTROL_BAD_COMMAND;
@@ -95,17 +110,20 @@ write_command(client interface control i[],
               unsigned char ifnum, control_resid_t resid, control_cmd_t cmd,
               const uint8_t payload[], unsigned payload_len)
 {
+  control_ret_t ret = CONTROL_ERROR;
+
   if (resid == CONTROL_SPECIAL_RESID) {
     debug_printf("ignoring write to special resource %d\n", CONTROL_SPECIAL_RESID);
-    return CONTROL_BAD_COMMAND;
+    ret = CONTROL_BAD_COMMAND;
   }
   else {
     debug_printf("%d write command %d, %d, %d\n", ifnum, resid, cmd, payload_len);
     debug_channel_activity(ifnum, 1);
-    control_ret_t ret = i[ifnum].write_command(resid, cmd, payload, payload_len);
+    ret = i[ifnum].write_command(resid, cmd, payload, payload_len);
     debug_channel_activity(ifnum, 0);
-    return ret;
   }
+  last_status = ret;
+  return ret;
 }
 
 static control_ret_t
@@ -113,6 +131,7 @@ read_command(client interface control i[],
              unsigned char ifnum, control_resid_t resid, control_cmd_t cmd,
              uint8_t payload[], unsigned payload_len)
 {
+  debug_printf("Read command %d %d\n", resid, cmd);
   if (resid == CONTROL_SPECIAL_RESID) {
     return special_read_command(cmd, payload, payload_len);
   }
@@ -138,41 +157,42 @@ control_ret_t
 control_process_i2c_write_data(const uint8_t data, client interface control i[])
 {
   unsigned char ifnum;
+  control_ret_t ret = CONTROL_ERROR;
 
   if (i2c.state == I2C_WRITE_START) {
     if (resource_table_search(data, ifnum) != 0) {
       debug_printf("resource %d not found\n", data);
       i2c.state = I2C_ERROR;
-      return CONTROL_BAD_COMMAND;
+      ret = CONTROL_BAD_COMMAND;
     }
     else {
       i2c.resid = data;
       i2c.ifnum = ifnum;
       i2c.state = I2C_WRITE_RESID;
-      return CONTROL_SUCCESS;
+      ret = CONTROL_SUCCESS;
     }
   }
   else if (i2c.state == I2C_WRITE_RESID) {
     i2c.cmd = data;
     i2c.state = I2C_WRITE_CMD;
-    return CONTROL_SUCCESS;
+    ret = CONTROL_SUCCESS;
   }
   else if (i2c.state == I2C_WRITE_CMD) {
     if (data > I2C_DATA_MAX_BYTES) {
       debug_printf("length %d exceeded limit %d\n", data, I2C_DATA_MAX_BYTES);
       i2c.state = I2C_ERROR;
-      return CONTROL_BAD_COMMAND;
+      ret = CONTROL_BAD_COMMAND;
     }
     else {
       i2c.payload_len_from_header = data;
       i2c.payload_len_transmitted = 0;
       i2c.state = I2C_WRITE_SIZE;
       if (i2c.payload_len_from_header == 0) {
-        return write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
+        ret = write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
           i2c.payload, i2c.payload_len_transmitted);
       }
       else {
-        return CONTROL_SUCCESS;
+        ret = CONTROL_SUCCESS;
       }
     }
   }
@@ -180,18 +200,18 @@ control_process_i2c_write_data(const uint8_t data, client interface control i[])
     if (IS_CONTROL_CMD_READ(i2c.cmd)) {
       debug_printf("unexpected write data in a read command\n");
       i2c.state = I2C_ERROR;
-      return CONTROL_OTHER_TRANSPORT_ERROR;
+      ret = CONTROL_OTHER_TRANSPORT_ERROR;
     }
     else {
       i2c.payload[0] = data;
       i2c.payload_len_transmitted = 1;
       i2c.state = I2C_WRITE_DATA;
       if (i2c.payload_len_from_header == 1) {
-        return write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
+        ret = write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
           i2c.payload, i2c.payload_len_transmitted);
       }
       else {
-        return CONTROL_SUCCESS;
+        ret = CONTROL_SUCCESS;
       }
     }
   }
@@ -200,27 +220,29 @@ control_process_i2c_write_data(const uint8_t data, client interface control i[])
       debug_printf("exceeded expected write data length %d, discarding rest of data\n",
         i2c.payload_len_from_header);
       i2c.state = I2C_WRITE_OVERFLOW;
-      return CONTROL_DATA_LENGTH_ERROR;
+      ret = CONTROL_DATA_LENGTH_ERROR;
     }
     else {
       i2c.payload[i2c.payload_len_transmitted] = data;
       i2c.payload_len_transmitted++;
       if (i2c.payload_len_transmitted == i2c.payload_len_from_header) {
-        return write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
+        ret = write_command(i, i2c.ifnum, i2c.resid, i2c.cmd,
           i2c.payload, i2c.payload_len_transmitted);
       }
       else {
-        return CONTROL_SUCCESS;
+        ret = CONTROL_SUCCESS;
       }
     }
   }
   else if (i2c.state == I2C_WRITE_OVERFLOW) {
-    return CONTROL_SUCCESS;
+    ret = CONTROL_SUCCESS;
   }
   else {
     i2c.state = I2C_ERROR;
-    return CONTROL_ERROR;
+    ret = CONTROL_ERROR;
   }
+  last_status = ret;
+  return ret;
 }
 
 control_ret_t
@@ -345,6 +367,7 @@ control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
   control_resid_t resid;
   control_cmd_t cmd;
   unsigned char ifnum;
+  control_ret_t ret = CONTROL_ERROR;
 
   resid = windex;
   cmd = wvalue;
@@ -352,15 +375,18 @@ control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 
   if (resource_table_search(resid, ifnum) != 0) {
     debug_printf("resource %d not found\n", resid);
-    return CONTROL_BAD_COMMAND;
+    ret = CONTROL_BAD_COMMAND;
   }
 
   if (IS_CONTROL_CMD_READ(cmd)) {
     debug_printf("read command code %d not expected in a SET request\n", cmd);
-    return CONTROL_BAD_COMMAND;
+    ret = CONTROL_BAD_COMMAND;
   }
-
-  return write_command(i, ifnum, resid, cmd, request_data, payload_len);
+  if (ret != CONTROL_BAD_COMMAND) {
+    ret = write_command(i, ifnum, resid, cmd, request_data, payload_len);
+  }
+  last_status = ret;
+  return ret;
 }
 
 control_ret_t
@@ -470,7 +496,7 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
     case SPI_WRITE_DATA:
       if(spi.payload_len_transmitted < spi.payload_len_from_header) {
         debug_printf("Payload is less than specified in header. "
-                     "Expected %d bytes; recieved %d bytes. Did not pass payload to program.\n",
+                     "Expected %d bytes; received %d bytes. Did not pass payload to program.\n",
                      spi.payload_len_from_header, spi.payload_len_transmitted);
         ret = CONTROL_ERROR;
       } else {
@@ -485,7 +511,7 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
       } else if (spi.payload_len_transmitted > SPI_DATA_MAX_BYTES) {
         debug_printf("Payload is greater than SPI_DATA_MAX_BYTES (%d). ", SPI_DATA_MAX_BYTES);
       }
-      debug_printf("Expected %d bytes; recieved %d bytes. "
+      debug_printf("Expected %d bytes; received %d bytes. "
                    "Discarded rest of input and didn't pass payload to program.\n",
                    spi.payload_len_from_header, spi.payload_len_transmitted);
       break;
@@ -565,7 +591,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       break;
 
     case SPI_RES_RECVD:
-      spi.cmd = datum & 0x7F; // 0111 1111
+      spi.cmd = datum;
       if(IS_CONTROL_CMD_READ(datum)) {
         spi.state = SPI_READ_CMD_RECVD;
       } else {

@@ -3,7 +3,7 @@
 #ifndef DESCRIPTORS_H_
 #define DESCRIPTORS_H_
 
-#include "usb.h"
+#include "xud_device.h"
 
 #define EP0_MAX_PACKET_SIZE 64
 

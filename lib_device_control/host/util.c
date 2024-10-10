@@ -1,4 +1,4 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <stdio.h>
 #ifdef _WIN32
@@ -15,19 +15,19 @@
 
 void pause_short(void)
 {
-  Sleep(0);
+  Sleep(10); // Unit is ms
 }
 
 void pause_long(void)
 {
-  Sleep(1000);
+  Sleep(1000); // Unit is ms
 }
 
 #elif __xcore__
 
 void pause_short(void)
 {
-  delay_milliseconds(100);
+  delay_milliseconds(10);
 }
 
 void pause_long(void)
@@ -39,12 +39,12 @@ void pause_long(void)
 
 void pause_short(void)
 {
-  usleep(0);
+  usleep(10000); // Unit is us
 }
 
 void pause_long(void)
 {
-  sleep(1);
+  sleep(1); // Unit is second
 }
 
 #endif // _WIN32
