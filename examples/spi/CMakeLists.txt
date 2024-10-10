@@ -12,7 +12,7 @@ set(APP_HW_TARGET src/XK_VOICE_L71.xn)
 set(APP_INCLUDES src)
 
 set(APP_COMPILER_FLAGS
-  -O3
+  -O2
   -g
   -report
   -Wall

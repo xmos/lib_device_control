@@ -12,7 +12,6 @@
 #define DEBUG_UNIT DEVICE
 #include "debug_print.h"
 
-[[combinable]]
 void xscope_client(chanend c_xscope, client interface control i_control[1])
 {
   uint8_t buffer[256]; /* 256 bytes from xscope.h */

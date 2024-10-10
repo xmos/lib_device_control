@@ -21,7 +21,7 @@ typedef enum { false = 0, true = 1} bool;
 #include "util.h"
 
 #define DBG(x) x
-//m#define DBG(x)
+//#define DBG(x)
 #define PRINT_ERROR(...)   fprintf(stderr, "Error  : " __VA_ARGS__)
 
 #define UNUSED_PARAMETER(x) (void)(x)

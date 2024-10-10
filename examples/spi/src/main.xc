@@ -18,7 +18,6 @@ on tile[SPI_TILE]: out buffered port:32    p_miso = PORT_SPI_SLAVE_MISO;
 on tile[SPI_TILE]: in buffered port:32     p_mosi = PORT_SPI_SLAVE_MOSI;
 on tile[SPI_TILE]: clock                   cb     = XS1_CLKBLK_1;
 
-[[combinable]]
 static void spi_client(server spi_slave_callback_if i_spi, client interface control i_control[1])
 {
   while (1) {
@@ -41,7 +40,6 @@ void spi_ctrl(client interface control i_control[1])
   interface spi_slave_callback_if i_spi;
   control_init();
   control_register_resources(i_control, 1);
-  [[combine]]
   par {
     spi_client(i_spi, i_control);
     spi_slave(i_spi, p_sclk, p_mosi, p_miso, p_ss, cb,
