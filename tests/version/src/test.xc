@@ -109,6 +109,7 @@ int main(void)
       test_usb(i);
       test_i2c(i);
       printf("Success!\n");
+
       exit(0);
     }
     dummy_user_task(i[0]);

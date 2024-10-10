@@ -1,17 +1,16 @@
 #!/usr/bin/env python
-# Copyright 2016-2021 XMOS LIMITED.
+# Copyright 2016-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
-import xmostest
-
-def runtest():
-    testlevel = 'smoke'
-    resources = xmostest.request_resource('xsim')
-
-    binary = 'version/bin/version.xe'.format()
-    tester = xmostest.ComparisonTester(open('version.expect'),
-                                       'lib_device_control',
-                                       'lib_device_control_tests',
-                                       'version',
-                                       {})
-    tester.set_min_testlevel(testlevel)
-    xmostest.run_on_simulator(resources['xsim'], binary, simargs=[], tester=tester)
+import pytest
+import utils
+import subprocess
+from pathlib import Path
+def test_version():
+    xe_path = Path(__file__).parent / 'version/bin/version.xe'
+    output = None
+    try:
+        output = utils.xsim_firmware(xe_path)
+    except Exception as e:
+        assert False, f"Test failed: {type(e).__name__}"
+    finally:
+        print(output)
