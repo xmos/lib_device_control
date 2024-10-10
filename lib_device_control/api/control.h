@@ -1,13 +1,10 @@
 // Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef CONTROL_H_
-#define CONTROL_H_
+#pragma once
 
 #include <stdint.h>
 #include <stddef.h>
 #include "control_shared.h"
-
-#pragma once
 
 /** Resource count limits. Sets the size of the arrays used for storing the mappings
  */
@@ -210,5 +207,3 @@ control_ret_t
 control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, client interface control i_ctl[]);
 
 #endif // __XC__
-
-#endif // CONTROL_H_
