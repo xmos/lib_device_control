@@ -34,9 +34,9 @@ pipeline {
   stages {
     stage('Cross-platform builds and tests') {
       parallel {
-        stage('Library checks, tests and Mac x86_64 host builds') {
+        stage('Library checks, tests and Linux x86_64 host builds') {
           agent {
-            label 'macOS&&x86_64'
+            label 'linux&&64'
           }
 
           stages {
@@ -53,12 +53,6 @@ pipeline {
             stage('xCORE builds') {
               steps {
                 // build all the supported firmware applications
-                sh 'pwd'
-                sh "ls -la"
-                sh "ls -la ${REPO}"
-                //sh 'ls -la lib_xassert/lib_xassert'
-                //sh 'ls -la lib_logging/lib_logging'
-
                 runForEach(['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']) { app ->
                   withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
                     dir("${REPO}/examples/${app}") {
@@ -150,9 +144,9 @@ pipeline {
           }
         } // RPI host builds
 
-        stage('Linux x86_64 host builds') {
+        stage('Mac x86_64 host builds') {
           agent {
-            label 'linux&&x86_64'
+            label 'macOS&&x86_64'
           }
           stages {
             stage('Build') {
