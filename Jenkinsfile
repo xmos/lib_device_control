@@ -21,7 +21,7 @@ pipeline {
 
   environment {
     REPO = 'lib_device_control'
-    XMOSDOC_VERSION = 'v5.5.1'
+    XMOSDOC_VERSION = 'v6.6.1'
   } // environment
 
   parameters {
