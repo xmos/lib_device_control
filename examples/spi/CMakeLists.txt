@@ -9,6 +9,12 @@ set(XMOS_SANDBOX_DIR ${CMAKE_SOURCE_DIR}/../../..)
 set(APP_HW_TARGET src/XK_VOICE_L71.xn)
 # set(APP_HW_TARGET src/XK-EVK-XU316-AIV.xn)
 
+if(APP_HW_TARGET STREQUAL "src/XK-EVK-XU316-AIV_i2c.xn")
+    set(SPI_TILE_VAL 1)
+else()
+    set(SPI_TILE_VAL 0)
+endif()
+
 set(APP_INCLUDES src)
 
 set(APP_COMPILER_FLAGS
@@ -16,7 +22,7 @@ set(APP_COMPILER_FLAGS
   -g
   -report
   -Wall
-  -DSPI_TILE=0
+  -DSPI_TILE=${SPI_TILE_VAL}
 )
 
 set(APP_DEPENDENT_MODULES lib_device_control lib_spi)
