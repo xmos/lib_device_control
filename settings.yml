@@ -17,22 +17,6 @@ documentation:
   root_doc: doc/index.rst
   exclude_patterns_path: doc/exclude_patterns.inc
   substitutions_path: doc/substitutions.inc
-  linkcheck_ignore_regex:
-    - ".*127\\.0\\.0\\.1.*"
-    - ".*lib_device_control"
-  doc_dirname: doc
-  build_path: doc/_build
-  output_path: doc/_out
-  doxygen_dirname: _doxygen
-  doctrees_dirname: _doctrees
-  watermarks: []
-  autosection_label_depth: 3
-  latex_toc_depth: 3
-  latex_secnum_depth: 3
-  enable_latex_index: false
-  extra_sphinx_opts: [-W]
-  use_numpydoc: true
-
   pdfs:
     doc/index:
       pdf_title: '{{product}} - User Guide'
