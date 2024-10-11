@@ -74,9 +74,9 @@ pipeline {
             }
             stage('Tests') {
               steps {
-                createVenv("requirements.txt")
+                createVenv("${REPO}/requirements.txt")
                 withVenv {
-                  dir("test/") {
+                  dir("${REPO}/test/") {
                     catchError{
                       sh "python -m pytest --junitxml=pytest_result.xml -rA -vvv --durations=0 -o junit_logging=all"
                     }
