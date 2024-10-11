@@ -14,7 +14,7 @@ products:
 
 documentation:
   title: Device Control Library
-  root_doc: doc/index.rst
+  root_doc: doc/rst/lib_device_control.rst
   exclude_patterns_path: doc/exclude_patterns.inc
   substitutions_path: doc/substitutions.inc
   pdfs:
