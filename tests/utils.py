@@ -38,11 +38,16 @@ def run_command(cmd, check_return_code=True, return_output=True, timeout_s=60):
         logging.error(f"Error type: {type(e).__name__}")
         logging.error(f"Command failed with return code {e.returncode}")
         logging.error(f"Output: {output}")
+        logging.error(f"Exception Output: {e.output}")
+        logging.error(f"Exception Standard Error: {e.stderr}")
+
         raise
     except subprocess.TimeoutExpired as e:
         logging.error(f"Error type: {type(e).__name__}")
         logging.error(f"Command timed out after {timeout_s} seconds")
         logging.error(f"Output: {output}")
+        logging.error(f"Exception Output: {e.output}")
+        logging.error(f"Exception Standard Error: {e.stderr}")
         raise
     except Exception as e:
         logging.error(f"Error type: {type(e).__name__}")
@@ -72,7 +77,7 @@ def build_firmware(target, project_dir=Path("."), build_dir="build", check_retur
 
     build_path = Path(build_dir) if build_dir else project_path
     # Use a list below to avoid that the argument "Unix Makefiles" is split into two arguments.
-    cmd = [ "cmake", "-S", str(project_dir), "-G", "\"Unix Makefiles\"", "-B", str(project_dir/build_dir), "--fresh" ]
+    cmd = [ "cmake", "-S", str(project_dir), "-G", "Unix Makefiles", "-B", str(project_dir/build_dir), "--fresh" ]
     run_command(cmd, check_return_code, return_output=False, timeout_s=timeout_s)
     cmd = f"xmake -C {project_dir / build_dir} -t {target}"
     run_command(cmd, check_return_code, return_output=False, timeout_s=timeout_s)
