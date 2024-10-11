@@ -80,10 +80,6 @@ pipeline {
                     withTools(params.TOOLS_VERSION) {
                       dir("tests") {
                         runPytest("--dist worksteal")
-                        //catchError{
-                        //  sh "python -m pytest --junitxml=pytest_result.xml -rA -vvv --durations=0 -o junit_logging=all"
-                        //}
-                        //junit "pytest_result.xml"
                       }
                     }
                   }
@@ -118,7 +114,7 @@ pipeline {
           stages {
             stage('Docs') {
               steps {
-                createVenv("requirements.txt")
+                createVenv(reqFile: "requirements.txt")
                 withVenv {
                   sh "pip install git+ssh://git@github.com/xmos/xmosdoc@${XMOSDOC_VERSION}"
                   sh 'xmosdoc'
