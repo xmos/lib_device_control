@@ -6,8 +6,9 @@ import utils
 import subprocess
 from pathlib import Path
 
-def test_i2c_device():
-    xe_path = Path(__file__).parent / 'usb_device/bin/usb_device.xe'
+def test_usb_device():
+    target = "usb_device"
+    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
     output = None
     try:
         output = utils.xsim_firmware(xe_path)

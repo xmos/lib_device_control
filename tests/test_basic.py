@@ -4,24 +4,28 @@
 import pytest
 import utils
 import subprocess
+import logging
 from pathlib import Path
 
 def test_version():
-    xe_path = Path(__file__).parent / 'version/bin/version.xe'
+    target = "version"
+    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
     output = None
     try:
         output = utils.xsim_firmware(xe_path)
     except Exception as e:
         assert False, f"Test failed: {type(e).__name__}"
     finally:
-        print(output)
-
+        if output:
+            logging.debug(output)
 def test_basic():
-    xe_path = Path(__file__).parent / 'basic/bin/basic.xe'
+    target = "basic"
+    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
     output = None
     try:
         output = utils.xsim_firmware(xe_path)
     except Exception as e:
         assert False, f"Test failed: {type(e).__name__}"
     finally:
-        print(output)
+        if output:
+            logging.debug(output)
