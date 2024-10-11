@@ -75,14 +75,15 @@ pipeline {
             stage('Tests') {
               steps {
                 dir("${REPO}") {
-                  createVenv("requirements.txt")
+                  createVenv(reqFile: "requirements.txt")
                   withVenv {
                     withTools(params.TOOLS_VERSION) {
                       dir("tests") {
-                        catchError{
-                          sh "python -m pytest --junitxml=pytest_result.xml -rA -vvv --durations=0 -o junit_logging=all"
-                        }
-                        junit "pytest_result.xml"
+                        runPytest("--dist worksteal")
+                        //catchError{
+                        //  sh "python -m pytest --junitxml=pytest_result.xml -rA -vvv --durations=0 -o junit_logging=all"
+                        //}
+                        //junit "pytest_result.xml"
                       }
                     }
                   }

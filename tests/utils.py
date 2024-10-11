@@ -37,15 +37,17 @@ def run_command(cmd, check_return_code=True, return_output=True, timeout_s=60):
     except subprocess.CalledProcessError as e:
         logging.error(f"Error type: {type(e).__name__}")
         logging.error(f"Command failed with return code {e.returncode}")
-        logging.error(f"Output: {e.output}")
+        logging.error(f"Output: {output}")
         raise
     except subprocess.TimeoutExpired as e:
         logging.error(f"Error type: {type(e).__name__}")
         logging.error(f"Command timed out after {timeout_s} seconds")
+        logging.error(f"Output: {output}")
         raise
     except Exception as e:
         logging.error(f"Error type: {type(e).__name__}")
         logging.error(f"An unexpected error occurred: {e}")
+        logging.error(f"Output: {output}")
         raise
 
 def build_firmware(target, project_dir=Path("."), build_dir="build", check_return_code=True, timeout_s=60):
@@ -70,7 +72,7 @@ def build_firmware(target, project_dir=Path("."), build_dir="build", check_retur
 
     build_path = Path(build_dir) if build_dir else project_path
     # Use a list below to avoid that the argument "Unix Makefiles" is split into two arguments.
-    cmd = [ "cmake", "-S", project_dir, "-G", "Unix Makefiles", "-B", build_dir, "--fresh" ]
+    cmd = [ "cmake", "-S", project_dir, "-G", "\"Unix Makefiles\"", "-B", project_dir/build_dir, "--fresh" ]
     run_command(cmd, check_return_code, return_output=False, timeout_s=timeout_s)
     cmd = f"xmake -C {project_dir / build_dir} -t {target}"
     run_command(cmd, check_return_code, return_output=False, timeout_s=timeout_s)
@@ -79,7 +81,7 @@ def build_firmware(target, project_dir=Path("."), build_dir="build", check_retur
         raise FileNotFoundError(f"The file {expected_xe_file} does not exist.")
     return expected_xe_file
 
-def xsim_firmware(xe_file, check_return_code=True, return_output=True, timeout_s=60):
+def xsim_firmware(xe_file, check_return_code=True, return_output=True, timeout_s=60, sim_args=None):
     """
     Simulates the execution of an XMOS executable file using the `xsim` tool.
 
@@ -101,5 +103,5 @@ def xsim_firmware(xe_file, check_return_code=True, return_output=True, timeout_s
     if not xe_path.is_file():
         raise FileNotFoundError(f"The file {xe_file} does not exist.")
 
-    cmd = f"xsim {xe_path}"
+    cmd = f"xsim {xe_path} {sim_args}" if sim_args else f"xsim {xe_path}"
     run_command(cmd, check_return_code, return_output, timeout_s)
