@@ -1,0 +1,4 @@
+# PyPI
+pytest
+pytest-xdist
+pip-tools
