@@ -79,7 +79,7 @@ def build_firmware(target, project_dir=Path("."), build_dir="build", check_retur
     # Use a list below to avoid that the argument "Unix Makefiles" is split into two arguments.
     cmd = [ "cmake", "-S", str(project_dir), "-G", "Unix Makefiles", "-B", str(project_dir/build_dir), "--fresh" ]
     run_command(cmd, check_return_code, return_output=False, timeout_s=timeout_s)
-    cmd = f"xmake -C {project_dir / build_dir} -t {target}"
+    cmd = f"xmake -C {project_dir / build_dir}"
     run_command(cmd, check_return_code, return_output=False, timeout_s=timeout_s)
     expected_xe_file = project_dir / "bin" / f"{target}.xe"
     if not expected_xe_file.is_file():
