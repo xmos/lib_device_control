@@ -11,6 +11,10 @@ def runForEach(folders, Closure body) {
   folders.each { app -> body(app) }
 }
 
+def buildXCoreApps(){
+
+
+}
 pipeline {
   agent none
 
@@ -70,9 +74,9 @@ pipeline {
             }
             stage('Tests') {
               steps {
+                createVenv("requirements.txt")
                 withVenv {
                   dir("test/") {
-
                     catchError{
                       sh "python -m pytest --junitxml=pytest_result.xml -rA -vvv --durations=0 -o junit_logging=all"
                     }
