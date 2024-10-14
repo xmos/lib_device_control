@@ -11,6 +11,14 @@ def runForEach(folders, Closure body) {
   folders.each { app -> body(app) }
 }
 
+def buildDocs() {
+    withVenv {
+        sh 'pip install git+ssh://git@github.com/xmos/xmosdoc@${XMOSDOC_VERSION}'
+        sh 'xmosdoc'
+        zip zipFile: "${REPO}_docs.zip", archive: true, dir: 'doc/_build'
+    }
+}
+
 pipeline {
   agent none
 
@@ -22,6 +30,7 @@ pipeline {
   environment {
     REPO = 'lib_device_control'
     XMOSDOC_VERSION = 'v6.1.1'
+    DOC_ZIP_FILE_NAME = 'doc.zip'
   } // environment
 
   parameters {
@@ -102,16 +111,9 @@ pipeline {
           stages {
             stage('Docs') {
               steps {
+                runningOn(env.NODE_NAME)
                 createVenv("requirements.txt")
-                withVenv {
-                  sh "pip install git+ssh://git@github.com/xmos/xmosdoc@${XMOSDOC_VERSION}"
-                  sh 'xmosdoc'
-                }
-                // Zip and archive doc files
-                zip dir: "doc/_build/html/", zipFile: "lib_device_control_docs_html.zip"
-                archiveArtifacts artifacts: "lib_device_control_docs_html.zip"
-                zip dir: "doc/_build/pdf/", zipFile: "lib_device_control_docs_pdf.zip"
-                archiveArtifacts artifacts: "lib_device_control_docs_pdf.zip"
+                buildDocs()
               }
             }
           }
