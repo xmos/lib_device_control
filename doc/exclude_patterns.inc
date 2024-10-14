@@ -1,11 +1,11 @@
 # The following patterns are to be excluded from the documentation build
 
 **readme*
-**README*
 **CHANGELOG*
 **LICENSE*
+examples/*
 
-.doc_venv/*
+.*venv*/*
 test/*
 build/*
 
