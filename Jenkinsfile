@@ -118,22 +118,9 @@ pipeline {
           stages {
             stage('Docs') {
               steps {
-<<<<<<< HEAD
-                createVenv(reqFile: "requirements.txt")
-                withVenv {
-                  sh "pip install git+ssh://git@github.com/xmos/xmosdoc@${XMOSDOC_VERSION}"
-                  sh 'xmosdoc'
-                }
-                // Zip and archive doc files
-                zip dir: "doc/_build/html/", zipFile: "lib_device_control_docs_html.zip"
-                archiveArtifacts artifacts: "lib_device_control_docs_html.zip"
-                zip dir: "doc/_build/pdf/", zipFile: "lib_device_control_docs_pdf.zip"
-                archiveArtifacts artifacts: "lib_device_control_docs_pdf.zip"
-=======
                 runningOn(env.NODE_NAME)
                 createVenv("requirements.txt")
                 buildDocs()
->>>>>>> fde69046e9cc1913f02bf342508605e62415b7d5
               }
             }
           }
