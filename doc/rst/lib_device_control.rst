@@ -10,7 +10,7 @@ The Device Control Library handles the routing of control messages between a hos
 many controllable resources within the controlled device.
 
 
-.. figure:: images/control_logical_view.pdf
+.. figure:: ../images/control_logical_view.pdf
    :width: 80%
 
    Logical view of lib_device_control
@@ -32,7 +32,7 @@ tasks that run on logical cores of the device. There can be multiple resources i
 The command code is 8 bits and is a *write* command when bit 7 is not set or a *read* command
 when bit 7 is set.
 
-.. figure:: images/control_packet.pdf
+.. figure:: ../images/control_packet.pdf
    :width: 80%
 
    Packet for control communications
@@ -52,7 +52,7 @@ Tasks *register* their resources and these get bound to the tasks' xC interface.
 received by the transport task they forwarded over the matching xC interface.
 
 
-.. figure:: images/resource_mapping.pdf
+.. figure:: ../images/resource_mapping.pdf
    :width: 80%
 
    Mapping between resource IDs and xC interfaces
@@ -194,11 +194,9 @@ API - Host side
 
 |newpage|
 
-|appendix|
-
 Known Issues
 ------------
 
 - New installations of Windows 10 Anniversary (1607) and will not install the USB control driver without disabling attestation signing checks (lib_device_control #40)
 
-.. include:: ../../../CHANGELOG.rst
+.. include:: ../../CHANGELOG.rst

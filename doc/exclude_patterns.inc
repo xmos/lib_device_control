@@ -3,9 +3,9 @@
 **readme*
 **CHANGELOG*
 **LICENSE*
-**/examples/**
+examples/*
 
-.doc_venv/*
+.*venv*/*
 test/*
 build/*
 
