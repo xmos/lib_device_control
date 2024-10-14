@@ -11,6 +11,14 @@ def runForEach(folders, Closure body) {
   folders.each { app -> body(app) }
 }
 
+def buildDocs() {
+    withVenv {
+        sh 'pip install git+ssh://git@github.com/xmos/xmosdoc@${XMOSDOC_VERSION}'
+        sh 'xmosdoc'
+        zip zipFile: "${REPO}_docs.zip", archive: true, dir: 'doc/_build'
+    }
+}
+
 pipeline {
   agent none
 
@@ -21,8 +29,9 @@ pipeline {
 
   environment {
     REPO = 'lib_device_control'
-    VIEW = getViewName(REPO)
-  }
+    XMOSDOC_VERSION = 'v6.1.1'
+  } // environment
+
   parameters {
     string(
       name: 'TOOLS_VERSION',
@@ -33,36 +42,19 @@ pipeline {
   stages {
     stage('Cross-platform builds and tests') {
       parallel {
-        stage('Library checks, tests and Mac x86_64 host builds') {
+        stage('Library checks, tests and Linux x86_64 host builds') {
           agent {
-            label 'macOS&&x86_64'
+            label 'linux&&64'
           }
+
           stages {
-            stage('Get view') {
+            stage("Clone library")
+            {
               steps {
-                xcorePrepareSandbox("${VIEW}", "${REPO}")
-              }
-            }
-            stage('Library checks') {
-              steps {
-                runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
-              }
-            }
-            stage('Tests') {
-              steps {
-                runXmostest("${REPO}", 'tests')
-              }
-            }
-            stage('Mac x86_64 host builds') {
-              steps {
-                // build all the supported host applications
-                runForEach(['usb', 'xscope']) { app ->
-                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
-                    dir("${REPO}/examples/${app}/host") {
-                      sh "cmake -B build"
-                      sh "make -C build"
-                    }
-                  }
+                runningOn(env.NODE_NAME)
+                dir("${REPO}") {
+                  // clone the repo and checkout the changes
+                  checkout scm
                 }
               }
             }
@@ -79,15 +71,58 @@ pipeline {
                 }
               }
             }
-            stage('Build documentation') {
+            stage('Library checks') {
               steps {
-                dir("${REPO}/${REPO}") {
-                  runXdoc('doc')
+                runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
+              }
+            }
+            // TODO: Re-enable tests when xmostest is replaced with pytest
+            //stage('Tests') {
+            //  steps {
+            //    runXmostest("${REPO}", 'tests')
+            //  }
+            //}
+            stage('Linux x86_64 host builds') {
+              steps {
+                // build all the supported host applications
+                runForEach(['usb', 'xscope']) { app ->
+                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                    dir("${REPO}/examples/${app}/host") {
+                      sh "cmake -B build"
+                      sh "make -C build"
+                    }
+                  }
                 }
               }
-           }
+            }
+          }
+          post {
+            cleanup {
+              xcoreCleanSandbox()
+            }
           }
         }
+
+        stage('Build documentation') {
+          agent {
+            label 'documentation'
+          }
+          stages {
+            stage('Docs') {
+              steps {
+                runningOn(env.NODE_NAME)
+                createVenv("requirements.txt")
+                buildDocs()
+              }
+            }
+          }
+          post {
+            cleanup {
+              xcoreCleanSandbox()
+            }
+          }
+        }
+
         stage('RPI host builds') {
           agent {
             label 'armv7l&&raspian'
@@ -115,9 +150,9 @@ pipeline {
           }
         } // RPI host builds
 
-        stage('Linux x86_64 host builds') {
+        stage('Mac x86_64 host builds') {
           agent {
-            label 'linux&&x86_64'
+            label 'macOS&&x86_64'
           }
           stages {
             stage('Build') {

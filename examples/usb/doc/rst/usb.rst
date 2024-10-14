@@ -1,7 +1,5 @@
 .. include:: ../../README.rst
 
-|newpage|
-
 Overview
 --------
 
@@ -161,7 +159,8 @@ resource, setting LEDs or reading the buttons.
 
 Please see the source code listing app_listing_ for more details.
 
-|appendix|
+.. TODO: Check how the substitution below worked and update it.
+.. |appendix|
 
 Demo Hardware Setup
 -------------------
@@ -174,13 +173,11 @@ and plug the xTAG to the board and connect the xTAG USB cable to your developmen
 
    Hardware setup
 
-|newpage|
-
 Launching the demo application
 ------------------------------
 
 Once the demo example has been built either from the command line using xmake from the project directory
-wherer the Makefile can be found or via the build mechanism of xTIMEcomposer studio it can be executed on the Vocal Fusion board.
+where the Makefile can be found or via the build mechanism of xTIMEcomposer studio it can be executed on the Vocal Fusion board.
 
 Once built there will be a ``bin/`` directory within the project which contains
 the binary for the xCORE device. The xCORE binary has a XMOS standard .xe extension.
@@ -260,8 +257,6 @@ indicates that the last button event was button C being released::
 
   Last button event: C value: 1
 
-|newpage|
-
 .. _driver:
 
 Installing the Driver on Windows
@@ -282,8 +277,6 @@ Right click on the device and select **Update Driver Software....**
 
    Update the driver
 
-|newpage|
-
 Select **Browse for driver software on your computer** and choose the ``libusb\Win32\driver`` directory.
 
 .. figure:: images/driver_3.png
@@ -299,9 +292,6 @@ The driver should be installed and create a device called **XMOS Custom Device**
    Once the driver has been installed
 
 The device is now ready to be controlled on Windows.
-
-
-|newpage|
 
 References
 ----------
@@ -324,23 +314,21 @@ References
 
     http://www.xmos.com/support/libraries/lib_usb
 
-|newpage|
-
 Full source code listing
 ------------------------
 
 Source code for main.xc
 .......................
 
-.. literalinclude:: main.xc
-  :largelisting:
+.. TODO: Check if the language below is correct.
+.. literalinclude:: ../src/main.xc
+  :language: c
 
 .. _app_listing:
 
 Source code for app.xc
 .......................
 
-.. literalinclude:: app.xc
-  :largelisting:
-
-|newpage|
+.. TODO: Check if the language below is correct.
+.. literalinclude:: ../src/app.xc
+  :language: c

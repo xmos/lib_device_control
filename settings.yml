@@ -1,0 +1,20 @@
+# This file relates to internal XMOS infrastructure and should be ignored by external users
+
+lib_name: lib_device_control
+project: '{{lib_name}}'
+title: '{{lib_name}}: Device Control for xcore'
+version: 5.0.0
+
+documentation:
+  root_doc: doc/rst/lib_device_control.rst
+  exclude_patterns_path: doc/exclude_patterns.inc
+  substitutions_path: doc/substitutions.inc
+  linkcheck_ignore_regex: ['.*github.com/xmos/lib_device_control.*']
+  pdfs:
+    doc/rst/lib_device_control.rst:
+      pdf_title: '{{project}} - User Guide'
+      pdf_filename: '{{project}}__user_guide_v{{version}}'
+    README.rst:
+      pdf_title: '{{title}} (README)'
+      pdf_filename: '{{project}}__readme_v{{version}}'
+      pdf_short: yes
