@@ -8,7 +8,7 @@ from pathlib import Path
 
 def test_xscope_device():
     target = "xscope_device"
-    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
+    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     output = None
     try:
         output = utils.xsim_firmware(xe_path)

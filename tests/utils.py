@@ -110,5 +110,5 @@ def xsim_firmware(xe_file, check_return_code=True, return_output=True, timeout_s
     if not xe_path.is_file():
         raise FileNotFoundError(f"The file {xe_file} does not exist.")
 
-    cmd = f"xsim {xe_path} {sim_args}" if sim_args else f"xsim {xe_path}"
+    cmd = f"xsim --args {xe_path} {sim_args}" if sim_args else f"xsim {xe_path}"
     run_command(cmd, check_return_code, return_output, timeout_s)

@@ -8,7 +8,7 @@ from pathlib import Path
 
 def test_i2c_device():
     target = "i2c_device"
-    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
+    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     output = None
     try:
         output = utils.xsim_firmware(xe_path)
@@ -17,9 +17,9 @@ def test_i2c_device():
     finally:
         print(output)
 
-def _test_i2c_end_to_end_sim():
+def test_i2c_end_to_end_sim():
     target = "i2c_end_to_end_sim"
-    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
+    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     output = None
     sim_args =  ("--plugin", "LoopbackPort.dll", "-pullup -port tile[0] XS1_PORT_1A 1 0 -port tile[1] XS1_PORT_1A 1 0 ",
         "--plugin", "LoopbackPort.dll", "-pullup -port tile[0] XS1_PORT_1B 1 0 -port tile[1] XS1_PORT_1B 1 0 ",
