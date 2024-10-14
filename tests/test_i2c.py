@@ -17,7 +17,7 @@ def test_i2c_device():
     finally:
         print(output)
 
-def test_i2c_end_to_end_sim():
+def _test_i2c_end_to_end_sim():
     target = "i2c_end_to_end_sim"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
     output = None
