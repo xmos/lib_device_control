@@ -18,8 +18,6 @@ many controllable resources within the controlled device.
 All communications are fully acknowledged and so the host will be informed whether or not the
 device has correctly received or provided the required control information.
 
-|newpage|
-
 Operation
 .........
 
@@ -46,8 +44,6 @@ Read and write Commands include *data* bytes that are optional (can have a data 
 There is a transport task in the device (e.g. I2C slave or USB endpoint 0) that dispatches
 all commands. All other tasks that have resources connect to this transport task over xC interfaces.
 
-|newpage|
-
 Tasks *register* their resources and these get bound to the tasks' xC interface. When commands are
 received by the transport task they forwarded over the matching xC interface.
 
@@ -71,7 +67,7 @@ each of the trasport types is as follows:
 .. list-table:: Maximum Data Length for Device Control Library Transports
  :header-rows: 1
 
- * - Transort
+ * - Transport
    - Data length
    - Limitation
  * - I2C
@@ -86,8 +82,6 @@ each of the trasport types is as follows:
 
 It would be straightforward to add support for additional physical protocols such as UART, SPI or
 TCP/UDP over Ethernet or add additional control hosts where the hardware and operating system supports it.
-
-|newpage|
 
 Usage
 .....
@@ -126,8 +120,6 @@ allows the host to query the device and check that it is running the same versio
 command compatibility.
 
 Please see the `API---Device side`_ section for further details.
-
-|newpage|
 
 References
 ..........
@@ -171,8 +163,6 @@ API---Device side
 
 .. doxygenfunction:: control_process_xscope_upload
 
-|newpage|
-
 API - Host side
 ---------------
 
@@ -191,8 +181,6 @@ API - Host side
 .. doxygenfunction:: control_write_command
 
 .. doxygenfunction:: control_read_command
-
-|newpage|
 
 Known Issues
 ------------

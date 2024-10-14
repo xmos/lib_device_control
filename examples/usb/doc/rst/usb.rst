@@ -1,7 +1,5 @@
 .. include:: ../../README.rst
 
-|newpage|
-
 Overview
 --------
 
@@ -175,8 +173,6 @@ and plug the xTAG to the board and connect the xTAG USB cable to your developmen
 
    Hardware setup
 
-|newpage|
-
 Launching the demo application
 ------------------------------
 
@@ -261,8 +257,6 @@ indicates that the last button event was button C being released::
 
   Last button event: C value: 1
 
-|newpage|
-
 .. _driver:
 
 Installing the Driver on Windows
@@ -283,8 +277,6 @@ Right click on the device and select **Update Driver Software....**
 
    Update the driver
 
-|newpage|
-
 Select **Browse for driver software on your computer** and choose the ``libusb\Win32\driver`` directory.
 
 .. figure:: images/driver_3.png
@@ -300,9 +292,6 @@ The driver should be installed and create a device called **XMOS Custom Device**
    Once the driver has been installed
 
 The device is now ready to be controlled on Windows.
-
-
-|newpage|
 
 References
 ----------
@@ -325,8 +314,6 @@ References
 
     http://www.xmos.com/support/libraries/lib_usb
 
-|newpage|
-
 Full source code listing
 ------------------------
 
@@ -345,5 +332,3 @@ Source code for app.xc
 .. TODO: Check if the language below is correct.
 .. literalinclude:: ../src/app.xc
   :language: c
-
-|newpage|
