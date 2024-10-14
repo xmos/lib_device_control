@@ -30,7 +30,6 @@ pipeline {
   environment {
     REPO = 'lib_device_control'
     XMOSDOC_VERSION = 'v6.1.1'
-    DOC_ZIP_FILE_NAME = 'doc.zip'
   } // environment
 
   parameters {
