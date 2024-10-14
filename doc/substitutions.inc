@@ -1,5 +1,6 @@
 
 .. _The XMOS XS3 Architecture: https://www.xmos.com/download/The-XMOS-XS3-Architecture.pdf
-.. |newpage| raw:: pdf
+.. role:: raw-pdf(raw)
+   :format: pdf
 
-   PageBreak
+.. |newpage| replace:: :raw-pdf:`PageBreak`
