@@ -64,42 +64,37 @@ void test_i2c(client interface control i[1])
     exit(1);
   }
 }
-
+#include "util.h"
 void test_spi(client interface control i[1])
 {
   uint8_t buf[SPI_TRANSACTION_MAX_BYTES];
   control_version_t version;
-  control_ret_t ret;
+  control_ret_t ret = CONTROL_SUCCESS;
   uint8_t data[8];
   size_t len;
-  int j;
-  // TODO: Update this test
-  return;
+  uint32_t data_32bit = 0;
+  uint8_t dummy_byte = 0;
+
+  // Prepare message header and payload
   len = control_build_spi_data(buf, CONTROL_SPECIAL_RESID,
-    CONTROL_GET_VERSION, data, sizeof(control_version_t));
+    CONTROL_GET_VERSION, (uint8_t*) data, sizeof(control_version_t));
 
-  ret = CONTROL_SUCCESS;
-  for (j = 0; j < sizeof(control_version_t); j++) {
-    for (int i =0; i<4; i++) {
-      printf("buf[i] %d ", buf[i]);
-    }
-    printf("\n");
+  // Send message information as in a write operation
+  for (j = 0; j < len; j++) {
     ret |= control_process_spi_master_supplied_data(buf[j], 8, i);
-  }
-  for (j = 0; j < sizeof(control_version_t)/sizeof(uint32_t)+1; j++) {
-    uint32_t data_32bit = 0;
     ret |= control_process_spi_master_requires_data(data_32bit, i);
-    printf("\n\n\n\n    %d   \n", sizeof(data_32bit));
-    memcpy(&data[j*sizeof(data_32bit)], &data_32bit, sizeof(data_32bit));
   }
-  for (int i =0; i<4; i++) {
-    printf("data[%d] %d ", i, data[i]);
-  }
-  printf("%d \n",sizeof(control_version_t));
-
-  memcpy(&version, data, sizeof(control_version_t));
-  printf("version %d data[0] %d\n", version, data[0]);
   ret |= control_process_spi_master_ends_transaction(i);
+
+  // Read back value
+  for (j = 0; j < sizeof(control_version_t); j++) {
+    ret |= control_process_spi_master_supplied_data(dummy_byte, 8, i);
+    ret |= control_process_spi_master_requires_data(data_32bit, i);
+  }
+  ret |= control_process_spi_master_ends_transaction(i);
+
+  memcpy(&version, &data_32bit, sizeof(control_version_t));
+
 
   if (ret != CONTROL_SUCCESS) {
     printf("ERROR - SPI processing functions returned %d\n", ret);
