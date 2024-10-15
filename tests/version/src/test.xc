@@ -71,9 +71,10 @@ void test_spi(client interface control i[1])
   control_version_t version;
   control_ret_t ret = CONTROL_SUCCESS;
   uint8_t data[8];
-  size_t len;
+  size_t len = 0;
   uint32_t data_32bit = 0;
   uint8_t dummy_byte = 0;
+  int j = 0;
 
   // Prepare message header and payload
   len = control_build_spi_data(buf, CONTROL_SPECIAL_RESID,
