@@ -87,7 +87,7 @@ def build_firmware(target, project_dir=Path("."), build_dir="build", check_retur
         raise FileNotFoundError(f"The file {expected_xe_file} does not exist.")
     return expected_xe_file
 
-def xsim_firmware(xe_file, check_return_code=True, return_output=True, timeout_s=60, sim_args=None):
+def xsim_firmware(xe_file, check_return_code=True, return_output=True, timeout_s=60, sim_args=[]):
     """
     Simulates the execution of an XMOS executable file using the `xsim` tool.
 
@@ -110,5 +110,6 @@ def xsim_firmware(xe_file, check_return_code=True, return_output=True, timeout_s
     if not xe_path.is_file():
         raise FileNotFoundError(f"The file {xe_file} does not exist.")
 
-    cmd = f"xsim --args {xe_path} {sim_args}" if sim_args else f"xsim {xe_path}"
+    cmd = [ "xsim", *sim_args, "--args", xe_path ] if sim_args else f"xsim {xe_path}"
+
     run_command(cmd, check_return_code, return_output, timeout_s)
