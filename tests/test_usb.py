@@ -6,12 +6,12 @@ import utils
 import subprocess
 from pathlib import Path
 
-def test_xscope_device():
+def test_usb_device():
     """
     This test runs on the device using xsim.
-    It creates several XSCOPE control interfaces, it sends some read and write commands, and it checks that the responses are correct.
+    It creates several USB control interfaces, it sends some read and write commands, and it checks that the responses are correct.
     """
-    target = "xscope_device"
+    target = "usb_device"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     output = None
     try:

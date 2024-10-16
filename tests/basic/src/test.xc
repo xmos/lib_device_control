@@ -1,4 +1,4 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <xs1.h>
 #include <stdio.h>
@@ -7,10 +7,12 @@
 
 int main(void)
 {
-  if (control_init() != CONTROL_SUCCESS)
+  if (control_init() != CONTROL_SUCCESS) {
     printf("ERROR on control_init\n");
+    exit(1);
+  }
   else
     printf("Success!\n");
 
-  return 1;
+  return 0;
 }

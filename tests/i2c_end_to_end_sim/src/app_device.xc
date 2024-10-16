@@ -1,4 +1,4 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <stdio.h>
 #include <stdint.h>
@@ -11,6 +11,7 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
 {
   control_init();
   control_register_resources(i_control, 1);
+
   while (1) {
     select {
       case i_i2c.ack_write_request(void) -> i2c_slave_ack_t resp:
