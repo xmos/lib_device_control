@@ -96,7 +96,7 @@ def xsim_firmware(xe_file, check_return_code=True, return_output=True, timeout_s
     check_return_code (bool): If True, raises a CalledProcessError if the command exits with a non-zero status.
     return_output (bool): If True, captures and returns the output of the command.
     timeout_s (int): The timeout in seconds for the command execution.
-    sim_args (str): Additional arguments to pass to the `xsim` command.
+    sim_args (list): Additional arguments to pass to the `xsim` command.
 
     Returns:
     str: The standard output of the command if `return_output` is True.

@@ -11,7 +11,7 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
 {
   control_init();
   control_register_resources(i_control, 1);
-  printf("Registered");
+
   while (1) {
     select {
       case i_i2c.ack_write_request(void) -> i2c_slave_ack_t resp:
