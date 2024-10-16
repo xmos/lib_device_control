@@ -8,6 +8,9 @@ import logging
 from pathlib import Path
 
 def test_version():
+    """
+    This test runs on the device using xsim, and it checks if the control version can be read over I2C, SPI, USB and XSCOPE.
+    """
     target = "version"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     output = None
@@ -19,6 +22,9 @@ def test_version():
         if output:
             logging.debug(output)
 def test_basic():
+    """
+    This test runs on the device only using xsim, and it checks if control_init() is successful.
+    """
     target = "basic"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     output = None

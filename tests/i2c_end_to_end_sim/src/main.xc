@@ -30,7 +30,7 @@ int main(void)
     on tile[0]: par {
       host_app(i_i2c_host[0]);
       i2c_master(i_i2c_host, 1, p_scl_host, p_sda_host, 400);
-      }
+    }
 
     /* Tile 1 contains the device test app*/
     on tile[1]: par {

@@ -7,6 +7,10 @@ import subprocess
 from pathlib import Path
 
 def test_i2c_device():
+    """
+    This test runs on the device using xsim.
+    It creates several I2C control interfaces, it sends some read and write commands, and it checks that the responses are correct.
+    """
     target = "i2c_device"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
     output = None
@@ -18,6 +22,12 @@ def test_i2c_device():
         print(output)
 
 def test_i2c_end_to_end_sim():
+    """
+    This test runs on the device using xsim with the LoopbackPort plugins.
+    It creates an I2C master server and a host control app on one tile, and an I2C slave client and a device control app on the other tile.
+    The master and slave are connected via two ports, one for SCL and one for SDA pins.
+    The host app on the master side sends some read and write commands to the device app on the slave side, and it checks that the operations return CONTROL_SUCCESS.
+    """
     target = "i2c_end_to_end_sim"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
     output = None

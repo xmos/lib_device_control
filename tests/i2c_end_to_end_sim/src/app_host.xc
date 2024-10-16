@@ -30,6 +30,7 @@ void host_app(client i2c_master_if i_i2c_host){
   }
   if (version != CONTROL_VERSION) {
     printf("version expected 0x%X, received 0x%X\n", CONTROL_VERSION, version);
+    _Exit(1);
   }
 
   printf("started\n");
