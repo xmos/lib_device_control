@@ -80,14 +80,14 @@ void test_spi(client interface control i[1])
   len = control_build_spi_data(buf, CONTROL_SPECIAL_RESID,
     CONTROL_GET_VERSION, (uint8_t*) data, sizeof(control_version_t));
 
-  // Send message information as in a write operation
+  // Send message information in a write transaction
   for (j = 0; j < len; j++) {
     ret |= control_process_spi_master_supplied_data(buf[j], 8, i);
     ret |= control_process_spi_master_requires_data(data_32bit, i);
   }
   ret |= control_process_spi_master_ends_transaction(i);
 
-  // Read back value
+  // Read back value in a read transaction
   for (j = 0; j < sizeof(control_version_t); j++) {
     ret |= control_process_spi_master_supplied_data(dummy_byte, 8, i);
     ret |= control_process_spi_master_requires_data(data_32bit, i);
