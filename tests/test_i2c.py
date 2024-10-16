@@ -25,7 +25,7 @@ def test_i2c_end_to_end_sim():
     """
     This test runs on the device using xsim with the LoopbackPort plugins.
     It creates an I2C master server and a host control app on one tile, and an I2C slave client and a device control app on the other tile.
-    The master and slave are connected via two ports, one for SCL and one for SDA pins.
+    The master and slave sides are connected via two ports, one for SCL pin and one for SDA pin.
     The host app on the master side sends some read and write commands to the device app on the slave side, and it checks that the operations return CONTROL_SUCCESS.
     """
     target = "i2c_end_to_end_sim"
