@@ -11,7 +11,7 @@
 
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
-
+//#define debug_printf printf
 control_status_t last_status;
 
 static void debug_channel_activity(int ifnum, int value)
@@ -491,6 +491,7 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
 
   control_ret_t ret = CONTROL_SUCCESS;
   unsigned reset = 1;
+  //printf("control_process_spi_master_ends_transaction spi.state %d\n", spi.state);
 
   switch(spi.state) {
     case SPI_WRITE_DATA:
@@ -521,6 +522,7 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
       reset = 0;
       break;
   }
+  //printf("control_process_spi_master_ends_transaction reset %d spi.state %d\n", reset, spi.state);
 
   if(reset) {
     memset(&spi, 0, sizeof(spi));
@@ -539,13 +541,17 @@ control_process_spi_master_requires_data(uint32_t &data, client interface contro
     case SPI_READ_DATA_START:
       ret = read_command(i_ctl, spi.ifnum, spi.resid, spi.cmd,
                          spi.payload, spi.payload_len_from_header);
+      //printf("control_process_spi_master_requires_data spi.payload[0] %x, spi.payload[1] %x, spi.payload[2] %x\n",spi.payload[0], spi.payload[1], spi.payload[2]);
       spi.state = SPI_READ_DATA_WAIT;
       break;
 
     case SPI_READ_DATA:
       if(spi.payload_len_transmitted < spi.payload_len_from_header &&
          spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
+        {
         data = spi.payload[spi.payload_len_transmitted];
+        //printf("control_process_spi_master_requires_data %x %x\n", spi.payload_len_transmitted, data);
+        }
         ++spi.payload_len_transmitted;
       }
       break;
@@ -566,7 +572,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
 
   // TODO: Fix it so valid_bits need not be 8
   if(valid_bits != 8) {
-    debug_printf("control_process_spi_master_supplied_data() expecting valid_bits to be 8. "
+    printf("control_process_spi_master_supplied_data() expecting valid_bits to be 8. "
                  "Should be fed data from spi_slave using the parameter SPI_TRANSFER_SIZE_8.\n");
     return CONTROL_ERROR;
   }
@@ -580,7 +586,6 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
     case SPI_IDLE:
       unsigned char ifnum;
       if (resource_table_search(datum, ifnum) != 0) {
-        debug_printf("Resource %d not found\n", datum);
         spi.state = SPI_ERROR;
         ret = CONTROL_ERROR;
       } else {
@@ -597,6 +602,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       } else {
         spi.state = SPI_WRITE_CMD_RECVD;
       }
+      //printf("SPI_RES_RECVD %d\n",spi.state);
       break;
 
     case SPI_READ_CMD_RECVD:
@@ -610,6 +616,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       break;
 
     case SPI_WRITE_DATA:
+      //printf("SPI_WRITE_DATA!\n");
       if(spi.payload_len_transmitted < spi.payload_len_from_header &&
          spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
         spi.payload[spi.payload_len_transmitted] = datum;
