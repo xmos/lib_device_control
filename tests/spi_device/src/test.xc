@@ -12,7 +12,7 @@
 
 void test_client(client interface control i[3], chanend c_user_task[3])
 {
-  uint8_t buf[I2C_TRANSACTION_MAX_BYTES];
+  uint8_t buf[SPI_TRANSACTION_MAX_BYTES];
   size_t buf_len;
   struct command c1, c2;
   struct options o;
@@ -23,7 +23,8 @@ void test_client(client interface control i[3], chanend c_user_task[3])
   int fails;
   unsigned payload_size;
   chan d;
-
+  uint32_t data_32bit;
+  uint8_t write_status = 0;
   for (j = 0; j < 8; j++) {
     c1.payload[j] = j;
   }
@@ -45,7 +46,8 @@ void test_client(client interface control i[3], chanend c_user_task[3])
           for (o.with_payload = 0; o.with_payload < 2; o.with_payload++) {
             make_command(c1, o);
 
-            buf_len = control_build_i2c_data(buf, c1.resid, c1.cmd, c1.payload, c1.payload_size);
+            // Prepare message header and payload
+            buf_len = control_build_spi_data(buf, c1.resid, c1.cmd, c1.payload, c1.payload_size);
 
             /* make a sequence of processing calls, catch the result and record it */
             unsafe {
@@ -59,31 +61,49 @@ void test_client(client interface control i[3], chanend c_user_task[3])
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                 { control_ret_t ret;
                   ret = CONTROL_SUCCESS;
-                  ret |= control_process_i2c_write_start(i);
+
+                  // TODO: Check why this call to control_process_spi_master_ends_transaction() is needed here.
+                  // If this call is removed the write operations fail.
+                  ret |= control_process_spi_master_ends_transaction(i);
+
+                  // Send message information in a write transaction
                   for (j = 0; j < buf_len; j++) {
-                    ret |= control_process_i2c_write_data(buf[j], i);
+                    ret |= control_process_spi_master_supplied_data(buf[j], SPI_TRANSFER_SIZE_BITS, i);
+                    ret |= control_process_spi_master_requires_data(data_32bit, i);
+
                   }
+                  ret |= control_process_spi_master_ends_transaction(i);
+
+                  // Read back values in a read transaction if it is a read message
                   if (o.read_cmd && payload_size > 0) {
-                    ret |= control_process_i2c_read_start(i);
-                    for (j = 0; j < payload_size; j++) {
-                      ret |= control_process_i2c_read_data(payload_ptr[j], i);
+                    for (j = 0; j < (payload_size); j++) {
+                      ret |= control_process_spi_master_supplied_data(0, SPI_TRANSFER_SIZE_BITS, i);
+                      ret |= control_process_spi_master_requires_data(data_32bit, i);
+
+                      memcpy(payload_ptr+j, &data_32bit, sizeof(uint8_t));
                     }
-                  }
-                  // Request control status for write command
-                  if (!o.read_cmd) {
-                    buf_len = control_build_i2c_data(buf, CONTROL_SPECIAL_RESID, CONTROL_CMD_SET_READ(CONTROL_GET_LAST_COMMAND_STATUS), c1.payload, sizeof(control_status_t));
-                    ret |= control_process_i2c_write_start(i);
-                    for (j = 0; j < buf_len; j++) {
-                      ret |= control_process_i2c_write_data(buf[j], i);
-                    }
-                    ret |= control_process_i2c_read_start(i);
-                    ret |= control_process_i2c_read_data(payload_ptr[0], i);
-                    ret |= payload_ptr[0];
+                    ret |= control_process_spi_master_ends_transaction(i);
                   }
 
-                  ret |= control_process_i2c_stop(i);
+                  // Request control status for write command if it is a write command
+                  if (!o.read_cmd) {
+                    buf_len = control_build_spi_data(buf, CONTROL_SPECIAL_RESID, CONTROL_CMD_SET_READ(CONTROL_GET_LAST_COMMAND_STATUS), c1.payload, sizeof(control_status_t));
+                    for (j = 0; j < buf_len; j++) {
+                      ret |= control_process_spi_master_supplied_data(buf[j], SPI_TRANSFER_SIZE_BITS, i);
+                      ret |= control_process_spi_master_requires_data(data_32bit, i);
+                    }
+                    ret |= control_process_spi_master_ends_transaction(i);
+
+                    ret |= control_process_spi_master_supplied_data(data_32bit, SPI_TRANSFER_SIZE_BITS, i);
+                    ret |= control_process_spi_master_requires_data(data_32bit, i);
+                    memcpy(&write_status, &data_32bit, sizeof(control_status_t));
+                    ret |= write_status;
+                    ret |= control_process_spi_master_ends_transaction(i);
+
+                  }
                   d <: ret;
                 }
+#pragma warning disable
                 { control_ret_t ret;
                   select {
                     case drive_user_task_commands(c2, c1, c_user_task, o.read_cmd);
@@ -94,7 +114,6 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                   d :> ret;
                   fails += check(o, c1, c2, timeout, ret, 3);
                 }
-#pragma warning enable
               }
             }
           }

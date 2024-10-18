@@ -6,11 +6,12 @@ import utils
 import logging
 from pathlib import Path
 
-@pytest.mark.parametrize("target", ["init", "version"])
-def test_basic(target):
+def test_spi_device():
     """
-    This test runs on the device using xsim, and it checks if control_init() is successful and the control version can be read over I2C, SPI, USB and XSCOPE.
+    This test runs on the device using xsim.
+    It creates several SPI control interfaces, it sends some read and write commands, and it checks that the responses are correct.
     """
+    target = "spi_device"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     proc = utils.xsim_firmware(xe_path)
     if proc.stdout:

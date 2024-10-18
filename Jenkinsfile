@@ -139,8 +139,6 @@ pipeline {
             stage('Build') {
               steps {
                 runningOn(env.NODE_NAME)
-                // clone the repo and checkout the changes
-                checkout scm
                 // build all the supported host applications
                 runForEach(['i2c/host_rpi', 'spi/host']) { app ->
                   dir("examples/${app}") {
@@ -166,8 +164,6 @@ pipeline {
             stage('Build') {
               steps {
                 runningOn(env.NODE_NAME)
-                // clone the repo and checkout the changes
-                checkout scm
                 // build all the supported host applications
                 runForEach(['usb', 'xscope']) { app ->
                   withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
@@ -195,8 +191,6 @@ pipeline {
             stage('Build') {
               steps {
                 runningOn(env.NODE_NAME)
-                // clone the repo and checkout the changes
-                checkout scm
                 // build all the supported host applications
                 runForEach(['usb', 'xscope']) { app ->
                   withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
@@ -224,8 +218,6 @@ pipeline {
              stage('Build') {
               steps {
                 runningOn(env.NODE_NAME)
-                // clone the repo and checkout the changes
-                checkout scm
 
                 // Build the USB host example for 32 bit as libusb is 32 bit
                 withVS('vcvars32.bat') {

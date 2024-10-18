@@ -11,7 +11,7 @@
 
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
-
+//#define debug_printf printf
 control_status_t last_status;
 
 static void debug_channel_activity(int ifnum, int value)
@@ -545,9 +545,9 @@ control_process_spi_master_requires_data(uint32_t &data, client interface contro
     case SPI_READ_DATA:
       if(spi.payload_len_transmitted < spi.payload_len_from_header &&
          spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
-        data = spi.payload[spi.payload_len_transmitted];
+          data = spi.payload[spi.payload_len_transmitted];
+        }
         ++spi.payload_len_transmitted;
-      }
       break;
   }
 
