@@ -15,10 +15,9 @@ def test_xscope_device():
     target = "xscope_device"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     output = None
-    try:
-        output = utils.xsim_firmware(xe_path)
-    except Exception as e:
-        assert False, f"Test failed: {type(e).__name__}"
-    finally:
-        if output:
-            logging.debug(output)
+
+    (returncode, output) = utils.xsim_firmware(xe_path)
+
+    if output:
+        logging.debug(output)
+    assert returncode == 0, f"Test failed: {returncode}"
