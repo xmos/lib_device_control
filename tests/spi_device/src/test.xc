@@ -45,6 +45,8 @@ void test_client(client interface control i[3], chanend c_user_task[3])
         for (o.bad_id = 0; o.bad_id < 2; o.bad_id++) {
           for (o.with_payload = 0; o.with_payload < 2; o.with_payload++) {
             make_command(c1, o);
+
+            // Prepare message header and payload
             buf_len = control_build_spi_data(buf, c1.resid, c1.cmd, c1.payload, c1.payload_size);
 
             /* make a sequence of processing calls, catch the result and record it */
@@ -60,15 +62,18 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                   ret = CONTROL_SUCCESS;
                   ret |= control_process_spi_master_ends_transaction(i);
 
+                  // Send message information in a write transaction
                   for (j = 0; j < buf_len; j++) {
-                    ret |= control_process_spi_master_supplied_data(buf[j], 8, i);
+                    ret |= control_process_spi_master_supplied_data(buf[j], SPI_TRANSFER_SIZE_BITS, i);
                     ret |= control_process_spi_master_requires_data(data_32bit, i);
 
                   }
                   ret |= control_process_spi_master_ends_transaction(i);
+
+                  // Read back values in a read transaction if it is a read message
                   if (o.read_cmd && payload_size > 0) {
-                    for (j = 0; j < (payload_size)/* + 3) / sizeof(uint32_t)*/; j++) {
-                      ret |= control_process_spi_master_supplied_data(0, 8, i);
+                    for (j = 0; j < (payload_size); j++) {
+                      ret |= control_process_spi_master_supplied_data(0, SPI_TRANSFER_SIZE_BITS, i);
                       ret |= control_process_spi_master_requires_data(data_32bit, i);
 
                       memcpy(payload_ptr+j, &data_32bit, sizeof(uint8_t));
@@ -76,16 +81,16 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                     ret |= control_process_spi_master_ends_transaction(i);
                   }
 
-                  // Request control status for write command
+                  // Request control status for write command if it is a write command
                   if (!o.read_cmd) {
                     buf_len = control_build_spi_data(buf, CONTROL_SPECIAL_RESID, CONTROL_CMD_SET_READ(CONTROL_GET_LAST_COMMAND_STATUS), c1.payload, sizeof(control_status_t));
                     for (j = 0; j < buf_len; j++) {
-                      ret |= control_process_spi_master_supplied_data(buf[j], 8, i);
+                      ret |= control_process_spi_master_supplied_data(buf[j], SPI_TRANSFER_SIZE_BITS, i);
                       ret |= control_process_spi_master_requires_data(data_32bit, i);
                     }
                     ret |= control_process_spi_master_ends_transaction(i);
 
-                    ret |= control_process_spi_master_supplied_data(data_32bit, 8, i);
+                    ret |= control_process_spi_master_supplied_data(data_32bit, SPI_TRANSFER_SIZE_BITS, i);
                     ret |= control_process_spi_master_requires_data(data_32bit, i);
                     memcpy(&write_status, &data_32bit, sizeof(control_status_t));
                     ret |= write_status;
