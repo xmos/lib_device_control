@@ -566,7 +566,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
 
   // TODO: Fix it so valid_bits need not be 8
   if(valid_bits != 8) {
-    printf("control_process_spi_master_supplied_data() expecting valid_bits to be 8. "
+    debug_printf("control_process_spi_master_supplied_data() expecting valid_bits to be 8. "
                  "Should be fed data from spi_slave using the parameter SPI_TRANSFER_SIZE_8.\n");
     return CONTROL_ERROR;
   }
@@ -580,6 +580,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
     case SPI_IDLE:
       unsigned char ifnum;
       if (resource_table_search(datum, ifnum) != 0) {
+        debug_printf("Resource %d not found\n", datum);
         spi.state = SPI_ERROR;
         ret = CONTROL_ERROR;
       } else {
