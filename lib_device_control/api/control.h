@@ -12,6 +12,11 @@
 #define RESOURCE_TABLE_MAX 256
 #define IFNUM_RESERVED 255
 
+/** Number of bits that can be transferred in a single SPI transaction.
+ *  32-bit transactions are not supported.
+ */
+#define SPI_TRANSFER_SIZE_BITS  8
+
 #define XSCOPE_CONTROL_PROBE "Control Probe"
 
 #ifdef __XC__

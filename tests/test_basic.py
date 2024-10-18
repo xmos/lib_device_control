@@ -1,17 +1,19 @@
 #!/usr/bin/env python
-# Copyright 2016-2021 XMOS LIMITED.
+# Copyright 2016-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
-import xmostest
+import pytest
+import utils
+import subprocess
+import logging
+from pathlib import Path
 
-def runtest():
-    testlevel = 'smoke'
-    resources = xmostest.request_resource('xsim')
-
-    binary = 'basic/bin/basic.xe'.format()
-    tester = xmostest.ComparisonTester(open('basic.expect'),
-                                       'lib_device_control',
-                                       'lib_device_control_tests',
-                                       'basic',
-                                       {})
-    tester.set_min_testlevel(testlevel)
-    xmostest.run_on_simulator(resources['xsim'], binary, simargs=[], tester=tester)
+@pytest.mark.parametrize("target", ["init", "version"])
+def test_basic(target):
+    """
+    This test runs on the device using xsim, and it checks if control_init() is successful and the control version can be read over I2C, SPI, USB and XSCOPE.
+    """
+    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
+    proc = utils.xsim_firmware(xe_path)
+    if proc.stdout:
+        logging.debug(proc.stdout)
+    assert proc.returncode == 0, f"Test failed: {proc.returncode}"

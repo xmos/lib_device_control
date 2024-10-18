@@ -76,12 +76,20 @@ pipeline {
                 runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
               }
             }
-            // TODO: Re-enable tests when xmostest is replaced with pytest
-            //stage('Tests') {
-            //  steps {
-            //    runXmostest("${REPO}", 'tests')
-            //  }
-            //}
+            stage('Tests') {
+              steps {
+                dir("${REPO}") {
+                  createVenv(reqFile: "requirements.txt")
+                  withVenv {
+                    withTools(params.TOOLS_VERSION) {
+                      dir("tests") {
+                        runPytest("--dist worksteal")
+                      }
+                    }
+                  }
+                }
+              }
+            }
             stage('Linux x86_64 host builds') {
               steps {
                 // build all the supported host applications
