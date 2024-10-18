@@ -3,7 +3,7 @@
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 import pytest
 import utils
-import subprocess
+import logging
 from pathlib import Path
 
 def test_spi_device():

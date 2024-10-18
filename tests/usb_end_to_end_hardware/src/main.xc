@@ -71,7 +71,6 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
 
       if (!handled) {
         /* if we haven't handled the request about then do standard enumeration requests */
-        //printf("not handled, passing to standard requests\n");
         unsafe {
           res = USB_StandardRequests(ep0_out, ep0_in, devDesc,
             sizeof(devDesc), cfgDesc, sizeof(cfgDesc),

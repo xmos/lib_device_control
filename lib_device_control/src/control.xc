@@ -491,7 +491,6 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
 
   control_ret_t ret = CONTROL_SUCCESS;
   unsigned reset = 1;
-  //printf("control_process_spi_master_ends_transaction spi.state %d\n", spi.state);
 
   switch(spi.state) {
     case SPI_WRITE_DATA:
@@ -522,7 +521,6 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
       reset = 0;
       break;
   }
-  //printf("control_process_spi_master_ends_transaction reset %d spi.state %d\n", reset, spi.state);
 
   if(reset) {
     memset(&spi, 0, sizeof(spi));
@@ -541,19 +539,15 @@ control_process_spi_master_requires_data(uint32_t &data, client interface contro
     case SPI_READ_DATA_START:
       ret = read_command(i_ctl, spi.ifnum, spi.resid, spi.cmd,
                          spi.payload, spi.payload_len_from_header);
-      //printf("control_process_spi_master_requires_data spi.payload[0] %x, spi.payload[1] %x, spi.payload[2] %x\n",spi.payload[0], spi.payload[1], spi.payload[2]);
       spi.state = SPI_READ_DATA_WAIT;
       break;
 
     case SPI_READ_DATA:
       if(spi.payload_len_transmitted < spi.payload_len_from_header &&
          spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
-        {
-        data = spi.payload[spi.payload_len_transmitted];
-        //printf("control_process_spi_master_requires_data %x %x\n", spi.payload_len_transmitted, data);
+          data = spi.payload[spi.payload_len_transmitted];
         }
         ++spi.payload_len_transmitted;
-      }
       break;
   }
 
@@ -602,7 +596,6 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       } else {
         spi.state = SPI_WRITE_CMD_RECVD;
       }
-      //printf("SPI_RES_RECVD %d\n",spi.state);
       break;
 
     case SPI_READ_CMD_RECVD:
@@ -616,7 +609,6 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
       break;
 
     case SPI_WRITE_DATA:
-      //printf("SPI_WRITE_DATA!\n");
       if(spi.payload_len_transmitted < spi.payload_len_from_header &&
          spi.payload_len_transmitted < SPI_DATA_MAX_BYTES) {
         spi.payload[spi.payload_len_transmitted] = datum;
