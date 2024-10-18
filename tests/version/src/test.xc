@@ -82,19 +82,20 @@ void test_spi(client interface control i[1])
 
   // Send message information in a write transaction
   for (j = 0; j < len; j++) {
-    ret |= control_process_spi_master_supplied_data(buf[j], 8, i);
+    ret |= control_process_spi_master_supplied_data(buf[j], SPI_TRANSFER_SIZE_BITS, i);
     ret |= control_process_spi_master_requires_data(data_32bit, i);
   }
   ret |= control_process_spi_master_ends_transaction(i);
 
   // Read back value in a read transaction
   for (j = 0; j < sizeof(control_version_t); j++) {
-    ret |= control_process_spi_master_supplied_data(dummy_byte, 8, i);
+    ret |= control_process_spi_master_supplied_data(dummy_byte, SPI_TRANSFER_SIZE_BITS, i);
     ret |= control_process_spi_master_requires_data(data_32bit, i);
+    memcpy(&data[j], &data_32bit, sizeof(uint8_t));
   }
-  ret |= control_process_spi_master_ends_transaction(i);
+  memcpy(&version, data, sizeof(control_version_t));
 
-  memcpy(&version, &data_32bit, sizeof(control_version_t));
+  ret |= control_process_spi_master_ends_transaction(i);
 
 
   if (ret != CONTROL_SUCCESS) {
