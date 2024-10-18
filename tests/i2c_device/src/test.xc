@@ -56,6 +56,7 @@ void test_client(client interface control i[3], chanend c_user_task[3])
               tmr :> t;
               timeout = 0;
               par {
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                 { control_ret_t ret;
                   ret = CONTROL_SUCCESS;
                   ret |= control_process_i2c_write_start(i);
@@ -93,6 +94,7 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                   d :> ret;
                   fails += check(o, c1, c2, timeout, ret, 3);
                 }
+#pragma warning enable
               }
             }
           }

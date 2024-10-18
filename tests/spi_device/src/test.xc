@@ -58,6 +58,7 @@ void test_client(client interface control i[3], chanend c_user_task[3])
               tmr :> t;
               timeout = 0;
               par {
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                 { control_ret_t ret;
                   ret = CONTROL_SUCCESS;
                   ret |= control_process_spi_master_ends_transaction(i);
@@ -99,6 +100,7 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                   }
                   d <: ret;
                 }
+#pragma warning disable
                 { control_ret_t ret;
                   select {
                     case drive_user_task_commands(c2, c1, c_user_task, o.read_cmd);
