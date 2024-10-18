@@ -48,6 +48,16 @@ pipeline {
           }
 
           stages {
+            stage("Clone library")
+            {
+              steps {
+                runningOn(env.NODE_NAME)
+                dir("${REPO}") {
+                  // clone the repo and checkout the changes
+                  checkout scm
+                }
+              }
+            }
             stage('xCORE builds') {
               steps {
                 // build all the supported firmware applications
