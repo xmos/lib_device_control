@@ -84,5 +84,5 @@ void app(server interface control i_control)
         break;
     }
   }
-  _Exit(0);
+  exit(0);
 }

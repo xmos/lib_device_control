@@ -4,6 +4,7 @@
 import pytest
 import utils
 import subprocess
+import logging
 from pathlib import Path
 
 def test_xscope_device():
@@ -19,4 +20,5 @@ def test_xscope_device():
     except Exception as e:
         assert False, f"Test failed: {type(e).__name__}"
     finally:
-        print(output)
+        if output:
+            logging.debug(output)
