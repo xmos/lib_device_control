@@ -17,6 +17,7 @@ void test_usb(client interface control i[1])
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
     CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
+
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
   ret = control_process_usb_get_request(windex, wvalue, wlength, request_data, i);
 #pragma warning disable
@@ -43,8 +44,8 @@ void test_i2c(client interface control i[1])
 
   len = control_build_i2c_data(buf, CONTROL_SPECIAL_RESID,
     CONTROL_GET_VERSION, data, sizeof(control_version_t));
-
   ret = CONTROL_SUCCESS;
+
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
   ret |= control_process_i2c_write_start(i);
   for (j = 0; j < len; j++) {
@@ -68,7 +69,7 @@ void test_i2c(client interface control i[1])
     exit(1);
   }
 }
-#include "util.h"
+
 void test_spi(client interface control i[1])
 {
   uint8_t buf[SPI_TRANSACTION_MAX_BYTES];
@@ -83,6 +84,7 @@ void test_spi(client interface control i[1])
   // Prepare message header and payload
   len = control_build_spi_data(buf, CONTROL_SPECIAL_RESID,
     CONTROL_GET_VERSION, (uint8_t*) data, sizeof(control_version_t));
+
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
   // Send message information in a write transaction
   for (j = 0; j < len; j++) {
@@ -111,6 +113,7 @@ void test_spi(client interface control i[1])
     exit(1);
   }
 }
+
 void test_xscope(client interface control i[1])
 {
   uint32_t buf[64];

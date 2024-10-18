@@ -61,6 +61,9 @@ void test_client(client interface control i[3], chanend c_user_task[3])
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                 { control_ret_t ret;
                   ret = CONTROL_SUCCESS;
+
+                  // TODO: Check why this call to control_process_spi_master_ends_transaction() is needed here.
+                  // If this call is removed the write operations fail.
                   ret |= control_process_spi_master_ends_transaction(i);
 
                   // Send message information in a write transaction
