@@ -12,11 +12,8 @@ def test_spi_device():
     It creates several SPI control interfaces, it sends some read and write commands, and it checks that the responses are correct.
     """
     target = "spi_device"
-    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
-    output = None
-    try:
-        output = utils.xsim_firmware(xe_path)
-    except Exception as e:
-        assert False, f"Test failed: {type(e).__name__}"
-    finally:
-        print(output)
+    xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
+    proc = utils.xsim_firmware(xe_path)
+    if proc.stdout:
+        logging.debug(proc.stdout)
+    assert proc.returncode == 0, f"Test failed: {proc.returncode}"
