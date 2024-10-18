@@ -15,9 +15,7 @@ def test_usb_device():
     target = "usb_device"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     output = None
-
     (returncode, output) = utils.xsim_firmware(xe_path)
-
     if output:
         logging.debug(output)
     assert returncode == 0, f"Test failed: {returncode}"

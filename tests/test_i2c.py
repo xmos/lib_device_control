@@ -14,14 +14,10 @@ def test_i2c_device():
     """
     target = "i2c_device"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target, build_dir="build")
-    output = None
-    try:
-        output = utils.xsim_firmware(xe_path)
-    except Exception as e:
-        assert False, f"Test failed: {type(e).__name__}"
-    finally:
-        if output:
-            logging.debug(output)
+    (returncode, output) = utils.xsim_firmware(xe_path)
+    if output:
+        logging.debug(output)
+    assert returncode == 0, f"Test failed: {returncode}"
 
 def test_i2c_end_to_end_sim():
     """

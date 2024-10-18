@@ -13,14 +13,11 @@ def test_version():
     """
     target = "version"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
-    output = None
-    try:
-        output = utils.xsim_firmware(xe_path)
-    except Exception as e:
-        assert False, f"Test failed: {type(e).__name__}"
-    finally:
-        if output:
-            logging.debug(output)
+    (returncode, output) = utils.xsim_firmware(xe_path)
+    if output:
+        logging.debug(output)
+    assert returncode == 0, f"Test failed: {returncode}"
+
 def test_basic():
     """
     This test runs on the device using xsim, and it checks if control_init() is successful.
@@ -28,7 +25,6 @@ def test_basic():
     target = "basic"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
     (returncode, output) = utils.xsim_firmware(xe_path)
-
     if output:
         logging.debug(output)
     assert returncode == 0, f"Test failed: {returncode}"

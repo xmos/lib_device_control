@@ -66,22 +66,18 @@ def build_firmware(target, project_dir=Path("."), build_dir="build", return_outp
 
     """
     project_path = Path(project_dir)
-    if not project_path.is_dir():
-        assert False, f"The directory {project_dir} does not exist."
+    assert project_path.is_dir(), f"The directory {project_dir} does not exist."
 
     build_path = Path(build_dir) if build_dir else project_path
     # Use a list below to avoid that the argument "Unix Makefiles" is split into two arguments.
     cmd = ["cmake", "-S", str(project_dir), "-G", "Unix Makefiles", "-B", str(project_dir/build_dir)]
     (returncode, _) = run_command(cmd, return_output=return_output, timeout_s=timeout_s)
-    if returncode != 0:
-        assert False, f"Build failed with return code {returncode}"
+    assert returncode == 0, f"Build failed with return code {returncode}"
     cmd = f"xmake -C {project_dir / build_dir}"
     (returncode, _) = run_command(cmd, return_output=return_output, timeout_s=timeout_s)
-    if returncode != 0:
-        assert False, f"Build failed with return code {returncode}"
+    assert returncode == 0, f"Build failed with return code {returncode}"
     expected_xe_file = project_dir / "bin" / f"{target}.xe"
-    if not expected_xe_file.is_file():
-        assert False, f"The file {expected_xe_file} does not exist."
+    assert expected_xe_file.is_file(), f"The file {expected_xe_file} does not exist."
     return expected_xe_file
 
 def xsim_firmware(xe_file, return_output=True, timeout_s=60, sim_args=[]):
@@ -103,8 +99,7 @@ def xsim_firmware(xe_file, return_output=True, timeout_s=60, sim_args=[]):
     
     """
     xe_path = Path(xe_file)
-    if not xe_path.is_file():
-        assert False, f"The file {xe_file} does not exist."
+    assert xe_path.is_file(), f"The file {xe_file} does not exist."
 
     cmd = [ "xsim", *sim_args, "--args", xe_path ] if sim_args else f"xsim {xe_path}"
 
