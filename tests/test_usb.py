@@ -4,6 +4,7 @@
 import pytest
 import utils
 import subprocess
+import logging
 from pathlib import Path
 
 def test_usb_device():
@@ -13,10 +14,7 @@ def test_usb_device():
     """
     target = "usb_device"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
-    output = None
-    try:
-        output = utils.xsim_firmware(xe_path)
-    except Exception as e:
-        assert False, f"Test failed: {type(e).__name__}"
-    finally:
-        print(output)
+    proc = utils.xsim_firmware(xe_path)
+    if proc.stdout:
+        logging.debug(proc.stdout)
+    assert proc.returncode == 0, f"Test failed: {proc.returncode}"

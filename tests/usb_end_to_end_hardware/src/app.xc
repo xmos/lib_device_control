@@ -1,4 +1,4 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <stdio.h>
 #include <stdint.h>
@@ -84,5 +84,5 @@ void app(server interface control i_control)
         break;
     }
   }
-  _Exit(0);
+  exit(0);
 }
