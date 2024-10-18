@@ -13,10 +13,10 @@ def test_version():
     """
     target = "version"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
-    (returncode, output) = utils.xsim_firmware(xe_path)
-    if output:
-        logging.debug(output)
-    assert returncode == 0, f"Test failed: {returncode}"
+    proc = utils.xsim_firmware(xe_path)
+    if proc.stdout:
+        logging.debug(proc.stdout)
+    assert proc.returncode == 0, f"Test failed: {proc.returncode}"
 
 def test_basic():
     """
@@ -24,7 +24,7 @@ def test_basic():
     """
     target = "basic"
     xe_path = utils.build_firmware(target, project_dir=Path(__file__).parent / target)
-    (returncode, output) = utils.xsim_firmware(xe_path)
-    if output:
-        logging.debug(output)
-    assert returncode == 0, f"Test failed: {returncode}"
+    proc = utils.xsim_firmware(xe_path)
+    if proc.stdout:
+        logging.debug(proc.stdout)
+    assert proc.returncode == 0, f"Test failed: {proc.returncode}"

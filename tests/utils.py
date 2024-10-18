@@ -14,9 +14,9 @@ def run_command(cmd, return_output=False, timeout_s=60):
     return_output (bool): If True, captures and returns the output of the command.
     timeout_s (int): The timeout in seconds for the command execution.
 
-   Returns:
-    tuple: A tuple containing the return code and the standard output of the command if `return_output` is True.
-           Otherwise, returns the return code and None.
+    Returns:
+        subprocess.CompletedProcess: The completed process object containing the return code and output.
+
 
     Raises:
     subprocess.TimeoutExpired: If the command times out.
@@ -28,12 +28,12 @@ def run_command(cmd, return_output=False, timeout_s=60):
     logging.debug(f"Running: {' '.join([str(i) for i in cmd])}")
     output = None
     try:
-        result = subprocess.run(cmd, capture_output=return_output, text=True, timeout=timeout_s)
-        output = result.stdout
-        returncode = result.returncode
+        proc = subprocess.run(cmd, capture_output=return_output, text=True, timeout=timeout_s)
+        output = proc.stdout
+        returncode = proc.returncode
         logging.debug(f"Command output: {output}")
         logging.debug(f"Command return code: {returncode}")
-        return (returncode, output)
+        return proc
 
     except subprocess.TimeoutExpired as e:
         logging.error(f"Error type: {type(e).__name__}")
@@ -71,11 +71,11 @@ def build_firmware(target, project_dir=Path("."), build_dir="build", return_outp
     build_path = Path(build_dir) if build_dir else project_path
     # Use a list below to avoid that the argument "Unix Makefiles" is split into two arguments.
     cmd = ["cmake", "-S", str(project_dir), "-G", "Unix Makefiles", "-B", str(project_dir/build_dir)]
-    (returncode, _) = run_command(cmd, return_output=return_output, timeout_s=timeout_s)
-    assert returncode == 0, f"Build failed with return code {returncode}"
+    proc = run_command(cmd, return_output=return_output, timeout_s=timeout_s)
+    assert proc.returncode == 0, f"Build failed with return code {returncode}"
     cmd = f"xmake -C {project_dir / build_dir}"
-    (returncode, _) = run_command(cmd, return_output=return_output, timeout_s=timeout_s)
-    assert returncode == 0, f"Build failed with return code {returncode}"
+    proc = run_command(cmd, return_output=return_output, timeout_s=timeout_s)
+    assert proc.returncode == 0, f"Build failed with return code {returncode}"
     expected_xe_file = project_dir / "bin" / f"{target}.xe"
     assert expected_xe_file.is_file(), f"The file {expected_xe_file} does not exist."
     return expected_xe_file
@@ -91,8 +91,8 @@ def xsim_firmware(xe_file, return_output=True, timeout_s=60, sim_args=[]):
     sim_args (list): Additional arguments to pass to the `xsim` command.
 
     Returns:
-    tuple: A tuple containing the return code and the standard output of the command if `return_output` is True.
-           Otherwise, returns the return code and None.
+    subprocess.CompletedProcess: The completed process object containing the return code and output.
+
 
     Raises:
     AssertionError: If the .xe file does not exist.
