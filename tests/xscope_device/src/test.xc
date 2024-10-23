@@ -68,7 +68,9 @@ void test_client(client interface control i[3], chanend c_user_task[3])
               tmr :> t;
               timeout = 0;
               par {
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                 d <: control_process_xscope_upload((uint8_t*)buf_ptr, sizeof(buf), lenin, lenout, i);
+#pragma warning enable
                 { const size_t header_len = sizeof(struct control_xscope_response);
                   struct control_xscope_response *resp = (struct control_xscope_response*)buf;
                   uint8_t *payload = (uint8_t*)(resp + 1);

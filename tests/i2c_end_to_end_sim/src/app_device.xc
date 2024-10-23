@@ -14,6 +14,7 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
 
   while (1) {
     select {
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
       case i_i2c.ack_write_request(void) -> i2c_slave_ack_t resp:
         if (control_process_i2c_write_start(i_control) == CONTROL_SUCCESS)
           resp = I2C_SLAVE_ACK;
@@ -44,6 +45,7 @@ void i2c_client(server i2c_slave_callback_if i_i2c, client interface control i_c
         control_process_i2c_stop(i_control);
         break;
     }
+#pragma warning enable
   }
 }
 
@@ -52,7 +54,6 @@ void app_device(server interface control i_control)
   unsigned num_commands;
   int i;
 
-  //printf("Start device app\n");
 #ifdef ERRONEOUS_DEVICE
   printf("Generate errors\n");
 #endif

@@ -11,7 +11,6 @@
 
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
-
 control_status_t last_status;
 
 static void debug_channel_activity(int ifnum, int value)

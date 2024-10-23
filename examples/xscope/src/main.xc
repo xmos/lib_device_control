@@ -28,7 +28,9 @@ void xscope_client(chanend c_xscope, client interface control i_control[1])
   while (1) {
     select {
       case xscope_data_from_host(c_xscope, buffer, num_bytes_read):
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
         control_process_xscope_upload(buffer, sizeof(buffer), num_bytes_read, return_size, i_control);
+#pragma warning enable
         if (return_size > 0) {
           xscope_core_bytes(0, return_size, buffer);
         }

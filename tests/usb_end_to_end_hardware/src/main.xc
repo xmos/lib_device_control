@@ -44,8 +44,10 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
         case USB_BMREQ_H2D_VENDOR_DEV:
           res = XUD_GetBuffer(ep0_out, request_data, len);
           if (res == XUD_RES_OKAY) {
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
             if (control_process_usb_set_request(sp.wIndex, sp.wValue, sp.wLength,
                                                 request_data, i_control) == CONTROL_SUCCESS) {
+#pragma warning enable
               /* zero length data to indicate success
                * on control error, go to standard requests, which will issue STALL
                */
@@ -54,13 +56,14 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
             }
           }
           break;
-
         case USB_BMREQ_D2H_VENDOR_DEV:
           /* application retrieval latency inside the control library call
            * XUD task defers further calls by NAKing USB transactions
            */
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
           if (control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength,
                                               request_data, i_control) == CONTROL_SUCCESS) {
+#pragma warning enable
             len = sp.wLength;
             res = XUD_DoGetRequest(ep0_out, ep0_in, request_data, len, len);
             handled = 1;
@@ -71,7 +74,6 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
 
       if (!handled) {
         /* if we haven't handled the request about then do standard enumeration requests */
-        //printf("not handled, passing to standard requests\n");
         unsafe {
           res = USB_StandardRequests(ep0_out, ep0_in, devDesc,
             sizeof(devDesc), cfgDesc, sizeof(cfgDesc),

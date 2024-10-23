@@ -21,6 +21,7 @@ on tile[SPI_TILE]: clock                   cb     = XS1_CLKBLK_1;
 static void spi_client(server spi_slave_callback_if i_spi, client interface control i_control[1])
 {
   while (1) {
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
     select {
       case i_spi.master_ends_transaction():
         control_process_spi_master_ends_transaction(i_control);
@@ -32,6 +33,7 @@ static void spi_client(server spi_slave_callback_if i_spi, client interface cont
         control_process_spi_master_supplied_data(datum, valid_bits, i_control);
         break;
     }
+#pragma warning enable
   }
 }
 

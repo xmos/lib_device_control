@@ -59,6 +59,7 @@ void test_client(client interface control i[3], chanend c_user_task[3])
               tmr :> t;
               timeout = 0;
               par {
+#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                 { if (o.read_cmd) {
                     d <: control_process_usb_get_request(windex, wvalue, wlength,
                       (uint8_t*)payload_ptr, i);
@@ -73,6 +74,7 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                     d <: payload_ptr[0];
                   }
                 }
+#pragma warning enable
                 { select {
                     case drive_user_task_commands(c2, c1, c_user_task, o.read_cmd);
                     case tmr when timerafter(t + 500) :> void:
