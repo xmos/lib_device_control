@@ -1,19 +1,23 @@
 // Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+
 #include "control_host.h"
-#include "control_transport_shared.h" // Needed for SPI_DATA_MAX_BYTES
+#include "control_transport_shared.h" // for SPI_DATA_MAX_BYTES
 #include "resource.h"
 #include "util.h"
 #include <bcm2835.h>
 
 #define INVALID_CONTROL_VERSION 0xFF
-#define PAYLOAD_LEN 1 // Select a value between 1 and SPI_DATA_MAX_BYTES
+#define PAYLOAD_LEN 1
 
 int main(void)
 {
   control_version_t version = INVALID_CONTROL_VERSION;
+  assert(PAYLOAD_LEN > 0 && PAYLOAD_LEN < SPI_DATA_MAX_BYTES);
   unsigned char payload[PAYLOAD_LEN];
   uint8_t i;
 
