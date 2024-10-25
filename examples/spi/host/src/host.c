@@ -9,7 +9,7 @@
 #include <bcm2835.h>
 
 #define INVALID_CONTROL_VERSION 0xFF
-#define PAYLOAD_LEN SPI_DATA_MAX_BYTES
+#define PAYLOAD_LEN 1 // Select a value between 1 and SPI_DATA_MAX_BYTES
 
 int main(void)
 {
