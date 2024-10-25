@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include "control.h"
+#include "control_transport_shared.h" // Needed for SPI_DATA_MAX_BYTES
 #include "app.h"
 
 void app(server interface control i_control)
@@ -17,7 +18,7 @@ void app(server interface control i_control)
 #endif
 
   num_commands = 0;
-  uint8_t test_value = 0;
+  uint8_t test_values[SPI_DATA_MAX_BYTES] = {0};
   while (1) {
     select {
       case i_control.register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],
@@ -43,7 +44,9 @@ void app(server interface control i_control)
           ret = CONTROL_ERROR;
           break;
         }
-        test_value = payload[0];
+        for (int j = 0; j < payload_len; j++) {
+          test_values[j] = payload[j];
+        }
         ret = CONTROL_SUCCESS;
         break;
 
@@ -60,12 +63,11 @@ void app(server interface control i_control)
           ret = CONTROL_ERROR;
           break;
         }
-        if (payload_len != 1) {
-          printf("expecting 1 read byte, not %d\n", payload_len);
-          ret = CONTROL_ERROR;
-          break;
+
+        for (int j = 0; j < payload_len; j++) {
+          payload[j] = test_values[j];
         }
-        payload[0] = test_value;
+
         ret = CONTROL_SUCCESS;
         break;
     }
