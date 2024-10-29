@@ -1,6 +1,12 @@
 // Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
+/*
+ * This example demonstrates sending a command to a device and reading it back.
+ * The control command utilizes a payload of size PAYLOAD_LEN bytes.
+ * The example verifies that the read-back value matches the written value(s).
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -12,7 +18,7 @@
 #include <bcm2835.h>
 
 #define INVALID_CONTROL_VERSION 0xFF
-#define PAYLOAD_LEN 1
+#define PAYLOAD_LEN 1 // payload length in bytes
 
 int main(void)
 {
@@ -49,8 +55,6 @@ int main(void)
       printf("control write command failed\n");
       exit(1);
     }
-
-    pause_short();
 
     if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, PAYLOAD_LEN) != CONTROL_SUCCESS) {
       printf("control read command failed\n");
