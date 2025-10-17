@@ -19,6 +19,7 @@ lib_device_control change log
   * FIXED: Include guards in header files comply with the C standard.
   * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and
     stdbool.h.
+  * FIXED: Example and test to use updated return code name for XUD.
 
   * Changes to dependencies:
 

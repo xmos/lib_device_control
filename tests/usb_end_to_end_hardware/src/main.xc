@@ -1,4 +1,4 @@
-// Copyright 2016-2024 XMOS LIMITED.
+// Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <platform.h>
 #include <assert.h>
@@ -84,7 +84,7 @@ void endpoint0(chanend c_ep0_out, chanend c_ep0_in, client interface control i_c
       }
     }
 
-    if (res == XUD_RES_RST) {
+    if (res == XUD_RES_UPDATE) {
       bus_speed = XUD_ResetEndpoint(ep0_out, ep0_in);
     }
   }
