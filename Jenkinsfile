@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.34.0') _
+@Library('xmos_jenkins_shared_library@v0.43.2') _
 
 getApproval()
 
@@ -29,13 +29,13 @@ pipeline {
 
   environment {
     REPO = 'lib_device_control'
-    XMOSDOC_VERSION = 'v6.1.2'
+    XMOSDOC_VERSION = 'v8.0.0'
   } // environment
 
   parameters {
     string(
       name: 'TOOLS_VERSION',
-        defaultValue: '15.3.0',
+        defaultValue: '15.3.1',
         description: 'The XTC tools version'
     )
   }
