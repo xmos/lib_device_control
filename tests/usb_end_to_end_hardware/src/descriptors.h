@@ -1,7 +1,7 @@
-// Copyright 2016-2024 XMOS LIMITED.
+// Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef DESCRIPTORS_H_
-#define DESCRIPTORS_H_
+#ifndef DESCRIPTORS_H
+#define DESCRIPTORS_H
 
 #include "xud_device.h"
 
@@ -93,4 +93,4 @@ unsafe
   };
 }
 
-#endif // DESCRIPTORS_H_
+#endif // DESCRIPTORS_H

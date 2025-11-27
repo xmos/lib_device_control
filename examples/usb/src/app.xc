@@ -1,4 +1,4 @@
-// Copyright 2016-2024 XMOS LIMITED.
+// Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
 #include <stdio.h>
@@ -10,7 +10,6 @@
 void app(server interface control i_control)
 {
   unsigned num_commands;
-  int i;
 
   printf("started\n");
 #ifdef ERRONEOUS_DEVICE
@@ -35,7 +34,7 @@ void app(server interface control i_control)
           resid += 1;
 #endif
         printf("%u: W %d %d %d,", num_commands, resid, cmd, payload_len);
-        for (i = 0; i < payload_len; i++) {
+        for (unsigned i = 0; i < payload_len; i++) {
           printf(" %02x", payload[i]);
         }
         printf("\n");

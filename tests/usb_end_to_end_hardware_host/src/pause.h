@@ -1,7 +1,7 @@
-// Copyright 2016-2024 XMOS LIMITED.
+// Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef PAUSE_H_
-#define PAUSE_H_
+#ifndef PAUSE_H
+#define PAUSE_H
 
 #ifdef _WIN32
 #include <windows.h>
@@ -35,4 +35,4 @@ static void pause_long(void)
 
 #endif // WIN32
 
-#endif // PAUSE_H_
+#endif // PAUSE_H
