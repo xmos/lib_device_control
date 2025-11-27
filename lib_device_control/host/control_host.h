@@ -58,7 +58,7 @@ control_ret_t control_cleanup_i2c(void);
  *
  *  \param vendor_id     Vendor ID of controlled USB device
  *  \param product_id    Product ID of controlled USB device
- *  \param interface_num USB Control interface number of controlled device
+ *  \param interface_num Deprecated parameter, no longer used
  *
  *  \returns           Whether the initialization was successful or not
  */

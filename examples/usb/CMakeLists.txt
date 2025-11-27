@@ -18,5 +18,5 @@ set(APP_COMPILER_FLAGS
   -Wall
 )
 
-set(APP_DEPENDENT_MODULES lib_device_control lib_xud)
+set(APP_DEPENDENT_MODULES lib_device_control "lib_xud(4.0.0)")
 XMOS_REGISTER_APP()
