@@ -14,7 +14,7 @@ int main(void)
   unsigned char payload[4];
   uint8_t i;
 
-  if (control_init_usb(0x20B1, 0x1010, 0) != CONTROL_SUCCESS) {
+  if (control_init_usb(0x20B1, 0x001A, 0) != CONTROL_SUCCESS) {
     printf("control init failed\n");
     exit(1);
   }

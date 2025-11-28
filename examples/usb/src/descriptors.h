@@ -11,7 +11,7 @@
 
 #define BCD_DEVICE              0x0100
 #define VENDOR_ID               0x20B1
-#define PRODUCT_ID              0x1010
+#define PRODUCT_ID              0x001A
 
 #define MANUFACTURER_STR_INDEX  0x01
 #define PRODUCT_STR_INDEX       0x02
