@@ -1,11 +1,11 @@
 // Copyright 2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
-/** MSOPS 2.0 Descriptors - TODO: move this file to lib_xud
+/** MSOS 2.0 Descriptors - TODO: move this file to lib_xud
 */
 
-#ifndef _MSOS_DESCRIPTORS_
-#define _MSOS_DESCRIPTORS_
+#ifndef MSOS_DESCRIPTORS
+#define MSOS_DESCRIPTORS
 
 #include <stddef.h>
 #include <stdint.h>
@@ -49,10 +49,10 @@ extern "C" {
 
 // USB Binary Device Object Store (BOS) Descriptor
 typedef struct {
-  uint8_t  bLength         ; ///< Size of this descriptor in bytes
-  uint8_t  bDescriptorType ; ///< CONFIGURATION Descriptor Type
-  uint16_t wTotalLength    ; ///< Total length of data returned for this descriptor
-  uint8_t  bNumDeviceCaps  ; ///< Number of device capability descriptors in the BOS
+  uint8_t  bLength;         ///< Size of this descriptor in bytes
+  uint8_t  bDescriptorType; ///< CONFIGURATION Descriptor Type
+  uint16_t wTotalLength;    ///< Total length of data returned for this descriptor
+  uint8_t  bNumDeviceCaps;  ///< Number of device capability descriptors in the BOS
 } PACKED_STRUCT USB_Descriptor_BOS_standard_t;
 
 // Platform device capability BOS descriptor
@@ -60,7 +60,7 @@ typedef struct {
 typedef struct
 {
   uint8_t bLength;
-  uint8_t bDescriptorType ;
+  uint8_t bDescriptorType;
   uint8_t bDevCapabilityType;
   uint8_t bReserved;
   uint8_t PlatformCapabilityUUID[16];
@@ -110,7 +110,7 @@ typedef struct {
   uint8_t bConfigurationValue;
   uint8_t bReserved;
   uint16_t wTotalLength;
-}PACKED_STRUCT MSOS_desc_cfg_subset_header_t;
+} PACKED_STRUCT MSOS_desc_cfg_subset_header_t;
 
 typedef struct {
   uint16_t wLength;
@@ -118,14 +118,14 @@ typedef struct {
   uint8_t bFirstInterface;
   uint8_t bReserved;
   uint16_t wSubsetLength;
-}PACKED_STRUCT MSOS_desc_fn_subset_header_t;
+} PACKED_STRUCT MSOS_desc_fn_subset_header_t;
 
 typedef struct {
   uint16_t wLength;
   uint16_t  wDescriptorType;
   uint8_t CompatibleID[8];
   uint8_t SubCompatibleID[8];
-}PACKED_STRUCT MSOS_desc_compat_id_t;
+} PACKED_STRUCT MSOS_desc_compat_id_t;
 
 
 typedef struct
@@ -137,17 +137,17 @@ typedef struct
   uint8_t PropertyName[MSOS_PROPERTY_NAME_LEN];
   uint16_t wPropertyDataLength;
   uint8_t PropertyData[MSOS_INTERFACE_GUID_LEN];
-}PACKED_STRUCT MSOS_desc_registry_property_t;
+} PACKED_STRUCT MSOS_desc_registry_property_t;
 
 
 typedef struct {
   MSOS_desc_header_t              msos_desc_header;
   MSOS_desc_compat_id_t           msos_desc_compat_id;
   MSOS_desc_registry_property_t   msos_desc_registry_property;
-}PACKED_STRUCT MSOS_desc_simple_t;
+} PACKED_STRUCT MSOS_desc_simple_t;
 
 #ifdef __XC__
 } // extern "C"
 #endif
 
-#endif
+#endif // MSOS_DESCRIPTORS

@@ -1,7 +1,7 @@
 // Copyright 2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
-/** MSOPS 2.0 Descriptors for vendor Endpoint 0 handling
+/** MSOS 2.0 Descriptors for vendor Endpoint 0 handling
 */
 
 #ifndef EP0_MSOS_DESCRIPTORS

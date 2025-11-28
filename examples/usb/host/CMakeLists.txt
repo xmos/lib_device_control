@@ -45,7 +45,7 @@ target_include_directories(
 )
 
 # Properties and options
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(usb_host_app PRIVATE /W4 /WX /O2 /EHsc -D USE_USB=1)
 else()
     target_compile_options(usb_host_app PRIVATE -Wall -Wextra -Werror -D USE_USB=1 -O2)
