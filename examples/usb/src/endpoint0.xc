@@ -108,14 +108,14 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
                     if (sp.wLength <= EP0_MAX_REQUEST_SIZE) {
                         size_t len_ep0 = 0;
 
-                        result = XUD_RES_OKAY;
-                        // TODO: handle difference of bulk vs control transfer sizes
-                        while (result == XUD_RES_OKAY && len_ep0 < sp.wLength) {
+                        XUD_Result_t loop_result = XUD_RES_OKAY;
+                        while (loop_result == XUD_RES_OKAY && len_ep0 < sp.wLength) {
                             unsigned packet_len;
-                            result = XUD_GetBuffer(ep0_out, request_data + len_ep0, packet_len);
+                            loop_result = XUD_GetBuffer(ep0_out, request_data + len_ep0, packet_len);
 
                             len_ep0 += packet_len;
                         }
+                        result = loop_result;
                     } else {
                         result = XUD_RES_ERR;
                     }
