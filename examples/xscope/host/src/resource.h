@@ -1,10 +1,9 @@
-// Copyright 2016-2024 XMOS LIMITED.
+// Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef RESOURCE_H_
-#define RESOURCE_H_
 
-#include "control.h"
+#ifndef RESOURCE_H
+#define RESOURCE_H
 
 #define RESOURCE_ID 0x12
 
-#endif // RESOURCE_H_
+#endif // RESOURCE_H

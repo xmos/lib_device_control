@@ -1,11 +1,13 @@
-// Copyright 2024 XMOS LIMITED.
+// Copyright 2024-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#pragma once
+
+#ifndef CONTROL_TRANSPORT_SHARED_H
+#define CONTROL_TRANSPORT_SHARED_H
 
 #include "control_shared.h"
 
 /**
- * \defgroup control_transport_shared
+ * \defgroup control_transport_shared_group control_transport_shared
  *
  * The internal defines and structs for using the device control library on the device and host
  * @{
@@ -38,7 +40,7 @@
 /**
  * This is the special resource ID owned by the control library.
  * It can be used to check the version of the control protocol.
- * Servicers may not register this resource ID.
+ * Services may not register this resource ID.
  */
 #define CONTROL_SPECIAL_RESID 0
 
@@ -53,6 +55,8 @@
  * It must be sent to resource ID CONTROL_SPECIAL_RESID.
  */
 #define CONTROL_GET_LAST_COMMAND_STATUS CONTROL_CMD_SET_READ(1)
+
+/**@}*/
 
 /* The max USB packet size is 64B (USB 2.0 section 5.5.3),
  * but larger data transfers are fragmented into several packets.
@@ -89,4 +93,4 @@ struct control_xscope_response {
   control_ret_t ret;
 };
 
-/**@}*/
+#endif // CONTROL_TRANSPORT_SHARED_H

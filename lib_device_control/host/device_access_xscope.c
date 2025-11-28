@@ -15,6 +15,7 @@ typedef enum { false = 0, true = 1} bool;
 
 #include <stdlib.h>
 #include <stdint.h>
+
 #include "xscope_endpoint.h"
 #include "control_host.h"
 #include "control_host_support.h"
@@ -210,7 +211,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
   size_t len = control_xscope_create_upload_buffer(b,
     CONTROL_CMD_SET_READ(cmd), resid, NULL, payload_len);
 
-  DBG(printf("[HOST] %u read, len %d: ", num_commands, len));
+  DBG(printf("[HOST] %u read, len %zd: ", num_commands, len));
   DBG(print_bytes((unsigned char*)b, len));
 
   record_count = 0;

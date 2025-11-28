@@ -1,10 +1,10 @@
-.. include:: ../../README.rst
+############################################
+lib_device_control: Device Control for XCORE
+############################################
 
-Device Control Library
-----------------------
-
+************
 Introduction
-............
+************
 
 The Device Control Library handles the routing of control messages between a host and one or
 many controllable resources within the controlled device.
@@ -18,16 +18,19 @@ many controllable resources within the controlled device.
 All communications are fully acknowledged and so the host will be informed whether or not the
 device has correctly received or provided the required control information.
 
+*********
 Operation
-.........
+*********
 
-The *Host* controls *resources* on an xCORE *device* by sending *commands* to it over a
-*transport* protocol. Resources are identified by an 8-bit identifier and exist in
+The `Host` controls resources on an XCORE device by sending `commands` to it over a
+`transport` protocol. Resources are identified by an 8-bit identifier and exist in
 tasks that run on logical cores of the device. There can be multiple resources in a task.
 
-      **Send command c to resource r**
+.. code-block:: console
 
-The command code is 8 bits and is a *write* command when bit 7 is not set or a *read* command
+   Send command c to resource r
+
+The command code is 8 bits and is a `write` command when bit 7 is not set or a `read` command
 when bit 7 is set.
 
 .. figure:: ../images/control_packet.pdf
@@ -35,16 +38,18 @@ when bit 7 is set.
 
    Packet for control communications
 
-Read and write Commands include *data* bytes that are optional (can have a data length of zero).
+Read and write Commands include `data` bytes that are optional (can have a data length of zero).
 
-      **Send write command c to resource ``r`` with ``n`` bytes of data ``d``**
+.. code-block:: console
 
-      **Send read command c to resource ``r`` and get ``n`` bytes of data ``d`` back**
+   Send write command c to resource ``r`` with ``n`` bytes of data ``d``
+
+   Send read command c to resource ``r`` and get ``n`` bytes of data ``d`` back
 
 There is a transport task in the device (e.g. I2C slave or USB endpoint 0) that dispatches
 all commands. All other tasks that have resources connect to this transport task over xC interfaces.
 
-Tasks *register* their resources and these get bound to the tasks' xC interface. When commands are
+Tasks `register` their resources and these get bound to the tasks' xC interface. When commands are
 received by the transport task they forwarded over the matching xC interface.
 
 
@@ -62,7 +67,7 @@ host can indicate error to the user.
 
 The control library supports USB (device is USB device), I2C (device is I2C slave) and xSCOPE
 (device is target connected via xTAG debug adapter) as physical protocols. The maximum data packet size for
-each of the trasport types is as follows:
+each of the transport types is as follows:
 
 .. list-table:: Maximum Data Length for Device Control Library Transports
  :header-rows: 1
@@ -83,8 +88,36 @@ each of the trasport types is as follows:
 It would be straightforward to add support for additional physical protocols such as UART, SPI or
 TCP/UDP over Ethernet or add additional control hosts where the hardware and operating system supports it.
 
+
+*****
 Usage
-.....
+*****
+
+``lib_device_control`` is intended to be used with the
+`XCommon CMake <https://www.xmos.com/file/xcommon-cmake-documentation/?version=latest>`_,
+the `XMOS` application build and dependency management system.
+
+To use this library in an application include ``lib_device_control`` in the application's ``APP_DEPENDENT_MODULES`` list in
+`CMakeLists.txt`, for example:
+
+.. code-block:: cmake
+
+    set(APP_DEPENDENT_MODULES "lib_device_control")
+
+.. note:: Dependent modules should be pinned to release versions where possible, otherwise the
+   latest commit on the `develop` branch will be used.  For further details on managing modules,
+   pinning to a release version and other options, please see the page
+   `xcommon-cmake Dependency Management <https://www.xmos.com/documentation/XM-015090-PC/html/doc/dependency_management.html>`_.
+
+All ``lib_device_control`` functions can be accessed via the ``device_control.h`` header file, for example:
+
+.. code-block:: C
+
+    #include "device_control.h"
+
+*********
+Transport
+*********
 
 The transport task receives its natural unit of data, such as I2C transaction, or USB request, and
 calls a processing function on it from the library. At the same time it passes in the whole array of xC interfaces
@@ -119,29 +152,41 @@ To ensure compatibility, a special command is provided to query the version of c
 allows the host to query the device and check that it is running the same version, which will ensure
 command compatibility.
 
-Please see the `API---Device side`_ section for further details.
+Please see the `Device side`_ and `Host side`_ sections for further details.
 
+**********
 References
-..........
+**********
 
 I2C
-***
+===
 
-   * https://developer.mbed.org/users/okano/notebook/i2c-access-examples
-   * http://www.robot-electronics.co.uk/i2c-tutorial
-   * https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=15840&start=25
+* https://developer.mbed.org/users/okano/notebook/i2c-access-examples
+* http://www.robot-electronics.co.uk/i2c-tutorial
+* https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=15840&start=25
 
 USB
+===
+
+* http://www.beyondlogic.org/usbnutshell/usb6.shtml
+
+***
+API
 ***
 
-   * http://www.beyondlogic.org/usbnutshell/usb6.shtml
+Shared
+======
 
-API---Device side
------------------
+.. doxygengroup:: control_shared_group
 
-.. doxygenenum:: control_ret_values
+.. doxygengroup:: control_transport_shared_group
 
-.. doxygeninterface:: control
+Device side
+===========
+
+.. doxygendefine:: MAX_RESOURCES_PER_INTERFACE
+
+.. doxygengroup:: control
 
 .. doxygenfunction:: control_init
 
@@ -163,8 +208,8 @@ API---Device side
 
 .. doxygenfunction:: control_process_xscope_upload
 
-API - Host side
----------------
+Host side
+=========
 
 .. doxygenfunction:: control_init_xscope
 
@@ -181,10 +226,3 @@ API - Host side
 .. doxygenfunction:: control_write_command
 
 .. doxygenfunction:: control_read_command
-
-Known Issues
-------------
-
-- New installations of Windows 10 Anniversary (1607) and will not install the USB control driver without disabling attestation signing checks (lib_device_control #40)
-
-.. include:: ../../CHANGELOG.rst

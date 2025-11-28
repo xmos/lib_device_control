@@ -1,84 +1,89 @@
-@Library('xmos_jenkins_shared_library@v0.34.0') _
+@Library('xmos_jenkins_shared_library@v0.43.3') _
 
 getApproval()
 
-def runningOn(machine) {
-    println "Stage running on:"
-    println machine
-}
-
 def runForEach(folders, Closure body) {
   folders.each { app -> body(app) }
-}
-
-def buildDocs() {
-    withVenv {
-        sh 'pip install git+ssh://git@github.com/xmos/xmosdoc@${XMOSDOC_VERSION}'
-        sh 'xmosdoc'
-        zip zipFile: "${REPO}_docs.zip", archive: true, dir: 'doc/_build'
-    }
 }
 
 pipeline {
   agent none
 
   options {
+    skipDefaultCheckout()
     timestamps()
     buildDiscarder(xmosDiscardBuildSettings(onlyArtifacts=false))
   }
 
   environment {
-    REPO = 'lib_device_control'
-    XMOSDOC_VERSION = 'v8.0.0'
+    REPO_NAME = 'lib_device_control'
   } // environment
 
   parameters {
     string(
       name: 'TOOLS_VERSION',
-        defaultValue: '15.3.1',
-        description: 'The XTC tools version'
+      defaultValue: '15.3.1',
+      description: 'XTC tools version'
+    )
+    string(
+      name: 'XMOSDOC_VERSION',
+      defaultValue: 'v8.0.0',
+      description: 'xmosdoc version'
+    )
+    string(
+      name: 'INFR_APPS_VERSION',
+      defaultValue: 'v3.2.1',
+      description: 'The infr_apps version'
     )
   }
+
   stages {
     stage('Cross-platform builds and tests') {
       parallel {
         stage('Library checks, tests and Linux x86_64 host builds') {
           agent {
-            label 'linux&&64'
+            label 'linux && 64 && documentation'
           }
 
           stages {
-            stage("Clone library")
-            {
+            stage("Checkout") {
               steps {
-                runningOn(env.NODE_NAME)
-                dir("${REPO}") {
-                  // clone the repo and checkout the changes
-                  checkout scm
+                println "Stage running on ${env.NODE_NAME}"
+
+                dir(REPO_NAME) {
+                  checkoutScmShallow()
                 }
               }
             }
-            stage('xCORE builds') {
+            stage('XCORE builds') {
               steps {
                 // build all the supported firmware applications
                 runForEach(['i2c', 'i2c/host_xcore', 'spi', 'usb', 'xscope']) { app ->
                   withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
-                    dir("${REPO}/examples/${app}") {
-                          sh 'cmake -G "Unix Makefiles" -B build'
-                          sh "xmake -C build"
+                    dir("${REPO_NAME}/examples/${app}") {
+                      xcoreBuild()
                     }
                   }
                 }
               }
             }
-            stage('Library checks') {
+            stage('Repo checks') {
               steps {
-                runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
+                warnError("Repo checks failed") {
+                  runRepoChecks("${WORKSPACE}/${REPO_NAME}")
+                }
+              }
+            }
+            stage('Doc build') {
+              steps {
+                dir(REPO_NAME) {
+                  buildDocs()
+                }
               }
             }
             stage('Tests') {
               steps {
-                dir("${REPO}") {
+                dir(REPO_NAME) {
                   createVenv(reqFile: "requirements.txt")
                   withVenv {
                     withTools(params.TOOLS_VERSION) {
@@ -95,7 +100,7 @@ pipeline {
                 // build all the supported host applications
                 runForEach(['usb', 'xscope']) { app ->
                   withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
-                    dir("${REPO}/examples/${app}/host") {
+                    dir("${REPO_NAME}/examples/${app}/host") {
                       sh "cmake -B build"
                       sh "make -C build"
                     }
@@ -111,39 +116,22 @@ pipeline {
           }
         }
 
-        stage('Build documentation') {
-          agent {
-            label 'documentation'
-          }
-          stages {
-            stage('Docs') {
-              steps {
-                runningOn(env.NODE_NAME)
-                createVenv("requirements.txt")
-                buildDocs()
-              }
-            }
-          }
-          post {
-            cleanup {
-              xcoreCleanSandbox()
-            }
-          }
-        }
-
         stage('RPI host builds') {
           agent {
-            label 'armv7l&&raspian'
+            label 'armv7l && raspian'
           }
           stages {
-            stage('Build') {
+            stage('RPI Build') {
               steps {
-                runningOn(env.NODE_NAME)
-                // build all the supported host applications
-                runForEach(['i2c/host_rpi', 'spi/host']) { app ->
-                  dir("examples/${app}") {
-                      sh "cmake -B build"
-                      sh "make -C build"
+                println "Stage running on ${env.NODE_NAME}"
+                dir(REPO_NAME){
+                  checkoutScmShallow()
+                  // build all the supported host applications
+                  runForEach(['i2c/host_rpi', 'spi/host']) { app ->
+                    dir("examples/${app}") {
+                        sh "cmake -B build"
+                        sh "make -C build"
+                    }
                   }
                 }
               }
@@ -158,18 +146,21 @@ pipeline {
 
         stage('Mac x86_64 host builds') {
           agent {
-            label 'macOS&&x86_64'
+            label 'macOS && x86_64'
           }
           stages {
-            stage('Build') {
+            stage('Mac x86_64 Build') {
               steps {
-                runningOn(env.NODE_NAME)
-                // build all the supported host applications
-                runForEach(['usb', 'xscope']) { app ->
-                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
-                    dir("examples/${app}/host") {
-                      sh "cmake -B build"
-                      sh "make -C build"
+                println "Stage running on ${env.NODE_NAME}"
+                dir(REPO_NAME){
+                  checkoutScmShallow()
+                  // build all the supported host applications
+                  runForEach(['usb', 'xscope']) { app ->
+                    withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                      dir("examples/${app}/host") {
+                        sh "cmake -B build"
+                        sh "make -C build"
+                      }
                     }
                   }
                 }
@@ -181,22 +172,25 @@ pipeline {
               xcoreCleanSandbox()
             }
           }
-        } // Linux x86_64 host suilds
+        } // Linux x86_64 host builds
 
         stage('Mac arm64 host builds') {
           agent {
-            label 'macos&&arm64'
+            label 'macos && arm64'
           }
           stages {
-            stage('Build') {
+            stage('Mac arm64 Build') {
               steps {
-                runningOn(env.NODE_NAME)
-                // build all the supported host applications
-                runForEach(['usb', 'xscope']) { app ->
-                  withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
-                    dir("examples/${app}/host") {
-                      sh "cmake -B build"
-                      sh "make -C build"
+                println "Stage running on ${env.NODE_NAME}"
+                dir(REPO_NAME){
+                  checkoutScmShallow()
+                  // build all the supported host applications
+                  runForEach(['usb', 'xscope']) { app ->
+                    withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                      dir("examples/${app}/host") {
+                        sh "cmake -B build"
+                        sh "make -C build"
+                      }
                     }
                   }
                 }
@@ -215,23 +209,26 @@ pipeline {
             label 'sw-bld-win0'
           }
           stages {
-             stage('Build') {
+             stage('Win32 Build') {
               steps {
-                runningOn(env.NODE_NAME)
+                println "Stage running on ${env.NODE_NAME}"
 
-                // Build the USB host example for 32 bit as libusb is 32 bit
-                withVS('vcvars32.bat') {
-                  dir("examples/usb/host") {
-                    sh "cmake -G Ninja -B build"
-                    sh "ninja -C build"
-                  }
-                }
-                // Build the XCOPE host example for 64 bit as XTC tools  32 bit
-                withVS('vcvars64.bat') {
-                  withTools(params.TOOLS_VERSION) {
-                    dir("examples/xscope/host") {
+                dir(REPO_NAME){
+                  checkoutScmShallow()
+                  // Build the USB host example for 32 bit as libusb is 32 bit
+                  withVS('vcvars32.bat') {
+                    dir("examples/usb/host") {
                       sh "cmake -G Ninja -B build"
                       sh "ninja -C build"
+                    }
+                  }
+                  // Build the XSCOPE host example for 64 bit as XTC tools  32 bit
+                  withVS('vcvars64.bat') {
+                    withTools(params.TOOLS_VERSION) {
+                      dir("examples/xscope/host") {
+                        sh "cmake -G Ninja -B build"
+                        sh "ninja -C build"
+                      }
                     }
                   }
                 }
@@ -247,5 +244,14 @@ pipeline {
 
       } // parallel
     } // Cross-platform Builds & Tests
+    
+    stage('🚀 Release') {
+      when {
+        expression { triggerRelease.isReleasable() }
+      }
+      steps {
+        triggerRelease()
+      }
+    }
   } // stages
 }

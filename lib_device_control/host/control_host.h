@@ -1,13 +1,17 @@
 // Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#pragma once
 
-#include "control.h"
+#ifndef CONTROL_HOST_H
+#define CONTROL_HOST_H
+
+#include "control_shared.h"
 #include "control_transport_shared.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define XSCOPE_CONTROL_PROBE "Control Probe"
 
 #if USE_I2C && __xcore__
 #include "i2c.h"
@@ -78,7 +82,7 @@ control_ret_t control_cleanup_usb(void);
  *  \param clock_divider        The amount to divide the Raspberry Pi's clock by, e.g.
  *                              BCM2835_SPI_CLOCK_DIVIDER_1024 gives a clock of ~122kHz
  *                              on the RPI 2.
- *  \param delay_for_read       Delay between send and recieve for read command
+ *  \param delay_for_read       Delay between send and receive for read command
  *
  *  \returns                    Whether the initialization was successful or not
  */
@@ -88,7 +92,7 @@ control_ret_t control_init_spi_pi(spi_mode_t spi_mode, bcm2835SPIClockDivider cl
  *
  *  \param spi_mode             Mode that the SPI will run in
  *  \param spi_bitrate          Bitrate for SPI to run at
- *  \param delay_for_read       Delay between send and recieve for read command
+ *  \param delay_for_read       Delay between send and receive for read command
  *
  *  \returns                    Whether the initialization was successful or not
  */
@@ -102,7 +106,7 @@ control_ret_t control_cleanup_spi(void);
 #endif
 #if (!USE_USB && !USE_XSCOPE && !USE_I2C && !USE_SPI)
 #error "Please specify transport for lib_device_control using USE_xxx define in Makefile"
-#error "Eg. XCC_FLAGS = -DUSE_I2C=1"
+#error "Eg. APP_COMPILER_FLAGS = -DUSE_I2C=1"
 #endif // USE_XSCOPE
 
 #if USE_I2C && __xcore__
@@ -130,7 +134,7 @@ control_ret_t control_query_version(control_version_t *version);
  *
  *  \param resid        Resource ID. Indicates which resource the command is intended for
  *  \param cmd          Command code. Note that this will be in the range 0x80 to 0xFF
- *                      because bit 7 set indiciates a write command
+ *                      because bit 7 set indicates a write command
  *  \param payload      Array of bytes which constitutes the data payload
  *  \param payload_len  Size of the payload in bytes
  *
@@ -148,7 +152,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
  *
  *  \param resid        Resource ID. Indicates which resource the command is intended for
  *  \param cmd          Command code. Note that this will be in the range 0x80 to 0xFF
- *                      because bit 7 set indiciates a write command
+ *                      because bit 7 set indicates a write command
  *  \param payload      Array of bytes which constitutes the data payload
  *  \param payload_len  Size of the payload in bytes
  *
@@ -164,3 +168,5 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
 #ifdef __cplusplus
 }
 #endif
+
+#endif // CONTROL_HOST_H

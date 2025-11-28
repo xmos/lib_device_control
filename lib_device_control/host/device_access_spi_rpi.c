@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include "control.h"
+
 #include "control_host.h"
 #include "control_host_support.h"
 #include "bcm2835.h"
