@@ -28,10 +28,9 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     pkg_check_modules(libusb-1.0 REQUIRED libusb-1.0)
     set(LINK_LIBS usb-1.0)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    add_compile_definitions(nologo WAll WX- O2 EHa)
     target_link_directories(usb_host_app PRIVATE "${DEVICE_CONTROL_PATH}/host/libusb/Win32")
     set(libusb-1.0_INCLUDE_DIRS "${DEVICE_CONTROL_PATH}/host/libusb/Win32")
-    set(LINK_LIBS libusb)
+    set(LINK_LIBS libusb-1.0)
 endif()
 
 # Directories
@@ -46,7 +45,11 @@ target_include_directories(
 )
 
 # Properties and options
-target_compile_options(usb_host_app PRIVATE -D USE_USB -O2)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(usb_host_app PRIVATE /W4 /WX /O2 /EHsc -D USE_USB=1)
+else()
+    target_compile_options(usb_host_app PRIVATE -Wall -Wextra -Werror -D USE_USB=1 -O2)
+endif()
 
 target_link_libraries(usb_host_app PRIVATE ${LINK_LIBS})
 

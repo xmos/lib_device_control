@@ -1,4 +1,4 @@
-// Copyright 2016-2024 XMOS LIMITED.
+// Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #pragma once
 
@@ -58,7 +58,7 @@ control_ret_t control_cleanup_i2c(void);
  *
  *  \param vendor_id     Vendor ID of controlled USB device
  *  \param product_id    Product ID of controlled USB device
- *  \param interface_num USB Control interface number of controlled device
+ *  \param interface_num Deprecated parameter, no longer used
  *
  *  \returns           Whether the initialization was successful or not
  */

@@ -1,11 +1,11 @@
-// Copyright 2016-2024 XMOS LIMITED.
+// Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef USER_TASK_H_
-#define USER_TASK_H_
+#ifndef USER_TASK_H
+#define USER_TASK_H
 
 #include <xs1.h>
 #include "control.h"
 
 void user_task(server interface control i, chanend c);
 
-#endif // USER_TASK_H_
+#endif // USER_TASK_H

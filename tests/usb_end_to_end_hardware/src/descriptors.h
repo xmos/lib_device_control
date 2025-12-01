@@ -1,7 +1,7 @@
-// Copyright 2016-2024 XMOS LIMITED.
+// Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef DESCRIPTORS_H_
-#define DESCRIPTORS_H_
+#ifndef DESCRIPTORS_H
+#define DESCRIPTORS_H
 
 #include "xud_device.h"
 
@@ -9,7 +9,7 @@
 
 #define BCD_DEVICE              0x1000
 #define VENDOR_ID               0x20B1
-#define PRODUCT_ID              0x1010
+#define PRODUCT_ID              0x001A
 #define MANUFACTURER_STR_INDEX  0x0001
 #define PRODUCT_STR_INDEX       0x0002
 
@@ -93,4 +93,4 @@ unsafe
   };
 }
 
-#endif // DESCRIPTORS_H_
+#endif // DESCRIPTORS_H
