@@ -1,6 +1,8 @@
 // Copyright 2024-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#pragma once
+
+#ifndef CONTROL_SHARED_H
+#define CONTROL_SHARED_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -40,4 +42,8 @@ enum control_ret_values { /*This looks odd but helps us force byte enum */
     CONTROL_ERROR
 };
 
+/* Expected USB Vendor request value */
+#define CONTROL_VENDOR_REQUEST (0)
+
 /**@}*/
+#endif // CONTROL_SHARED_H
