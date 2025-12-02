@@ -1,20 +1,27 @@
 # This file relates to internal XMOS infrastructure and should be ignored by external users
-
+---
 lib_name: lib_device_control
 project: '{{lib_name}}'
 title: '{{lib_name}}: Device Control for xcore'
 version: 5.0.0
 
 documentation:
-  root_doc: doc/rst/lib_device_control.rst
   exclude_patterns_path: doc/exclude_patterns.inc
-  substitutions_path: doc/substitutions.inc
-  linkcheck_ignore_regex: ['.*github.com/xmos/lib_device_control.*']
+  root_doc: doc/rst/lib_device_control.rst
+  linkcheck_ignore_regex: ['']
+  latex_toc_depth: 3
+  latex_secnum_depth: 3
+  cognidox_part_number: XM-010892-UG
+  doxygen_projects:
+    lib_device_control:
+      doxyfile_path: doc/Doxyfile.inc
   pdfs:
     doc/rst/lib_device_control.rst:
-      pdf_title: '{{project}} - User Guide'
-      pdf_filename: '{{project}}__user_guide_v{{version}}'
+      pdf_title: '{{title}}'
+      pdf_filename: '{{lib_name}}_v{{version}}'
     README.rst:
       pdf_title: '{{title}} (README)'
-      pdf_filename: '{{project}}__readme_v{{version}}'
+      pdf_filename: '{{lib_name}}_v{{version}}_readme'
       pdf_short: yes
+software:
+  cognidox_part_number: XM-010580-SM

@@ -1,6 +1,19 @@
 lib_device_control change log
 =============================
 
+UNRELEASED
+----------
+
+  * ADDED: Support for XTC Tools 15.3.1
+  * CHANGED: USB Vendor control example now supports native WINUSB driver
+    installation on Windows
+
+  * Changes to dependencies:
+
+    - lib_logging: 3.2.0 -> 3.4.0
+
+    - lib_xassert: 4.2.0 -> 4.3.2
+
 5.0.0
 -----
 

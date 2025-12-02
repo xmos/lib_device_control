@@ -1,19 +1,32 @@
-Device Control Library
-======================
+:orphan:
 
+##########################################
+lib_device_control: Device Control Library
+##########################################
+
+:vendor: XMOS
+:version: 5.0.0
+:scope: General Use
+:description: A template for making XMOS libraries
+:category: General Purpose
+:keywords: USB, Serial interface, IO
+:devices: xcore-200, xcore.ai
+
+*******
 Summary
--------
+*******
 
 The Device Control Library provides the ability to configure and control an XMOS device 
 from a host over a number of transport layers.
 
+********
 Features
-........
+********
 
-  * Simple read/write API
-  * Fully acknowledged protocol
-  * Includes different transports including I2C slave, USB requests, xSCOPE over xCONNECT and SPI slave
-  * Supports multiple resources per task
+* Simple read/write API
+* Fully acknowledged protocol
+* Includes different transports including I2C slave, USB requests, xSCOPE over xCONNECT and SPI slave
+* Supports multiple resources per task
 
 The table below shows combinations of host and transport mechanisms that are currently supported. 
 Adding new transport layers and/or hosts is straightforward where the hardware supports it.
@@ -55,14 +68,40 @@ layer library requires. The API is in the form of function calls,
 so no additional logical cores are consumed. I/O requirements also depend on which transport
 layer is used.
 
-Software version and dependencies
-.................................
+************
+Known issues
+************
 
-The CHANGELOG contains information about the current and previous versions.
-For a list of direct dependencies, look for DEPENDENT_MODULES in lib_device_control/module_build_info.
+* None
 
+****************
+Development repo
+****************
+
+* `lib_device_control <https://www.github.com/xmos/lib_device_control>`_ (https://www.github.com/xmos/lib_device_control)
+
+**************
+Required tools
+**************
+
+* XMOS XTC Tools: 15.3.1
+
+*********************************
+Required libraries (dependencies)
+*********************************
+
+* `lib_logging <https://www.xmos.com/libraries/lib_logging>`_ (https://www.xmos.com/libraries/lib_logging)
+* `lib_xassert <https://www.xmos.com/libraries/lib_xassert>`_ (https://www.xmos.com/libraries/lib_xassert)
+
+*************************
 Related application notes
-.........................
+*************************
 
-   AN01034 - Using the Device Control Library over USB
+* None
 
+*******
+Support
+*******
+
+This package is supported by XMOS Ltd. Issues can be raised against the software at
+`www.xmos.com/support <https://www.xmos.com/support>`_ or using GitHub `issues <https://github.com/xmos/lib_device_control/issues>`_.

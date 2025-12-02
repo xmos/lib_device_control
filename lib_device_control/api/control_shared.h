@@ -1,4 +1,4 @@
-// Copyright 2024 XMOS LIMITED.
+// Copyright 2024-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #pragma once
 
@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 /**
- * \defgroup control_shared
+ * \defgroup control_shared_group control_shared
  *
  * The shared API for using the device control library on the device and host
  * @{
@@ -17,22 +17,19 @@
  */
 #define CONTROL_VERSION 0x10
 
-/**
- * @{
- * These types are used in control functions to identify the resource id,
- * command, version, and status.
- */
+/** Type used to identify a resource */
 typedef uint8_t control_resid_t;
+/** Type used to identify a command */
 typedef uint8_t control_cmd_t;
+/** Type used to identify a version */
 typedef uint8_t control_version_t;
+/** Type used to identify a return value */
 typedef uint8_t control_ret_t;
+/** Type used to identify a status */
 typedef uint8_t control_status_t;
-
-/**@}*/
 
 /**
  * This type enumerates the possible outcomes from a control transaction.
- *
  */
 enum control_ret_values { /*This looks odd but helps us force byte enum */
     CONTROL_SUCCESS = 0,

@@ -1,12 +1,14 @@
 // Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#pragma once
+
+#ifndef CONTROL_HOST_SUPPORT_H
+#define CONTROL_HOST_SUPPORT_H
 
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
-#include "control.h"
+
 #include "control_transport_shared.h"
 
 static inline size_t
@@ -88,3 +90,5 @@ control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
     return 3 + payload_len;
   }
 }
+
+#endif // CONTROL_HOST_SUPPORT_H
