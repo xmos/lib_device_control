@@ -1,21 +1,24 @@
 // Copyright 2016-2026 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
+
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "config.h"
 #include "control_host.h"
-#include "util.h"
-#include "resource.h"
+#include "control_host_util.h"
 
 #define INVALID_CONTROL_VERSION 0xFF
+
+// Payload size can be from 1 to 256 bytes
+#define PAYLOAD_SIZE 60
 
 int main(void)
 {
   control_version_t version = INVALID_CONTROL_VERSION;
-  // Exercise the control interface by writing and reading commands
-  // buffer is greater than 64 bytes to test USB control packet handling
-  uint8_t payload[100];
+  uint8_t payload[PAYLOAD_SIZE];
 
-  if (control_init_usb(0x20B1, 0x001A, 0) != CONTROL_SUCCESS) {
+  if (control_init_usb(VENDOR_ID, PRODUCT_ID, 0) != CONTROL_SUCCESS) {
     printf("control init failed\n");
     exit(1);
   }
@@ -45,7 +48,7 @@ int main(void)
 
     pause_short();
 
-    unsigned char read_payload[100];
+    unsigned char read_payload[PAYLOAD_SIZE];
     if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), read_payload, sizeof(read_payload)) != CONTROL_SUCCESS) {
       printf("control read command failed\n");
       exit(1);

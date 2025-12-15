@@ -8,6 +8,7 @@
 #include "control_transport_shared.h"
 #include "resource_table.h"
 #include <string.h>
+#include "xassert.h"
 
 #define DEBUG_UNIT CONTROL
 #include "debug_print.h"
@@ -19,6 +20,9 @@ static void debug_channel_activity(int ifnum, int value)
   // assume probe IDs are consecutive
   int probe_id = CH_CONTROL_0 + ifnum;
   xscope_int(probe_id, value);
+#else
+  (void)ifnum;
+  (void)value;
 #endif
 }
 
@@ -146,6 +150,7 @@ read_command(client interface control i[],
 control_ret_t
 control_process_i2c_write_start(client interface control i[])
 {
+  UNUSED_RES(i);
   // always start a new command
   // that way a write start recovers us from errors
   i2c.state = I2C_WRITE_START;
@@ -281,6 +286,8 @@ control_process_i2c_read_start(client interface control i[])
 control_ret_t
 control_process_i2c_read_data(uint8_t &data, client interface control i[])
 {
+  UNUSED_RES(i);
+
   if (i2c.state == I2C_READ_START) {
     data = i2c.payload[0];
     i2c.payload_len_transmitted = 1;
@@ -308,6 +315,8 @@ control_process_i2c_read_data(uint8_t &data, client interface control i[])
 control_ret_t
 control_process_i2c_stop(client interface control i[])
 {
+  UNUSED_RES(i);
+
   control_ret_t ret;
 
   ret = CONTROL_SUCCESS;
@@ -420,6 +429,9 @@ control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
                               unsigned length_in, unsigned &length_out,
                               client interface control i[])
 {
+  (void)buf_size;
+  (void)length_in;
+
   struct control_xscope_packet *p;
   struct control_xscope_response *r;
   unsigned char ifnum;
@@ -560,6 +572,7 @@ control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, cl
   // buffer[buffer_length] = (unsigned char) datum;
   // buffer_length++;
   /*************/
+  UNUSED_RES(i_ctl);
 
   control_ret_t ret = CONTROL_SUCCESS;
 

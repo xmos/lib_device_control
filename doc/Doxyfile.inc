@@ -3,7 +3,7 @@
 PROJECT_NAME            = lib_device_control
 PROJECT_BRIEF           = "Device Control for xcore"
 
-INPUT                   = ../lib_device_control/api ../lib_device_control/src  ../lib_device_control/host
+INPUT                   = ../lib_device_control/api ../lib_device_control/inc  ../host/api ../host/inc
 
 EXCLUDE_PATTERNS        = libusb.h
 

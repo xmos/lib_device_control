@@ -1,4 +1,3 @@
-.. include:: ../../README.rst
 
 Overview
 --------
@@ -188,20 +187,10 @@ Launching from the command line
 From the command line use the ``xrun`` tool to download and run the code
 on the xCORE device::
 
-  xrun --xscope bin/AN01034_usb.xe
+  xrun --xscope bin/usb.xe
 
 Once this command has executed the application will be running on the
 Vocal Fusion board.
-
-Launching from xTIMEcomposer Studio
-...................................
-
-From xTIMEcomposer Studio use the run mechanism to download code to xCORE device.
-Select the xCORE binary from the ``bin/`` directory, right click and go to **Run
-Configurations**. Double click on xCORE application to create a new run configuration,
-enable the xSCOPE I/O mode in the dialog box and then select **Run**.
-
-Once this command has executed the application will be running on the Vocal Fusion board.
 
 Running the application
 .......................
@@ -222,11 +211,13 @@ tools must be installed.
 
 To build the application, from a suitable command line shell with the compiler environment set, type either for Windows::
 
-  nmake -f Makefile.Win32
+  cmake -B build -G "Ninja"
+  cmake --build build
 
 or for OSX::
 
-  make -f Makefile.OSX
+  cmake -B build
+  cmake --build build
 
 The build will result in a binary being compiled into bin/a.out.
 
@@ -238,60 +229,21 @@ Running the host application
 
 To run under windows::
 
-  \bin\a.exe
+  \bin\usb_host_app.exe
 
 To run under OSX::
 
-  ./bin/a.out
+  ./bin/usb_host_app
 
 The application will attempt to enumerate the device and, on success, will request the user to input a number. This
 number will be sent across the device control API as a write command and set an appropriate number of LEDs on the device hardware.
 A number between 0 and 13 is valid. For example::
 
-  device found
   started
-  Enter number of LEDs to be lit: 11
-
-After receiving the command and the appropriate number of LEDs are lit, the last button event will be reported. The buttons are active low so the following report
-indicates that the last button event was button C being released::
-
-  Last button event: C value: 1
+  1: W 18 0 100, 00 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f 40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f 50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5f 60 61 62 63 64
+  2: R 18 128 100
 
 .. _driver:
-
-Installing the Driver on Windows
-................................
-
-The test vendor specific device used in this application which requires a driver on Windows. The driver is installed
-by finding the device when the application is running and connected to the host PC. Select :menuitem:`Control Panel,Device Manager`
-
-.. figure:: images/driver_1.png
-   :width: 40%
-
-   Device before driver install
-
-Right click on the device and select **Update Driver Software....**
-
-.. figure:: images/driver_2.png
-   :width: 40%
-
-   Update the driver
-
-Select **Browse for driver software on your computer** and choose the ``libusb\Win32\driver`` directory.
-
-.. figure:: images/driver_3.png
-   :width: 40%
-
-   Locate the driver
-
-The driver should be installed and create a device called **XMOS Custom Device**.
-
-.. figure:: images/driver_4.png
-   :width: 40%
-
-   Once the driver has been installed
-
-The device is now ready to be controlled on Windows.
 
 References
 ----------

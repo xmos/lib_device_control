@@ -6,7 +6,7 @@
 #include "control_host.h"
 #include "signals.h"
 #include "resource.h"
-#include "util.h"
+#include "control_host_util.h"
 
 int done = 0;
 
