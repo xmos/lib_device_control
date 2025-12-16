@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
+
 #include "control.h"
 #include "app.h"
 
@@ -60,12 +61,10 @@ void app(server interface control i_control)
           ret = CONTROL_ERROR;
           break;
         }
-        if (payload_len != 1) {
-          printf("expecting 1 read byte, not %d\n", payload_len);
-          ret = CONTROL_ERROR;
-          break;
+        // Simple test: fill the payload with the last written value
+        for (int i = 0; i < payload_len; i++) {
+          payload[i] = test_value;
         }
-        payload[0] = test_value;
         ret = CONTROL_SUCCESS;
         break;
     }

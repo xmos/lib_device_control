@@ -1,6 +1,8 @@
 // Copyright 2016-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#pragma once
+
+#ifndef RESOURCE_TABLE_H
+#define RESOURCE_TABLE_H
 
 #include "control.h"
 
@@ -10,3 +12,5 @@ int resource_table_add(const control_resid_t resources[MAX_RESOURCES_PER_INTERFA
                        unsigned num_resources, unsigned char ifnum);
 
 int resource_table_search(control_resid_t resid, unsigned char &ifnum);
+
+#endif // RESOURCE_TABLE_H

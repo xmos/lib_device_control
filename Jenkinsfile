@@ -38,9 +38,9 @@ pipeline {
   }
 
   stages {
-    stage('Cross-platform builds and tests') {
+    stage('🏗️ Build and test') {
       parallel {
-        stage('Library checks, tests and Linux x86_64 host builds') {
+        stage('Linux x86_64 checks, tests and builds') {
           agent {
             label 'linux && 64 && documentation'
           }
@@ -120,19 +120,15 @@ pipeline {
           agent {
             label 'armv7l && raspian'
           }
-          stages {
-            stage('RPI Build') {
-              steps {
-                println "Stage running on ${env.NODE_NAME}"
-                dir(REPO_NAME){
-                  checkoutScmShallow()
-                  // build all the supported host applications
-                  runForEach(['i2c/host_rpi', 'spi/host']) { app ->
-                    dir("examples/${app}") {
-                        sh "cmake -B build"
-                        sh "make -C build"
-                    }
-                  }
+          steps {
+            println "Stage running on ${env.NODE_NAME}"
+            dir(REPO_NAME){
+              checkoutScmShallow()
+              // build all the supported host applications
+              runForEach(['i2c/host_rpi', 'spi/host']) { app ->
+                dir("examples/${app}") {
+                    sh "cmake -B build"
+                    sh "make -C build"
                 }
               }
             }
@@ -148,20 +144,16 @@ pipeline {
           agent {
             label 'macOS && x86_64'
           }
-          stages {
-            stage('Mac x86_64 Build') {
-              steps {
-                println "Stage running on ${env.NODE_NAME}"
-                dir(REPO_NAME){
-                  checkoutScmShallow()
-                  // build all the supported host applications
-                  runForEach(['usb', 'xscope']) { app ->
-                    withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
-                      dir("examples/${app}/host") {
-                        sh "cmake -B build"
-                        sh "make -C build"
-                      }
-                    }
+          steps {
+            println "Stage running on ${env.NODE_NAME}"
+            dir(REPO_NAME){
+              checkoutScmShallow()
+              // build all the supported host applications
+              runForEach(['usb', 'xscope']) { app ->
+                withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                  dir("examples/${app}/host") {
+                    sh "cmake -B build"
+                    sh "make -C build"
                   }
                 }
               }
@@ -178,20 +170,16 @@ pipeline {
           agent {
             label 'macos && arm64'
           }
-          stages {
-            stage('Mac arm64 Build') {
-              steps {
-                println "Stage running on ${env.NODE_NAME}"
-                dir(REPO_NAME){
-                  checkoutScmShallow()
-                  // build all the supported host applications
-                  runForEach(['usb', 'xscope']) { app ->
-                    withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
-                      dir("examples/${app}/host") {
-                        sh "cmake -B build"
-                        sh "make -C build"
-                      }
-                    }
+          steps {
+            println "Stage running on ${env.NODE_NAME}"
+            dir(REPO_NAME){
+              checkoutScmShallow()
+              // build all the supported host applications
+              runForEach(['usb', 'xscope']) { app ->
+                withTools(params.TOOLS_VERSION) { // the XTC tools are necessary to build the XSCOPE host application
+                  dir("examples/${app}/host") {
+                    sh "cmake -B build"
+                    sh "make -C build"
                   }
                 }
               }
@@ -204,32 +192,24 @@ pipeline {
           }
         } // Mac arm64 host builds
 
-        stage('Win32 host builds') {
+        stage('Win64 host builds') {
           agent {
             label 'sw-bld-win0'
           }
-          stages {
-             stage('Win32 Build') {
-              steps {
-                println "Stage running on ${env.NODE_NAME}"
+          steps {
+            println "Stage running on ${env.NODE_NAME}"
 
-                dir(REPO_NAME){
-                  checkoutScmShallow()
-                  // Build the USB host example for 32 bit as libusb is 32 bit
-                  withVS('vcvars32.bat') {
-                    dir("examples/usb/host") {
-                      sh "cmake -G Ninja -B build"
-                      sh "ninja -C build"
-                    }
-                  }
-                  // Build the XSCOPE host example for 64 bit as XTC tools  32 bit
-                  withVS('vcvars64.bat') {
-                    withTools(params.TOOLS_VERSION) {
-                      dir("examples/xscope/host") {
-                        sh "cmake -G Ninja -B build"
-                        sh "ninja -C build"
-                      }
-                    }
+            dir(REPO_NAME){
+              checkoutScmShallow()
+              withVS('vcvars64.bat') {
+                dir("examples/usb/host") {
+                  sh "cmake -G Ninja -B build"
+                  sh "ninja -C build"
+                }
+                withTools(params.TOOLS_VERSION) {
+                  dir("examples/xscope/host") {
+                    sh "cmake -G Ninja -B build"
+                    sh "ninja -C build"
                   }
                 }
               }
@@ -240,7 +220,7 @@ pipeline {
               xcoreCleanSandbox()
             }
           }
-        } // Win32 host builds
+        } // Win64 host builds
 
       } // parallel
     } // Cross-platform Builds & Tests

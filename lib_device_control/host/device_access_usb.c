@@ -47,7 +47,7 @@ control_ret_t control_special_command(const uint8_t cmd_id, const uint16_t paylo
 
   int ret = libusb_control_transfer(devh,
     (uint8_t) LIBUSB_ENDPOINT_IN | (uint8_t) LIBUSB_REQUEST_TYPE_VENDOR | (uint8_t) LIBUSB_RECIPIENT_DEVICE,
-    0, wvalue, windex, request_data, wlength, sync_timeout_ms);
+    CONTROL_VENDOR_REQUEST, wvalue, windex, request_data, wlength, sync_timeout_ms);
 
   num_commands++;
 
@@ -116,7 +116,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
     return CONTROL_DATA_LENGTH_ERROR;
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
-    resid, CONTROL_CMD_SET_WRITE(cmd), payload_len);
+    resid, CONTROL_CMD_SET_WRITE(cmd), (unsigned)payload_len);
 
   DBG(printf("%u: send write command: 0x%04x 0x%04x 0x%04x ",
     num_commands, windex, wvalue, wlength));
@@ -124,7 +124,7 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
 
   int ret = libusb_control_transfer(devh,
     (uint8_t) LIBUSB_ENDPOINT_OUT | (uint8_t) LIBUSB_REQUEST_TYPE_VENDOR | (uint8_t) LIBUSB_RECIPIENT_DEVICE,
-    0, wvalue, windex, (unsigned char*)payload, wlength, sync_timeout_ms);
+    CONTROL_VENDOR_REQUEST, wvalue, windex, (unsigned char*)payload, wlength, sync_timeout_ms);
 
   num_commands++;
 
@@ -149,14 +149,14 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
     return CONTROL_DATA_LENGTH_ERROR;
 
   control_usb_fill_header(&windex, &wvalue, &wlength,
-    resid, CONTROL_CMD_SET_READ(cmd), payload_len);
+    resid, CONTROL_CMD_SET_READ(cmd), (unsigned)payload_len);
 
   DBG(printf("%u: send read command: 0x%04x 0x%04x 0x%04x\n",
     num_commands, windex, wvalue, wlength));
 
   int ret = libusb_control_transfer(devh,
     (uint8_t) LIBUSB_ENDPOINT_IN | (uint8_t) LIBUSB_REQUEST_TYPE_VENDOR | (uint8_t) LIBUSB_RECIPIENT_DEVICE,
-    0, wvalue, windex, payload, wlength, sync_timeout_ms);
+    CONTROL_VENDOR_REQUEST, wvalue, windex, payload, wlength, sync_timeout_ms);
 
   num_commands++;
 
@@ -182,10 +182,10 @@ control_ret_t control_init_usb(int vendor_id, int product_id, int interface_num)
   }
 
   libusb_device **devs = NULL;
-  int num_dev = libusb_get_device_list(NULL, &devs);
+  ssize_t num_dev = libusb_get_device_list(NULL, &devs);
 
   libusb_device *dev = NULL;
-  for (int i = 0; i < num_dev; i++) {
+  for (ssize_t i = 0; i < num_dev; i++) {
     struct libusb_device_descriptor desc;
     libusb_get_device_descriptor(devs[i], &desc);
     if (desc.idVendor == vendor_id && desc.idProduct == product_id) {

@@ -15,7 +15,7 @@ set(APP_COMPILER_FLAGS
   -Wall
 )
 
-set(APP_DEPENDENT_MODULES lib_device_control "lib_xud(4.0.0)")
+set(APP_DEPENDENT_MODULES lib_device_control "lib_xud(4.0.1)")
 
 set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
 

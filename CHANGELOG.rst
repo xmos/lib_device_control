@@ -4,9 +4,10 @@ lib_device_control change log
 UNRELEASED
 ----------
 
-  * ADDED: Support for XTC Tools 15.3.1
-  * CHANGED: USB Vendor control example now supports native WINUSB driver
+  * ADDED:    Support for XTC Tools 15.3.1
+  * CHANGED:  USB Vendor control example now supports native WINUSB driver
     installation on Windows
+  * CHANGED:  Migrated Windows USB host application from 32 bit to 64 bit
 
   * Changes to dependencies:
 

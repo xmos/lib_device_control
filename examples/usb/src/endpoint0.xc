@@ -7,10 +7,12 @@
 
 #include <platform.h>
 
+#include "app.h"
 #include "control.h"
 #include "descriptors.h"
-#include "ep0_msos_descriptors.h"
-#include "msos_descriptors.h"
+#include "msos_helpers.h"
+#include "simple_ep0_msos_descriptors.h"
+
 #include "xccompat.h"
 #include "xud_device.h"
 
@@ -19,8 +21,8 @@ static unsigned char devDesc[] =
 {
     0x12,                     /* 0  bLength */
     USB_DESCTYPE_DEVICE,      /* 1  bdescriptorType */
-    0x01,                     /* 2  bcdUSB */
-    0x02,                     /* 3  bcdUSB */
+    (BCD_USB & 0xFF),         /* 2  bcdUSB */
+    (BCD_USB >> 8),           /* 3  bcdUSB */
     VENDOR_SPECIFIC_CLASS,    /* 4  bDeviceClass (from xud_std_descriptors.h) */
     0,                        /* 5  bDeviceSubClass */
     0,                        /* 6  bDeviceProtocol */
@@ -71,7 +73,6 @@ unsafe {
 };
 
 #define EP0_MAX_REQUEST_SIZE        256 // max allowed USB recv size
-// #define EP0_MAX_REQUEST_BUF_SIZE    (EP0_MAX_REQUEST_SIZE + 2) // add 2 bytes for the CRC
 
 static unsigned char request_data[EP0_MAX_REQUEST_SIZE] = {0};
 
@@ -82,6 +83,8 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
     XUD_BusSpeed_t usbBusSpeed;
     XUD_ep ep0_out = XUD_InitEp(chan_ep0_out);
     XUD_ep ep0_in  = XUD_InitEp(chan_ep0_in);
+
+    XUD_Init_Simple_Ep0_Msos_Descriptors();
 
     control_init();
     control_register_resources(i_control, 1);
@@ -95,17 +98,17 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
         {
             result = XUD_RES_ERR; /* Start with error - will be set to OK if the next block is successful */
            
-            unsigned bmRequestType = (sp.bmRequestType.Direction<<7) | (sp.bmRequestType.Type<<5) | (sp.bmRequestType.Recipient);
+            unsigned bmRequestType = (sp.bmRequestType.Direction << 7) | (sp.bmRequestType.Type << 5) | (sp.bmRequestType.Recipient);
             switch(bmRequestType)
             {
                 case USB_BMREQ_D2H_STANDARD_DEV:
                     if (sp.bRequest == USB_GET_DESCRIPTOR) {
-                        result = Msos_Get_Bos_Descriptor(ep0_out, ep0_in, &sp);
+                        result = XUD_GetBosDescriptor(ep0_out, ep0_in, &sp);
                     }
                     break;
 
                 case USB_BMREQ_H2D_VENDOR_DEV:
-                    if (sp.wLength <= EP0_MAX_REQUEST_SIZE) {
+                    if ((sp.bRequest == CONTROL_VENDOR_REQUEST) && (sp.wLength <= EP0_MAX_REQUEST_SIZE)) {
                         size_t len_ep0 = 0;
 
                         XUD_Result_t loop_result = XUD_RES_OKAY;
@@ -131,11 +134,10 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
                     break;
 
                 case USB_BMREQ_D2H_VENDOR_DEV:
-                    // printf("Msos: rqst: %d, idx: %d, val: %d, len: %d, r: %d\n", sp.bRequest, sp.wIndex, sp.wValue, sp.wLength, result);
-                    if (sp.bRequest == REQUEST_GET_MS_DESCRIPTOR) {
-                        result = Msos_Get_Msos_Descriptor(ep0_out, ep0_in, &sp);
+                    if (sp.bRequest == XUD_REQUEST_GET_MSOS_DESCRIPTOR) {
+                        result = XUD_GetMsosDescriptor(ep0_out, ep0_in, &sp);
 
-                    } else {
+                    } else if ((sp.bRequest == CONTROL_VENDOR_REQUEST) && (sp.wLength <= EP0_MAX_REQUEST_SIZE)) {
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                         control_ret_t ctrl = control_process_usb_get_request(sp.wIndex, sp.wValue, sp.wLength, request_data, i_control);
 #pragma warning enable
