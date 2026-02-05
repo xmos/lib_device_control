@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "control_host.h"
 #include "resource.h"
-#include "util.h"
+#include "control_host_util.h"
 #include <bcm2835.h>
 
 #define INVALID_CONTROL_VERSION 0xFF

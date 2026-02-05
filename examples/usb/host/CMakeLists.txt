@@ -3,55 +3,29 @@ cmake_minimum_required(VERSION 3.21)
 set(CMAKE_BUILD_TYPE "Release")
 project(usb_host_app)
 
-# Define path to lib_device_control
-set(DEVICE_CONTROL_PATH ${CMAKE_CURRENT_LIST_DIR}/../../../lib_device_control)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../host/host_build_usb.cmake")
 
-# Define source files
-set(SOURCES
-    "${DEVICE_CONTROL_PATH}/host/device_access_usb.c"
-    "${DEVICE_CONTROL_PATH}/host/util.c"
-    "src/host.c"
+add_executable(usb_host_app "src/host.c")
+
+target_link_libraries(usb_host_app PRIVATE control_usb_host)
+
+# Set output directory
+set_target_properties(
+    usb_host_app PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../bin"
 )
-add_executable(usb_host_app ${SOURCES})
-
-# Discern OS for libusb library location
-if ((${CMAKE_SYSTEM_NAME} MATCHES "Darwin") AND (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64"))
-    target_link_directories(usb_host_app PRIVATE "${DEVICE_CONTROL_PATH}/host/libusb/OSX64")
-    set(libusb-1.0_INCLUDE_DIRS "${DEVICE_CONTROL_PATH}/host/libusb/OSX64")
-    set(LINK_LIBS usb-1.0.0)
-elseif ((${CMAKE_SYSTEM_NAME} MATCHES "Darwin") AND (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64"))
-    target_link_directories(usb_host_app PRIVATE "${DEVICE_CONTROL_PATH}/host/libusb/OSXARM")
-    set(libusb-1.0_INCLUDE_DIRS "${DEVICE_CONTROL_PATH}/host/libusb/OSXARM")
-    set(LINK_LIBS usb-1.0.0)
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    find_package(PkgConfig)
-    pkg_check_modules(libusb-1.0 REQUIRED libusb-1.0)
-    set(LINK_LIBS usb-1.0)
-elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    target_link_directories(usb_host_app PRIVATE "${DEVICE_CONTROL_PATH}/host/libusb/Win64")
-    set(libusb-1.0_INCLUDE_DIRS "${DEVICE_CONTROL_PATH}/host/libusb/Win64")
-    set(LINK_LIBS libusb-1.0)
-endif()
 
 # Directories
 target_include_directories(
-  usb_host_app
-    PRIVATE
-    src
-    ${DEVICE_CONTROL_PATH}/host
-    ${DEVICE_CONTROL_PATH}/api
-    ${DEVICE_CONTROL_PATH}/src
-    ${libusb-1.0_INCLUDE_DIRS}
+    usb_host_app PRIVATE
+        src
+        ../shared
 )
 
 # Properties and options
 if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(usb_host_app PRIVATE /W4 /WX /O2 /EHsc -D USE_USB=1)
+    target_compile_options(usb_host_app PRIVATE /W4 /WX /O2 /EHsc)
 else()
-    target_compile_options(usb_host_app PRIVATE -Wall -Wextra -Werror -D USE_USB=1 -O2)
+    target_compile_options(usb_host_app PRIVATE -Wall -Wextra -Werror -O2)
 endif()
 
-target_link_libraries(usb_host_app PRIVATE ${LINK_LIBS})
-
-# Set output directory
-set_target_properties(usb_host_app PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)

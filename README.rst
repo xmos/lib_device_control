@@ -7,7 +7,7 @@ lib_device_control: Device Control Library
 :vendor: XMOS
 :version: 5.0.0
 :scope: General Use
-:description: A template for making XMOS libraries
+:description: A library to control XMOS devices from a host
 :category: General Purpose
 :keywords: USB, Serial interface, IO
 :devices: xcore-200, xcore.ai

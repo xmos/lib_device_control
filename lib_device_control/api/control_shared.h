@@ -43,7 +43,18 @@ enum control_ret_values { /*This looks odd but helps us force byte enum */
 };
 
 /* Expected USB Vendor request value */
+#ifndef CONTROL_VENDOR_REQUEST
 #define CONTROL_VENDOR_REQUEST (0)
+#endif
+
+/* UNUSED_RES() works for resource: ports, interfaces, clocks, channels/chanends  */
+#ifndef UNUSED_RES
+#ifdef __XC__
+#define UNUSED_RES(x) do { unsafe { (void)(unsigned)(x); }  } while(0);
+#else
+#define UNUSED_RES(x) (void)(x)
+#endif
+#endif // UNUSED_RES
 
 /**@}*/
 #endif // CONTROL_SHARED_H

@@ -71,6 +71,33 @@ typedef interface control {
 #ifndef __DOXYGEN__
 } control_if;
 #endif
+#endif // defined(__XC__) || defined(__DOXYGEN__)
+
+/**
+ * Macro that expands to an array of client interfaces when used in an XC
+ * source file and to a pointer to the specified type when used in
+ * a C/C++ source file.
+ */
+#ifndef CLIENT_INTERFACE_ARRAY
+#ifdef __XC__
+#define CLIENT_INTERFACE_ARRAY(tag, name, size) client interface tag name[size]
+#else
+#define CLIENT_INTERFACE_ARRAY(type, name, size) unsigned *name
+#endif
+#endif
+
+/**
+ * Macro that expands to an array of server interfaces when used in an XC
+ * source file and to a pointer to the specified type when used in
+ * a C/C++ source file.
+ */
+#ifndef SERVER_INTERFACE_ARRAY
+#ifdef __XC__
+#define SERVER_INTERFACE_ARRAY(tag, name, size) server interface tag name[size]
+#else
+#define SERVER_INTERFACE_ARRAY(type, name, size) unsigned *name
+#endif
+#endif
 
   /** Initialize the control library. Clears resource table to ensure nothing is registered.
    *
@@ -87,7 +114,7 @@ control_init(void);
    *  \returns          Whether the registration was successful or not
    */
 control_ret_t
-control_register_resources(ARRAY_OF_SIZE(client interface control, i, n), unsigned n);
+control_register_resources(CLIENT_INTERFACE_ARRAY(control, i, n), unsigned n);
 
   /** Inform the control library that an I2C slave write has started. Called from I2C callback API.
    *
@@ -221,7 +248,5 @@ control_process_spi_master_requires_data(REFERENCE_PARAM(uint32_t, data), CLIENT
    */
 control_ret_t
 control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, CLIENT_INTERFACE(control, i_ctl[]));
-
-#endif // defined(__XC__) || defined(__DOXYGEN__)
 
 #endif // CONTROL_H
