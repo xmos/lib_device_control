@@ -26,4 +26,11 @@ elseif (TRANSPORT_UPPER STREQUAL "XSCOPE")
     list(APPEND LIB_XC_SRCS adapters/transport_xscope.xc)
 endif()
 
+# Add DFU control server source files based on configuration
+if (CONTROL_APP_DFU)
+    list(APPEND LIB_XC_SRCS apps/dfu_control_server.xc)
+endif()
+
+set(LIB_OPTIONAL_HEADERS    control_dfu_conf.h)
+
 XMOS_REGISTER_MODULE()
