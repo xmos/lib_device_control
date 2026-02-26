@@ -11,13 +11,19 @@
 
 #include "control_transport_shared.h"
 
-static inline size_t
+inline size_t
 control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
                                     control_cmd_t cmd, control_resid_t resid,
                                     const uint8_t *payload, unsigned payload_len)
 {
   const size_t header_size = sizeof(struct control_xscope_response);
   struct control_xscope_packet *p;
+  
+  if (buffer == NULL) {
+    return 0;
+  } else if (payload_len > XSCOPE_UPLOAD_MAX_WORDS) {
+    return 0;
+  }
 
   p = (struct control_xscope_packet*)buffer;
 
@@ -38,7 +44,7 @@ control_xscope_create_upload_buffer(uint32_t buffer[XSCOPE_UPLOAD_MAX_WORDS],
   }
 }
 
-static inline void
+inline void
 control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
                         control_resid_t resid, control_cmd_t cmd, unsigned payload_len)
 {
@@ -49,42 +55,56 @@ control_usb_fill_header(uint16_t *windex, uint16_t *wvalue, uint16_t *wlength,
   *wlength = (uint16_t)payload_len;
 }
 
-static inline size_t
+inline size_t
 control_build_spi_data(uint8_t data[SPI_TRANSACTION_MAX_BYTES],
                        control_resid_t resid, control_cmd_t cmd,
                        const uint8_t payload[], unsigned payload_len)
 {
+  if (data == NULL) {
+    return 0;
+  } else if (payload_len > SPI_TRANSACTION_MAX_BYTES) {
+    return 0;
+  }
+
   data[0] = resid;
   data[1] = cmd;
   data[2] = (uint8_t) payload_len;
 
-  for(unsigned i=0; i<5; ++i)
+  for(unsigned i=0; i<5; ++i) {
     data[3+i] = 0;
+  }
 
-  if (IS_CONTROL_CMD_READ(cmd)) return 8;
+  if (IS_CONTROL_CMD_READ(cmd) || payload == NULL) {
+    return 8;
+  }
 
-  for(unsigned i=0; i<payload_len; ++i)
+  for(unsigned i=0; i<payload_len; ++i) {
     data[3 + i] = payload[i];
+  }
 
   return 3 + payload_len;
 }
 
-static inline size_t
-control_build_i2c_data(uint8_t data[I2C_TRANSACTION_MAX_BYTES],
+inline size_t
+control_build_i2c_data(uint8_t data[],
                        control_resid_t resid, control_cmd_t cmd,
                        const uint8_t payload[], unsigned payload_len)
 {
-  unsigned i;
+  if (data == NULL) {
+    return 0;
+  } else if (payload_len > I2C_TRANSACTION_MAX_BYTES) {
+    return 0;
+  }
 
   data[0] = resid;
   data[1] = cmd;
   data[2] = (uint8_t)payload_len;
 
-  if (IS_CONTROL_CMD_READ(cmd)) {
+  if (IS_CONTROL_CMD_READ(cmd) || payload == NULL) {
     return 3;
-  }
-  else {
-    for (i = 0; i < payload_len; i++) {
+
+  } else {
+    for (unsigned i = 0; i < payload_len; i++) {
       data[3 + i] = payload[i];
     }
     return 3 + payload_len;

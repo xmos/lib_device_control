@@ -6,6 +6,8 @@
 
 #include "control_shared.h"
 #include "control_transport_shared.h"
+#include "control_default_conf.h"
+#include "control_default_dfu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
