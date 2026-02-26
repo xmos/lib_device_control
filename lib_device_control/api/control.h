@@ -9,6 +9,7 @@
 
 #include "control_shared.h"
 #include "xccompat.h"
+#include "control_default_conf.h"
 #include "control_default_dfu_conf.h"
 
 /** Resource count limits. Sets the size of the arrays used for storing the mappings */

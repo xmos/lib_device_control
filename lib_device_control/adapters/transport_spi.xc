@@ -1,16 +1,18 @@
 // Copyright 2025-2026 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
+#include "control.h"
+#if USE_SPI
+
 #include "transport_spi.h"
 
 #include <platform.h>
 
 #include "spi.h"
-#include "control.h"
 
 // SPI transport client processing function, this passes SPI data to the control interface.
 //
-// To include this file in the build, define TRANSPORT_CONFIG as "SPI" in CMakeLists.txt, "set(TRANSPORT_CONFIG  "SPI")"
+// To include this file in the build, define USE_SPI as 1, in control_conf.h
 
 void spi_control_client(server spi_slave_callback_if i_spi, client interface control i_control[])
 {
@@ -30,3 +32,5 @@ void spi_control_client(server spi_slave_callback_if i_spi, client interface con
 #pragma warning enable
   }
 }
+
+#endif // USE_SPI

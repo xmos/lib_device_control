@@ -13,4 +13,8 @@
 #define RESOURCE_ID_DFU 0xD0
 #endif
 
+#ifndef CONTROL_APP_DFU
+#define CONTROL_APP_DFU 0
+#endif
+
 #endif // CONTROL_DEFAULT_DFU_CONF_H

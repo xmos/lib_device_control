@@ -18,7 +18,7 @@ const char i2c_device_addr = 0x2C;
 int main(void)
 {
   i2c_slave_callback_if i_i2c;
-  interface control i_control[1];
+  interface control i_control[CONTROL_INTERFACES_NUM];
 
   par {
     on tile[PORT_I2C_SCL_TILE_NUM]: par {
@@ -26,7 +26,7 @@ int main(void)
     }
     on tile[PORT_I2C_SCL_TILE_NUM]: {
       control_init();
-      control_register_resources(i_control, 1);
+      control_register_resources(i_control, CONTROL_INTERFACES_NUM);
 
       /* bug 17317 - [[combine]] */
       par {

@@ -15,6 +15,7 @@ set(APP_COMPILER_FLAGS
   -g
   -report
   -Wall
+  -DCONTROL_TEST_HEADLESS=1
 )
 
 set(APP_DEPENDENT_MODULES lib_device_control)
