@@ -45,14 +45,15 @@ void dfu_control_server(server interface control dfu_control_interface) {
     {
         select
         {
-            case dfu_control_interface.register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],  unsigned &num_resources):
+            case dfu_control_interface.register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],  unsigned &num_resources): {
                 resources[0] = RESOURCE_ID_DFU;
                 num_resources = 1;
                 // printf("DFU control server: register resources: %d\n", RESOURCE_ID_DFU);
             break;
+            }
 
             case dfu_control_interface.write_command(control_resid_t resid, control_cmd_t cmd,
-                    const uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
+                    const uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret: {
 
                 if (payload_len > sizeof(local_payload) && payload_len >= sizeof(struct dfu_dnload_header)) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
@@ -102,9 +103,11 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 //     // device_reboot();
                 // }
             break;
+            }
 
             case dfu_control_interface.read_command(control_resid_t resid, control_cmd_t cmd,
-                    uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
+                    uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret: {
+
                 if (payload_len > sizeof(local_payload) && payload_len >= sizeof(struct dfu_dnload_header)) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
                     break;
@@ -112,6 +115,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
                     ret = CONTROL_BAD_COMMAND;
                     break;
                 }
+                memset(local_payload, 0, sizeof(local_payload));
 
                 struct dfu_cmd_response dfu_response = dfu_request_with_arguments(CONTROL_CMD_VALUE(cmd), local_payload, (payload_len - sizeof(struct dfu_dnload_header)), null);
                 struct dfu_dnload_header header = { 0, 0 };
@@ -132,6 +136,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 }
                 debug_printf("DFU read command: cmd=%d, block_num=%d, payload_len=%d, status=%d\n", CONTROL_CMD_VALUE(cmd), header.block_num, (payload_len - sizeof(header)), dfu_response.status);
             break;
+            }
 
             // WAS for reset timeout handling - might be needed/helpful for poll timeout handling, TBC
             // case dfu_write_command_state.timeout.enable => dfu_timer when timerafter(dfu_time) :> void:
