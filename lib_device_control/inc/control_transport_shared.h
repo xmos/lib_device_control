@@ -100,4 +100,15 @@ struct control_xscope_response {
   control_ret_t ret;
 };
 
+// Non-USB transport; sending block number with payload.
+struct dfu_dnload_header {
+  uint16_t block_num;
+  uint16_t pad;
+};
+
+struct dfu_upload_header {
+  uint16_t read_length;
+  uint16_t pad;
+};
+
 #endif // CONTROL_TRANSPORT_SHARED_H

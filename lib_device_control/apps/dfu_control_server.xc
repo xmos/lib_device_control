@@ -29,12 +29,6 @@
 #error "Transport not supported"
 #endif
 
-// Non-USB transport; sending block number with payload.
-struct dfu_dnload_header {
-  uint16_t block_num;
-  uint16_t pad;
-};
-
 // TODO - build lib_device_control example using this server to build.
 
 // [[combinable]]
@@ -55,6 +49,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
             case dfu_control_interface.write_command(control_resid_t resid, control_cmd_t cmd,
                     const uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret: {
 
+                debug_printf("DFU write command received: resid=%d, cmd=%d, payload_len=%d\n", resid, cmd, payload_len);
                 if (payload_len > sizeof(local_payload) && payload_len >= sizeof(struct dfu_dnload_header)) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
                     break;
@@ -62,15 +57,20 @@ void dfu_control_server(server interface control dfu_control_interface) {
                     ret = CONTROL_BAD_COMMAND;
                     break;
                 }
+
+                int32_t request_length = payload_len;
+                int32_t block_num = 0;
                 
-                size_t header_size = sizeof(struct dfu_dnload_header);
-                struct dfu_dnload_header header = { 0, 0 };
-                memcpy(&header, payload, header_size);
-                memcpy(local_payload, &payload[header_size], (payload_len - header_size));
-                int32_t block_num = header.block_num;
-                
-                struct dfu_cmd_response dfu_response = dfu_request_with_arguments(CONTROL_CMD_VALUE(cmd), local_payload, (payload_len - header_size), block_num);
-                debug_printf("DFU write command: cmd=%d, block_num=%d, payload_len=%d, status=%d\n", CONTROL_CMD_VALUE(cmd), block_num, (payload_len - header_size), dfu_response.status);
+                if (payload_len != 0) {
+                    size_t header_size = sizeof(struct dfu_dnload_header);
+                    struct dfu_dnload_header header = { 0, 0 };
+                    memcpy(&header, payload, header_size);
+                    memcpy(local_payload, &payload[header_size], (payload_len - header_size));
+                    block_num = header.block_num;
+                    request_length = (payload_len - header_size);
+                }
+                struct dfu_cmd_response dfu_response = dfu_request_with_arguments(CONTROL_CMD_VALUE(cmd), local_payload, request_length, block_num);
+                debug_printf("DFU write command status=%d\n", dfu_response.status);
 
                 if (dfu_response.status == DFU_API_SUCCESS) {
                     ret = CONTROL_SUCCESS;
@@ -108,7 +108,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
             case dfu_control_interface.read_command(control_resid_t resid, control_cmd_t cmd,
                     uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret: {
 
-                if (payload_len > sizeof(local_payload) && payload_len >= sizeof(struct dfu_dnload_header)) {
+                if (payload_len > sizeof(local_payload) && payload_len >= sizeof(struct dfu_upload_header)) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
                     break;
                 } else if (resid != RESOURCE_ID_DFU) {
@@ -117,10 +117,10 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 }
                 memset(local_payload, 0, sizeof(local_payload));
 
-                struct dfu_cmd_response dfu_response = dfu_request_with_arguments(CONTROL_CMD_VALUE(cmd), local_payload, (payload_len - sizeof(struct dfu_dnload_header)), null);
-                struct dfu_dnload_header header = { 0, 0 };
+                struct dfu_cmd_response dfu_response = dfu_request_with_arguments(CONTROL_CMD_VALUE(cmd), local_payload, (payload_len - sizeof(struct dfu_upload_header)), null);
+                struct dfu_upload_header header = { 0, 0 };
                 if (dfu_response.status == DFU_API_SUCCESS) {
-                    header.block_num = dfu_response.return_data_len;
+                    header.read_length = dfu_response.return_data_len;
                     memcpy(payload, &header, sizeof(header));
 
                     size_t payload_for_dfu = (payload_len - sizeof(header));
@@ -134,7 +134,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 } else {
                     ret = CONTROL_ERROR;
                 }
-                debug_printf("DFU read command: cmd=%d, block_num=%d, payload_len=%d, status=%d\n", CONTROL_CMD_VALUE(cmd), header.block_num, (payload_len - sizeof(header)), dfu_response.status);
+                debug_printf("DFU read command: cmd=%d, read_length=%d, payload_len=%d, status=%d\n", CONTROL_CMD_VALUE(cmd), header.read_length, (payload_len - sizeof(header)), dfu_response.status);
             break;
             }
 
