@@ -33,9 +33,9 @@
 #endif
 
 #if (CONTROL_TEST_HEADLESS + USE_USB + USE_I2C + USE_SPI + USE_XSCOPE) > 1
-#error "Multiple USB transport types defined. Please ensure only one of USE_USB, USE_I2C, USE_SPI, or USE_XSCOPE is set to 1."
+#error "Multiple transport types defined. Please ensure only one of USE_USB, USE_I2C, USE_SPI, or USE_XSCOPE is set to 1."
 #elif ((CONTROL_TEST_HEADLESS + USE_USB + USE_I2C + USE_SPI + USE_XSCOPE) == 0)
-#error "No USB transport type defined. Please ensure one of USE_USB, USE_I2C, USE_SPI, or USE_XSCOPE is set to 1."
+#error "No transport type defined. Please ensure one of USE_USB, USE_I2C, USE_SPI, or USE_XSCOPE is set to 1."
 #endif
 
 
