@@ -24,6 +24,13 @@
 #define IS_CONTROL_CMD_READ(c) ((c) & 0x80)
 
 /**
+ * Returns the command value with the read/write bit cleared.
+ *
+ * \param[in,out] c The transport command code converted to an application command code.
+ */
+#define CONTROL_CMD_VALUE(c) ((c) & ~0x80)
+
+/**
  * Sets the read bit on a command code
  *
  * \param[in,out] c The command code to set the read bit on.
@@ -91,6 +98,17 @@ struct control_xscope_response {
   control_cmd_t cmd;
   uint8_t payload_len;
   control_ret_t ret;
+};
+
+// Non-USB transport; sending block number with payload.
+struct dfu_dnload_header {
+  uint16_t block_num;
+  uint16_t pad;
+};
+
+struct dfu_upload_header {
+  uint16_t read_length;
+  uint16_t pad;
 };
 
 #endif // CONTROL_TRANSPORT_SHARED_H

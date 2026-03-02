@@ -8,7 +8,8 @@
 #include <stddef.h>
 
 #include "control_shared.h"
-#include "xccompat.h"
+#include "control_default_conf.h"
+#include "control_default_dfu_conf.h"
 
 /** Resource count limits. Sets the size of the arrays used for storing the mappings */
 #define MAX_RESOURCES_PER_INTERFACE 64
@@ -21,6 +22,8 @@
 #define SPI_TRANSFER_SIZE_BITS  8
 
 #if defined(__XC__) || defined(__DOXYGEN__)
+#include "xccompat.h"
+
 #ifndef __DOXYGEN__
 /* This interface is used to communicate with the control library from the application */
 typedef interface control {

@@ -11,7 +11,6 @@
 
 #include "i2c.h"
 #include "control_host_util.h"
-#include "resource.h"
 #include "control_host.h"
 #include "control_host_support.h"
 

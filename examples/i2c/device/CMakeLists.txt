@@ -9,9 +9,6 @@ set(APP_HW_TARGET src/XK_VOICE_L71.xn)
 # Includes and flags
 set(APP_INCLUDES src ../shared)
 
-# To enable I2C transport in the library, this application must build 'i2c' configuration
-set(TRANSPORT_CONFIG  "I2C")
-
 set(APP_COMPILER_FLAGS
   -O2
   -g

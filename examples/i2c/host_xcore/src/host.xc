@@ -19,7 +19,7 @@ int main(void)
   i2c_master_if i_i2c[1];
   par {
     on tile[0]: {
-      i2c_master(i_i2c, 1, p_scl, p_sda, 10);
+      i2c_master(i_i2c, 1, p_scl, p_sda, 100);
     }
     on tile[1]: {
       control_version_t version;
