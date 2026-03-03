@@ -88,7 +88,7 @@ control_build_spi_data(uint8_t data[SPI_TRANSACTION_MAX_BYTES],
 inline size_t
 control_build_i2c_data(uint8_t data[],
                        control_resid_t resid, control_cmd_t cmd,
-                       const uint8_t payload[], unsigned payload_len)
+                       const uint8_t payload[], size_t payload_len)
 {
   if (data == NULL) {
     return 0;
