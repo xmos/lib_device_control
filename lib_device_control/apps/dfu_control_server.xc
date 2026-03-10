@@ -36,6 +36,13 @@ static timer dfu_timer;
 static unsigned dfu_time;
 static enum dfu_request dfu_deferred_action = 0;
 
+/* Profiling */
+static unsigned profile_dfu_start_time;
+static unsigned profile_dfu_end_time;
+static unsigned profile_dfu_index;
+
+static struct dfu_profile_data profile_data;
+
 // [[combinable]]
 void dfu_control_server(server interface control dfu_control_interface) {
     uint8_t local_payload[DFU_CONTROL_PAYLOAD_BYTES];
@@ -54,6 +61,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
             case dfu_control_interface.write_command(control_resid_t resid, control_cmd_t cmd,
                     const uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret: {
 
+                profile_dfu_index += 1;
                 debug_printf("DFU write command received: resid=%d, cmd=%d, payload_len=%d\n", resid, cmd, payload_len);
                 if (payload_len > sizeof(local_payload) && payload_len >= sizeof(struct dfu_dnload_header)) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
@@ -66,6 +74,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 int32_t request_length = payload_len;
                 int32_t block_num = 0;
                 
+                dfu_timer :> profile_dfu_start_time;
                 if (payload_len != 0) {
                     size_t header_size = sizeof(struct dfu_dnload_header);
                     struct dfu_dnload_header header = { 0, 0 };
@@ -79,6 +88,14 @@ void dfu_control_server(server interface control dfu_control_interface) {
                     cmd = XMOS_DFU_REVERTFACTORY;
                 }
                 struct dfu_cmd_response dfu_response = dfu_request_with_arguments(cmd, local_payload, request_length, block_num);
+                dfu_timer :> profile_dfu_end_time;
+                unsigned dfu_command_time = profile_dfu_end_time - profile_dfu_start_time;
+                if (dfu_command_time > profile_data.command_time) {
+                    profile_data.command_time = dfu_command_time;
+                    profile_data.command_index = profile_dfu_index;
+                    profile_data.cmd = CONTROL_CMD_VALUE(cmd);
+                }
+
                 debug_printf("DFU write command status=%d\n", dfu_response.status);
 
                 if (dfu_response.status == DFU_API_SUCCESS) {
@@ -105,6 +122,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
             case dfu_control_interface.read_command(control_resid_t resid, control_cmd_t cmd,
                     uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret: {
 
+                profile_dfu_index += 1;
                 if (payload_len > sizeof(local_payload) || payload_len < sizeof(struct dfu_upload_header)) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
                     break;
@@ -114,8 +132,20 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 }
                 memset(local_payload, 0, sizeof(local_payload));
 
+                /* Read profile data */
+                if (CONTROL_CMD_VALUE(cmd) == CONTROL_CMD_VALUE(XMOS_DFU_GETPROFILE)) {
+                    struct dfu_upload_header prof_header = { 0, 0 };
+                    prof_header.read_length = sizeof(struct dfu_profile_data);
+                    memcpy(payload, &prof_header, sizeof(prof_header));
+
+                    profile_data.index_total = profile_dfu_index;
+                    memcpy(payload + sizeof(prof_header), &profile_data, (payload_len - sizeof(prof_header)));
+                    ret = CONTROL_SUCCESS;
+                    break;
+                }
+
+                dfu_timer :> profile_dfu_start_time;
                 struct dfu_cmd_response dfu_response = dfu_request_with_arguments(CONTROL_CMD_VALUE(cmd), local_payload, (payload_len - sizeof(struct dfu_upload_header)), null);
-                
                 struct dfu_upload_header header = { 0, 0 };
                 if (dfu_response.status == DFU_API_SUCCESS) {
                     header.read_length = dfu_response.return_data_len;
@@ -138,6 +168,14 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 } else {
                     ret = CONTROL_ERROR;
                 }
+                dfu_timer :> profile_dfu_end_time;
+                unsigned dfu_command_time = profile_dfu_end_time - profile_dfu_start_time;
+                if (dfu_command_time > profile_data.command_time) {
+                    profile_data.command_time = dfu_command_time;
+                    profile_data.command_index = profile_dfu_index;
+                    profile_data.cmd = CONTROL_CMD_VALUE(cmd);
+                }
+
                 debug_printf("DFU read command: cmd=%d, read_length=%d, payload_len=%d, status=%d\n", CONTROL_CMD_VALUE(cmd), header.read_length, (payload_len - sizeof(header)), dfu_response.status);
                 dfu_timer :> dfu_time;
                 dfu_time += (1 * XS1_TIMER_KHZ);
