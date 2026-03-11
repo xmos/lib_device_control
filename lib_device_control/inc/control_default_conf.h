@@ -38,5 +38,14 @@
 #error "No transport type defined. Please ensure one of USE_USB, USE_I2C, USE_SPI, or USE_XSCOPE is set to 1."
 #endif
 
+/** Resource ID for DFU */
+#ifndef RESOURCE_ID_DFU
+#define RESOURCE_ID_DFU 0xD0
+#endif
+
+/* When enabled, will include the control DFU application server in the build */
+#ifndef CONTROL_APP_DFU
+#define CONTROL_APP_DFU 0
+#endif
 
 #endif // CONTROL_DEFAULT_CONF_H

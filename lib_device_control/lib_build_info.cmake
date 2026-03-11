@@ -16,7 +16,6 @@ set(LIB_XC_SRCS         src/control.xc
                         adapters/transport_xscope.xc
                         apps/dfu_control_server.xc)
 
-set(LIB_OPTIONAL_HEADERS    control_conf.h
-                            control_dfu_conf.h)
+set(LIB_OPTIONAL_HEADERS    control_conf.h)
 
 XMOS_REGISTER_MODULE()
