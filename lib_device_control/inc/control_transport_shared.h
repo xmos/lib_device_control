@@ -28,7 +28,7 @@
  *
  * \param[in,out] c The transport command code converted to an application command code.
  */
-#define CONTROL_CMD_VALUE(c) ((c) & ~0x80)
+#define CONTROL_CMD_VALUE(c) ((c) & (control_cmd_t)~0x80)
 
 /**
  * Sets the read bit on a command code
@@ -42,7 +42,7 @@
  *
  * \param[in,out] c The command code to clear the read bit on.
  */
-#define CONTROL_CMD_SET_WRITE(c) ((c) & ~0x80)
+#define CONTROL_CMD_SET_WRITE(c) ((c) & (control_cmd_t)~0x80)
 
 /**
  * This is the special resource ID owned by the control library.
