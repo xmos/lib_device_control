@@ -5,6 +5,6 @@
 #define CONTROL_CONF_H
 
 #define CONTROL_INTERFACES_NUM 1
-#define USE_I2C 1
+#define CONTROL_USE_I2C 1
 
 #endif // CONTROL_CONF_H

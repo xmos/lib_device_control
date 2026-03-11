@@ -4,9 +4,9 @@ add_library(control_usb_host INTERFACE)
 
 # Properties and options
 if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(control_usb_host INTERFACE -D USE_USB=1)
+    target_compile_options(control_usb_host INTERFACE -DCONTROL_USE_USB=1)
 else()
-    target_compile_options(control_usb_host INTERFACE -D USE_USB=1)
+    target_compile_options(control_usb_host INTERFACE -DCONTROL_USE_USB=1)
 endif()
 
 # Discern OS for libusb library location

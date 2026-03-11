@@ -1,7 +1,7 @@
 // Copyright 2025-2026 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include "control.h"
-#if USE_USB
+#if CONTROL_USE_USB
 
 #include "transport_usb.h"
 
@@ -16,7 +16,7 @@ static unsigned char request_data[EP0_MAX_REQUEST_SIZE] = {0};
 
 // USB Transport device processing function, this passes USB vendor requests to the control interface.
 //
-// To include this file in the build, define USE_USB as 1, in control_conf.h
+// To include this file in the build, define CONTROL_USE_USB as 1, in control_conf.h
 
 static XUD_Result_t USB_EP0_Receive(XUD_ep ep0_out, USB_SetupPacket_t *sp, uint8_t buffer[]) {
     XUD_Result_t result = XUD_RES_OKAY;
@@ -64,4 +64,4 @@ XUD_Result_t USB_D2H_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacke
     return result;
 }
 
-#endif // USE_USB
+#endif // CONTROL_USE_USB

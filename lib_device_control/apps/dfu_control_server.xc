@@ -18,13 +18,13 @@
 #include "control_transport_shared.h"
 #include "dfu.h"
 
-#if USE_I2C
+#if CONTROL_USE_I2C
 #define DFU_CONTROL_PAYLOAD_BYTES (I2C_DATA_MAX_BYTES)
-#elif USE_SPI
+#elif CONTROL_USE_SPI
 #define DFU_CONTROL_PAYLOAD_BYTES (SPI_DATA_MAX_BYTES)
-#elif USE_USB
+#elif CONTROL_USE_USB
 #define DFU_CONTROL_PAYLOAD_BYTES (USB_DATA_MAX_BYTES)
-#elif USE_XSCOPE
+#elif CONTROL_USE_XSCOPE
 #define DFU_CONTROL_PAYLOAD_BYTES (XSCOPE_DATA_MAX_BYTES)
 #else
 #error "Transport not supported"

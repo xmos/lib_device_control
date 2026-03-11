@@ -2,7 +2,7 @@
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
 #include "control.h"
-#if USE_I2C
+#if CONTROL_USE_I2C
 
 #include "transport_i2c.h"
 
@@ -12,7 +12,7 @@
 
 // I2C transport client processing function, this passes I2C data to the control interface.
 //
-// To include this file in the build, define USE_I2C as 1, in control_conf.h
+// To include this file in the build, define CONTROL_USE_I2C as 1, in control_conf.h
 
 // [[distributable]]
 void i2c_control_client(server i2c_slave_callback_if i_i2c, client interface control i_control[])
@@ -53,4 +53,4 @@ void i2c_control_client(server i2c_slave_callback_if i_i2c, client interface con
   }
 }
 
-#endif // USE_I2C
+#endif // CONTROL_USE_I2C

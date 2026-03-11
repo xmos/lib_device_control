@@ -4,7 +4,7 @@ add_library(control_i2c_host INTERFACE)
 
 if ((${CMAKE_SYSTEM_NAME} MATCHES "Linux") AND (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
     # Raspberry Pi specific I2C includes
-    target_compile_options(control_i2c_host INTERFACE -DUSE_I2C=1 -DRPI=1)
+    target_compile_options(control_i2c_host INTERFACE -DCONTROL_USE_I2C=1 -DCONTROL_RPI=1)
     target_sources(control_i2c_host
         INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/src/device_access_i2c_rpi.c
@@ -12,7 +12,7 @@ if ((${CMAKE_SYSTEM_NAME} MATCHES "Linux") AND (${CMAKE_SYSTEM_PROCESSOR} MATCHE
     )
 elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "XCORE_XS")
     # XCore specific I2C includes
-    target_compile_options(control_i2c_host INTERFACE -DUSE_I2C=1)
+    target_compile_options(control_i2c_host INTERFACE -DCONTROL_USE_I2C=1)
     target_sources(control_i2c_host
         INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/src/device_access_i2c_xcore.xc

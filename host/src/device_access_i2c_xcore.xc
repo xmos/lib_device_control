@@ -1,6 +1,6 @@
 // Copyright 2016-2026 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#if USE_I2C && __xcore__
+#if CONTROL_USE_I2C && __xcore__
 
 #include <platform.h>
 #include <stdio.h>
@@ -126,4 +126,4 @@ control_ret_t control_cleanup_i2c(void)
   return CONTROL_SUCCESS;
 }
 
-#endif // USE_I2C
+#endif // CONTROL_USE_I2C

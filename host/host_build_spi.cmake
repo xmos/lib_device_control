@@ -16,7 +16,7 @@ target_link_libraries(control_spi_host INTERFACE ${BCM2835_LIB})
 
 if ((${CMAKE_SYSTEM_NAME} MATCHES "Linux") AND (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
     # Raspberry Pi specific I2C includes
-    target_compile_options(control_spi_host INTERFACE -DUSE_SPI=1 -DRPI=1)
+    target_compile_options(control_spi_host INTERFACE -DCONTROL_USE_SPI=1 -DCONTROL_RPI=1)
     target_sources(control_spi_host
         INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/src/device_access_spi_rpi.c

@@ -4,9 +4,9 @@ add_library(control_xscope_host INTERFACE)
 
 # Properties and options
 if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(control_xscope_host INTERFACE -D USE_XSCOPE=1)
+    target_compile_options(control_xscope_host INTERFACE -D CONTROL_USE_XSCOPE=1)
 else()
-    target_compile_options(control_xscope_host INTERFACE -D USE_XSCOPE=1)
+    target_compile_options(control_xscope_host INTERFACE -D CONTROL_USE_XSCOPE=1)
 endif()
 
 set(HOST_XSCOPE_INCLUDES $ENV{XMOS_TOOL_PATH}/include)

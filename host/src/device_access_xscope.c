@@ -1,6 +1,6 @@
 // Copyright 2016-2026 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#if USE_XSCOPE
+#if CONTROL_USE_XSCOPE
 
 #include <stdio.h>
 #include <string.h>
@@ -248,4 +248,4 @@ control_ret_t control_cleanup_xscope(void)
   return CONTROL_SUCCESS;
 }
 
-#endif // USE_XSCOPE
+#endif // CONTROL_USE_XSCOPE

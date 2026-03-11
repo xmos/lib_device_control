@@ -1,7 +1,7 @@
 // Copyright 2016-2026 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
-#if USE_USB
+#if CONTROL_USE_USB
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -217,4 +217,4 @@ control_ret_t control_cleanup_usb(void)
   return CONTROL_SUCCESS;
 }
 
-#endif // USE_USB
+#endif // CONTROL_USE_USB
