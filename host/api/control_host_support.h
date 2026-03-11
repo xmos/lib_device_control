@@ -92,7 +92,7 @@ control_build_i2c_data(uint8_t data[],
 {
   if (data == NULL) {
     return 0;
-  } else if (payload_len > I2C_TRANSACTION_MAX_BYTES) {
+  } else if (payload_len > I2C_DATA_MAX_BYTES) {
     return 0;
   }
 
