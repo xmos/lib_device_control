@@ -63,7 +63,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
 
                 profile_dfu_index += 1;
                 debug_printf("DFU write command received: resid=%d, cmd=%d, payload_len=%d\n", resid, cmd, payload_len);
-                if (payload_len > sizeof(local_payload) || (payload_len < sizeof(struct dfu_dnload_header) && (payload_len != 0))) {
+                if ((payload_len > sizeof(local_payload)) || ((payload_len < sizeof(struct dfu_dnload_header)) && (payload_len != 0))) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
                     break;
                 } else if (resid != RESOURCE_ID_DFU) {
@@ -134,7 +134,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
 
                 /* Read profile data */
                 if (CONTROL_CMD_VALUE(cmd) == CONTROL_CMD_VALUE(XMOS_DFU_GETPROFILE)) {
-                    if (payload_len != sizeof(struct dfu_profile_data)) {
+                    if (payload_len != (sizeof(struct dfu_upload_header) + sizeof(struct dfu_profile_data))) {
                         ret = CONTROL_BAD_COMMAND;
                         break;
                     }
