@@ -15,7 +15,7 @@ set(APP_COMPILER_FLAGS
   -g
   -report
   -Wall
-  -DUSE_I2C=1
+  -DCONTROL_USE_I2C=1
 )
 set(APP_C_SRCS ../../host/src/device_access_i2c_xcore.xc ../../host/src/control_host_util.c)
 

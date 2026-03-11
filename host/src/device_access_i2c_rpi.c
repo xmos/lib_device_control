@@ -1,6 +1,6 @@
 // Copyright 2016-2026 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#if USE_I2C && RPI
+#if CONTROL_USE_I2C && CONTROL_RPI
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,14 +70,14 @@ control_write_command(control_resid_t resid, control_cmd_t cmd,
 {
   unsigned char command_status[1]; // status
   unsigned char buffer_to_send[I2C_TRANSACTION_MAX_BYTES + 3];
-  int len = control_build_i2c_data(buffer_to_send, resid, cmd, payload, payload_len);
+  size_t len = control_build_i2c_data(buffer_to_send, resid, cmd, payload, payload_len);
 
   DBG(printf("%u: send write command: ", num_commands));
   DBG(print_bytes((unsigned char*)buffer_to_send, payload_len));
 
-  int numbytes = write(fd, buffer_to_send, len);
-  if (numbytes != len){
-    PRINT_ERROR("Failed to write to i2c. %d of %d bytes sent\n", numbytes, len);
+  ssize_t numbytes = write(fd, buffer_to_send, len);
+  if (numbytes != (ssize_t)len){
+    PRINT_ERROR("Failed to write to i2c. %zd of %zu bytes sent\n", numbytes, len);
     return CONTROL_ERROR;
   }
 
@@ -98,9 +98,9 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
                      uint8_t payload[], size_t payload_len)
 {
   unsigned char read_hdr[I2C_TRANSACTION_MAX_BYTES];
-  unsigned len = control_build_i2c_data(read_hdr, resid, cmd, payload, payload_len);
-  if (len != 3){
-    PRINT_ERROR("Failed to read command section of read_device. len should be 3 but is %d\n", len);
+  size_t len = control_build_i2c_data(read_hdr, resid, cmd, payload, payload_len);
+  if (len != 3U){
+    PRINT_ERROR("Failed to read command section of read_device. len should be 3 but is %zu\n", len);
     return CONTROL_ERROR;
   }
 
@@ -125,7 +125,7 @@ control_read_command(control_resid_t resid, control_cmd_t cmd,
     .nmsgs = 2
   };
 
-  DBG(printf("%d: issued command to read %d bytes: command=", num_commands, payload_len));
+  DBG(printf("%d: issued command to read %zu bytes: command=", num_commands, payload_len));
   DBG(print_bytes((unsigned char*)read_hdr, len));
 
   int errno = ioctl( fd, I2C_RDWR, &rdwr_data );
@@ -160,4 +160,4 @@ control_ret_t control_cleanup_i2c(void)
   return CONTROL_SUCCESS;
 }
 
-#endif // USE_I2C
+#endif // CONTROL_USE_I2C && CONTROL_RPI

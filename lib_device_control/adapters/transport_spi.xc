@@ -2,7 +2,7 @@
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
 #include "control.h"
-#if USE_SPI
+#if CONTROL_USE_SPI
 
 #include "transport_spi.h"
 
@@ -12,7 +12,7 @@
 
 // SPI transport client processing function, this passes SPI data to the control interface.
 //
-// To include this file in the build, define USE_SPI as 1, in control_conf.h
+// To include this file in the build, define CONTROL_USE_SPI as 1, in control_conf.h
 
 void spi_control_client(server spi_slave_callback_if i_spi, client interface control i_control[])
 {
@@ -33,4 +33,4 @@ void spi_control_client(server spi_slave_callback_if i_spi, client interface con
   }
 }
 
-#endif // USE_SPI
+#endif // CONTROL_USE_SPI

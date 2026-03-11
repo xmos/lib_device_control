@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <xs1.h>
 
 #define DEBUG_UNIT DFU_SERVER
 #define DEBUG_PRINT_ENABLE_DFU_SERVER 0
@@ -17,19 +18,30 @@
 #include "control_transport_shared.h"
 #include "dfu.h"
 
-#if USE_I2C
+#if CONTROL_USE_I2C
 #define DFU_CONTROL_PAYLOAD_BYTES (I2C_DATA_MAX_BYTES)
-#elif USE_SPI
+#elif CONTROL_USE_SPI
 #define DFU_CONTROL_PAYLOAD_BYTES (SPI_DATA_MAX_BYTES)
-#elif USE_USB
+#elif CONTROL_USE_USB
 #define DFU_CONTROL_PAYLOAD_BYTES (USB_DATA_MAX_BYTES)
-#elif USE_XSCOPE
+#elif CONTROL_USE_XSCOPE
 #define DFU_CONTROL_PAYLOAD_BYTES (XSCOPE_DATA_MAX_BYTES)
 #else
 #error "Transport not supported"
 #endif
 
-// TODO - build lib_device_control example using this server to build.
+// TODO - lib_device_control should build this code in an example, or test.
+
+static timer dfu_timer;
+static unsigned dfu_time;
+static enum dfu_request dfu_deferred_action = 0;
+
+/* Profiling */
+static unsigned profile_dfu_start_time;
+static unsigned profile_dfu_end_time;
+static unsigned profile_dfu_index;
+
+static struct dfu_profile_data profile_data;
 
 // [[combinable]]
 void dfu_control_server(server interface control dfu_control_interface) {
@@ -42,15 +54,16 @@ void dfu_control_server(server interface control dfu_control_interface) {
             case dfu_control_interface.register_resources(control_resid_t resources[MAX_RESOURCES_PER_INTERFACE],  unsigned &num_resources): {
                 resources[0] = RESOURCE_ID_DFU;
                 num_resources = 1;
-                // printf("DFU control server: register resources: %d\n", RESOURCE_ID_DFU);
-            break;
+                debug_printf("DFU control server: register resources: %d\n", RESOURCE_ID_DFU);
+                break;
             }
 
             case dfu_control_interface.write_command(control_resid_t resid, control_cmd_t cmd,
                     const uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret: {
 
+                profile_dfu_index += 1;
                 debug_printf("DFU write command received: resid=%d, cmd=%d, payload_len=%d\n", resid, cmd, payload_len);
-                if (payload_len > sizeof(local_payload) && payload_len >= sizeof(struct dfu_dnload_header)) {
+                if ((payload_len > sizeof(local_payload)) || ((payload_len < sizeof(struct dfu_dnload_header)) && (payload_len != 0))) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
                     break;
                 } else if (resid != RESOURCE_ID_DFU) {
@@ -61,6 +74,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 int32_t request_length = payload_len;
                 int32_t block_num = 0;
                 
+                dfu_timer :> profile_dfu_start_time;
                 if (payload_len != 0) {
                     size_t header_size = sizeof(struct dfu_dnload_header);
                     struct dfu_dnload_header header = { 0, 0 };
@@ -69,7 +83,19 @@ void dfu_control_server(server interface control dfu_control_interface) {
                     block_num = header.block_num;
                     request_length = (payload_len - header_size);
                 }
-                struct dfu_cmd_response dfu_response = dfu_request_with_arguments(CONTROL_CMD_VALUE(cmd), local_payload, request_length, block_num);
+                if (CONTROL_CMD_VALUE(cmd) == CONTROL_CMD_VALUE(XMOS_DFU_REVERTFACTORY)) {
+                    // Restore revert-factory value, as this is affected by the read-bit in lib_device_control.
+                    cmd = XMOS_DFU_REVERTFACTORY;
+                }
+                struct dfu_cmd_response dfu_response = dfu_request_with_arguments(cmd, local_payload, request_length, block_num);
+                dfu_timer :> profile_dfu_end_time;
+                unsigned dfu_command_time = profile_dfu_end_time - profile_dfu_start_time;
+                if (dfu_command_time > profile_data.command_time) {
+                    profile_data.command_time = dfu_command_time;
+                    profile_data.command_index = profile_dfu_index;
+                    profile_data.cmd = CONTROL_CMD_VALUE(cmd);
+                }
+
                 debug_printf("DFU write command status=%d\n", dfu_response.status);
 
                 if (dfu_response.status == DFU_API_SUCCESS) {
@@ -82,33 +108,22 @@ void dfu_control_server(server interface control dfu_control_interface) {
                     ret = CONTROL_ERROR;
                 }
 
-                if (dfu_response.reset_type == DFU_RESET_TYPE_RESET_TO_DFU) {
-                    // TODO - handle reset to DFU, e.g. by delaying response and then rebooting after response is sent, or by delaying PHY initialisation on reboot so that device doesn't come back on bus until we're ready.
-                    // For now just print message.
-                    debug_printf("DFU write command: device needs to reboot to DFU mode\n");
-                    // TODO - possibly simulate bus reset by sending command, instead of 3610 host app?
+                if (dfu_response.deferred_request == DFU_DEFERRED_ACTION_REBOOT_TO_DFU) {
+                    /* This is USB DFU mode entry mechanism, for non-USB ignore. */
+                } else if (dfu_response.deferred_request == DFU_DEFERRED_ACTION_FLASH_CONNECT) {
+                    dfu_deferred_action = dfu_response.deferred_request;
                 }
 
-                // WAS for reset timeout handling - might be needed/helpful for poll timeout handling, TBC
-                // if (dfu_write_command_state.timeout.enable) {
-                //     unsigned now;
-                //     dfu_timer :> now;
-                //     //debug_printf("now = %d\n", now);
-                //     dfu_time = now + dfu_write_command_state.timeout.delta;
-                // }
-                // if (dfu_write_command_state.needs_reboot) {
-                //     dfu_timer :> dfu_time;
-                //     dfu_timer when timerafter(dfu_time + (DELAY_BEFORE_REBOOT_TO_DFU_MS * XS1_TIMER_KHZ)) :> void;
-                //     // DFUDelay(DELAY_BEFORE_REBOOT_TO_DFU_MS * XS1_TIMER_KHZ);
-                //     // device_reboot();
-                // }
-            break;
+                dfu_timer :> dfu_time;
+                dfu_time += (1 * XS1_TIMER_KHZ);
+                break;
             }
 
             case dfu_control_interface.read_command(control_resid_t resid, control_cmd_t cmd,
                     uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret: {
 
-                if (payload_len > sizeof(local_payload) && payload_len >= sizeof(struct dfu_upload_header)) {
+                profile_dfu_index += 1;
+                if (payload_len > sizeof(local_payload) || payload_len < sizeof(struct dfu_upload_header)) {
                     ret = CONTROL_DATA_LENGTH_ERROR;
                     break;
                 } else if (resid != RESOURCE_ID_DFU) {
@@ -117,10 +132,33 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 }
                 memset(local_payload, 0, sizeof(local_payload));
 
+                /* Read profile data */
+                if (CONTROL_CMD_VALUE(cmd) == CONTROL_CMD_VALUE(XMOS_DFU_GETPROFILE)) {
+                    if (payload_len != (sizeof(struct dfu_upload_header) + sizeof(struct dfu_profile_data))) {
+                        ret = CONTROL_BAD_COMMAND;
+                        break;
+                    }
+                    struct dfu_upload_header prof_header = { 0, 0 };
+                    prof_header.read_length = sizeof(struct dfu_profile_data);
+                    memcpy(payload, &prof_header, sizeof(prof_header));
+
+                    profile_data.index_total = profile_dfu_index;
+                    memcpy(payload + sizeof(prof_header), &profile_data, (payload_len - sizeof(prof_header)));
+                    ret = CONTROL_SUCCESS;
+                    break;
+                }
+
+                dfu_timer :> profile_dfu_start_time;
                 struct dfu_cmd_response dfu_response = dfu_request_with_arguments(CONTROL_CMD_VALUE(cmd), local_payload, (payload_len - sizeof(struct dfu_upload_header)), null);
                 struct dfu_upload_header header = { 0, 0 };
                 if (dfu_response.status == DFU_API_SUCCESS) {
                     header.read_length = dfu_response.return_data_len;
+                    dfu_deferred_action = dfu_response.deferred_request;
+                    if (dfu_deferred_action != 0) {
+                        debug_printf("DFU read command: deferred action %d\n", dfu_deferred_action);
+                    }
+                    // TODO - get at block_num here.
+                    // header.block_num = dfu_response.block_num;
                     memcpy(payload, &header, sizeof(header));
 
                     size_t payload_for_dfu = (payload_len - sizeof(header));
@@ -134,21 +172,27 @@ void dfu_control_server(server interface control dfu_control_interface) {
                 } else {
                     ret = CONTROL_ERROR;
                 }
+                dfu_timer :> profile_dfu_end_time;
+                unsigned dfu_command_time = profile_dfu_end_time - profile_dfu_start_time;
+                if (dfu_command_time > profile_data.command_time) {
+                    profile_data.command_time = dfu_command_time;
+                    profile_data.command_index = profile_dfu_index;
+                    profile_data.cmd = CONTROL_CMD_VALUE(cmd);
+                }
+
                 debug_printf("DFU read command: cmd=%d, read_length=%d, payload_len=%d, status=%d\n", CONTROL_CMD_VALUE(cmd), header.read_length, (payload_len - sizeof(header)), dfu_response.status);
-            break;
+                dfu_timer :> dfu_time;
+                dfu_time += (1 * XS1_TIMER_KHZ);
+                break;
             }
 
-            // WAS for reset timeout handling - might be needed/helpful for poll timeout handling, TBC
-            // case dfu_write_command_state.timeout.enable => dfu_timer when timerafter(dfu_time) :> void:
-            //     {   timer tmr;
-            //         int t;
-            //         tmr :> t;
-            //         //debug_printf("t = %d\n", t);
-            //     }
-            //     //debug_printf("GPIO server: DFU timeout\n");
-            //     dfu_timeout_detach();
-            //     dfu_write_command_state.timeout.enable = false;
-            // break;
+            case (dfu_deferred_action != 0) => dfu_timer when timerafter(dfu_time) :> void: {
+
+                debug_printf("deferred action: %d\n", dfu_deferred_action);
+                dfu_request_with_arguments(dfu_deferred_action, null, 0, null);
+                dfu_deferred_action = 0;
+                break;
+            }
 
         }// select
     }//While 1
