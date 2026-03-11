@@ -1,45 +1,31 @@
 lib_device_control change log
 =============================
 
-UNRELEASED
-----------
-
-  * ADDED:    Support for XTC Tools 15.3.1
-  * CHANGED:  USB Vendor control example now supports native WINUSB driver
-    installation on Windows
-  * CHANGED:  Migrated Windows USB host application from 32 bit to 64 bit
-
-  * Changes to dependencies:
-
-    - lib_logging: 3.2.0 -> 3.4.0
-
-    - lib_xassert: 4.2.0 -> 4.3.2
-
 5.0.0
 -----
 
-  * ADDED: Support for XTC Tools 15.3.0.
-  * ADDED: Support for xcommon_cmake in library and examples.
-  * CHANGED: Replace makefiles in examples with CMakeLists.txt files.
-  * CHANGED: Update examples to support XCORE-VOICE-L71 board.
-  * ADDED: Example with SPI slave interface.
-  * CHANGED: Replace lib_usb with lib_xud in examples and tests.
-  * CHANGED: Tidy-up libusb drivers.
-  * REMOVED: Project files for xTIMEcomposer.
-  * ADDED: Support for status check of write operations.
-  * ADDED: Driver for SPI interface on Raspberry Pi.
-  * CHANGED: Move the code shared between host and device side to separate
-    files.
-  * FIXED: Include guards in header files comply with the C standard.
-  * FIXED: Windows host issue with pre-2013 Visual Studio Compiler and
-    stdbool.h.
-  * FIXED: Example and test to use updated return code name for XUD.
+  * ADDED:    Support for XTC Tools 15.3.1
+  * ADDED:    Support for xcommon_cmake in library and examples.
+  * ADDED:    Example with SPI slave interface.
+  * ADDED:    Support for status check of write operations.
+  * ADDED:    Driver for SPI interface on Raspberry Pi.
+  * ADDED:    Raspberry Pi examples support 64-bit hosts.
+  * ADDED:    Per-transport host CMake files.
+  * ADDED:    Support per-transport device-to-control code.
+  * ADDED:    Support control-to- ``lib_dfu`` code.
+  * CHANGED:  Update examples to support XCORE-VOICE-L71 board.
+  * CHANGED:  Replace lib_usb with lib_xud in examples and tests.
+  * CHANGED:  Supports common shared code for each example.
+  * CHANGED:  USB Vendor control example now supports native WINUSB driver
+    installation on Windows
+  * CHANGED:  Migrated Windows USB host application from 32 bit to 64 bit
+  * CHANGED:  Host files moved to their own directory
 
   * Changes to dependencies:
 
-    - lib_logging: 2.1.0 -> 3.2.0
+    - lib_logging: 3.0.0 -> 3.4.0
 
-    - lib_xassert: 2.0.1 -> 4.2.0
+    - lib_xassert: 4.0.0 -> 4.3.2
 
 4.2.1
 -----
@@ -72,6 +58,12 @@ UNRELEASED
 -----
 
   * CHANGED: Build files updated to support new "xcommon" behaviour in xwaf.
+
+  * Changes to dependencies:
+
+    - lib_logging: 3.0.1 -> 3.0.0
+
+    - lib_xassert: 2.1.1 -> 4.0.0
 
 3.2.4
 -----
