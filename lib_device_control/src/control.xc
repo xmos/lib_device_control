@@ -332,7 +332,7 @@ control_process_i2c_stop(client interface control i[])
   }
   else if (i2c.state == I2C_WRITE_DATA) {
     if (i2c.payload_len_transmitted < i2c.payload_len_from_header) {
-      debug_printf("incomplete write command, %d expected, %d actual\n",
+      debug_printf("uncompleted write command, %d expected, %d actual\n",
         i2c.payload_len_from_header, i2c.payload_len_transmitted);
       ret = CONTROL_DATA_LENGTH_ERROR;
     }
@@ -346,7 +346,7 @@ control_process_i2c_stop(client interface control i[])
   }
   else if (i2c.state == I2C_READ_DATA) {
     if (i2c.payload_len_transmitted < i2c.payload_len_from_header) {
-      debug_printf("incompleted read command, %d expected, %d actual\n",
+      debug_printf("uncompleted read command, %d expected, %d actual\n",
         i2c.payload_len_from_header, i2c.payload_len_transmitted);
       ret = CONTROL_DATA_LENGTH_ERROR;
     }
@@ -493,7 +493,7 @@ control_ret_t
 control_process_spi_master_ends_transaction(client interface control i_ctl[])
 {
   /* Debugging */
-  // debug_printf("Recieved: ");
+  // debug_printf("Received: ");
   // for(unsigned i=0; i<buffer_length; ++i)
   //   debug_printf("%u ", buffer[i]);
   // debug_printf("\n");

@@ -17,6 +17,7 @@
 
 #include "control_transport_shared.h"
 #include "dfu.h"
+#include "dfu_reboot.h"
 
 #if CONTROL_USE_I2C
 #define DFU_CONTROL_PAYLOAD_BYTES (I2C_DATA_MAX_BYTES)
@@ -112,6 +113,8 @@ void dfu_control_server(server interface control dfu_control_interface) {
                     /* This is USB DFU mode entry mechanism, for non-USB ignore. */
                 } else if (dfu_response.deferred_request == DFU_DEFERRED_ACTION_FLASH_CONNECT) {
                     dfu_deferred_action = dfu_response.deferred_request;
+                } else if (dfu_response.deferred_request == DFU_DEFERRED_ACTION_REBOOT) {
+                    dfu_deferred_action = dfu_response.deferred_request;
                 }
 
                 dfu_timer :> dfu_time;
@@ -189,7 +192,19 @@ void dfu_control_server(server interface control dfu_control_interface) {
             case (dfu_deferred_action != 0) => dfu_timer when timerafter(dfu_time) :> void: {
 
                 debug_printf("deferred action: %d\n", dfu_deferred_action);
-                dfu_request_with_arguments(dfu_deferred_action, null, 0, null);
+                if (dfu_deferred_action == DFU_DEFERRED_ACTION_REBOOT) {
+                    timer tmr;
+                    unsigned now;
+                    tmr :> now;
+                    debug_printf("Rebooting out of DFU mode\n");
+                    tmr when timerafter(now + (DELAY_BEFORE_REBOOT_FROM_DFU_MS * XS1_TIMER_KHZ)) :> void;
+                    device_reboot();
+                    // Note: testing will fall through to without reboot, which is fine.
+
+                } else {
+                    dfu_request_with_arguments(dfu_deferred_action, null, 0, null);
+                }
+
                 dfu_deferred_action = 0;
                 break;
             }
