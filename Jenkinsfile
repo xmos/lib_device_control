@@ -108,6 +108,11 @@ pipeline {
                 }
               }
             }
+            stage("Archive sandbox") {
+              steps {
+                archiveSandbox(REPO_NAME)
+              }
+            }
           }
           post {
             cleanup {
