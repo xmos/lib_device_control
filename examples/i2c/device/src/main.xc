@@ -28,11 +28,9 @@ int main(void)
       control_init();
       control_register_resources(i_control, CONTROL_INTERFACES_NUM);
 
-      /* bug 17317 - [[combine]] */
       par {
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
+        [[distribute]]
         i2c_control_client(i_i2c, i_control);
-#pragma warning enable
         i2c_slave(i_i2c, p_scl, p_sda, i2c_device_addr);
       }
     }

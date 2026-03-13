@@ -14,13 +14,12 @@
 //
 // To include this file in the build, define CONTROL_USE_I2C as 1, in control_conf.h
 
-// [[distributable]]
-void i2c_control_client(server i2c_slave_callback_if i_i2c, client interface control i_control[])
+[[distributable]]
+void i2c_control_client(server i2c_slave_callback_if i_i2c, client interface control i_control[CONTROL_INTERFACES_NUM])
 {
   while (1) {
     select {
       case i_i2c.ack_write_request(void) -> i2c_slave_ack_t resp:
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
         if (control_process_i2c_write_start(i_control) == CONTROL_SUCCESS)
           resp = I2C_SLAVE_ACK;
         else
@@ -47,7 +46,6 @@ void i2c_control_client(server i2c_slave_callback_if i_i2c, client interface con
       case i_i2c.stop_bit(void):
         control_process_i2c_stop(i_control);
         break;
-#pragma warning enable
 
     }
   }
