@@ -26,7 +26,7 @@ XUD_EpType epTypeTableIn[XUD_EP_COUNT_IN] =   {XUD_EPTYPE_CTL | XUD_STATUS_ENABL
 int main(void)
 {
   chan c_ep_out[XUD_EP_COUNT_OUT], c_ep_in[XUD_EP_COUNT_IN];
-  interface control i_control[1];
+  interface control i_control[CONTROL_INTERFACES_NUM];
   par {
     on USB_TILE: par {
       Endpoint0(c_ep_out[0], c_ep_in[0], i_control);

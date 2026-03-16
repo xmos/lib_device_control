@@ -13,7 +13,7 @@
 
 #define PRINT_ALL 0
 
-void test_client(client interface control i[3], chanend c_user_task[3])
+void test_client(client interface control i[CONTROL_INTERFACES_NUM], chanend c_user_task[CONTROL_INTERFACES_NUM])
 {
   uint32_t buf[64];
   struct command c1, c2;
@@ -39,8 +39,8 @@ void test_client(client interface control i[3], chanend c_user_task[3])
 
   /* trigger a registration call, catch it and supply resource IDs to register */
   par {
-    control_register_resources(i, 3);
-    drive_user_task_registration(c_user_task, 3);
+    control_register_resources(i, CONTROL_INTERFACES_NUM);
+    drive_user_task_registration(c_user_task, CONTROL_INTERFACES_NUM);
   }
 
   fails = 0;
@@ -68,9 +68,7 @@ void test_client(client interface control i[3], chanend c_user_task[3])
               tmr :> t;
               timeout = 0;
               par {
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                 d <: control_process_xscope_upload((uint8_t*)buf_ptr, sizeof(buf), lenin, lenout, i);
-#pragma warning enable
                 { const size_t header_len = sizeof(struct control_xscope_response);
                   struct control_xscope_response *resp = (struct control_xscope_response*)buf;
                   uint8_t *payload = (uint8_t*)(resp + 1);
@@ -151,13 +149,13 @@ void test_client(client interface control i[3], chanend c_user_task[3])
 
 int main(void)
 {
-  interface control i[3];
-  chan c_user_task[3];
+  interface control i[CONTROL_INTERFACES_NUM];
+  chan c_user_task[CONTROL_INTERFACES_NUM];
   par {
     test_client(i, c_user_task);
-    user_task(i[0], c_user_task[0]);
-    user_task(i[1], c_user_task[1]);
-    user_task(i[2], c_user_task[2]);
+    par(int t=0; t < CONTROL_INTERFACES_NUM; t++) {
+      user_task(i[t], c_user_task[t]);
+    }
     { delay_microseconds(5000);
       printf("ERROR - test timeout\n");
       exit(1);

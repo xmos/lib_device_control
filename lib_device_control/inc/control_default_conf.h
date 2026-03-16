@@ -10,6 +10,9 @@
 
 #ifndef CONTROL_INTERFACES_NUM
 #define CONTROL_INTERFACES_NUM 1
+// TODO host apps fail with this warning
+// #warning "CONTROL_INTERFACES_NUM not defined in control_conf.h, defaulting to 1."
+// #warning "Please define CONTROL_INTERFACES_NUM in control_conf.h to silence this warning."
 #endif
 
 #if CONTROL_INTERFACES_NUM <= 0

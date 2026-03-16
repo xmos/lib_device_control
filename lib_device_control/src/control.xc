@@ -2,7 +2,6 @@
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <stdint.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <xscope.h>
 #include "control.h"
 #include "control_transport_shared.h"
@@ -42,7 +41,6 @@ control_ret_t control_register_resources(client interface control i[n], unsigned
   ret = CONTROL_SUCCESS;
 
   for (j = 0; j < n; j++) {
-    printf("registering resources for interface %d\n", j);
     i[j].register_resources(r, n0);
     if (resource_table_add(r, n0, j) != 0)
       ret = CONTROL_REGISTRATION_FAILED;
