@@ -17,15 +17,13 @@ on tile[PORT_SPI_SLAVE_CS_TILE_NUM]: in port                p_ss   = PORT_SPI_SL
 on tile[PORT_SPI_SLAVE_MISO_TILE_NUM]: out buffered port:32 p_miso = PORT_SPI_SLAVE_MISO;
 on tile[PORT_SPI_SLAVE_MOSI_TILE_NUM]: in buffered port:32  p_mosi = PORT_SPI_SLAVE_MOSI;
 
-void spi_ctrl(client interface control i_control[1])
+void spi_ctrl(client interface control i_control[CONTROL_INTERFACES_NUM])
 {
   interface spi_slave_callback_if i_spi;
   control_init();
-  control_register_resources(i_control, 1);
+  control_register_resources(i_control, CONTROL_INTERFACES_NUM);
   par {
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
     spi_control_client(i_spi, i_control);
-#pragma warning enable
     spi_slave(i_spi, p_sclk, p_mosi, p_miso, p_ss, cb,
               SPI_MODE_3, SPI_TRANSFER_SIZE_8);
   }
@@ -34,7 +32,7 @@ void spi_ctrl(client interface control i_control[1])
 
 int main(void)
 {
-  interface control i_control[1];
+  interface control i_control[CONTROL_INTERFACES_NUM];
   par {
     on tile[PORT_SPI_SLAVE_SCLK_TILE_NUM]: par {
       spi_ctrl(i_control);

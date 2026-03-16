@@ -18,9 +18,7 @@ void test_usb(client interface control i[1])
   control_usb_fill_header(&windex, &wvalue, &wlength,
     CONTROL_SPECIAL_RESID, CONTROL_GET_VERSION, sizeof(control_version_t));
 
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
   ret = control_process_usb_get_request(windex, wvalue, wlength, request_data, i);
-#pragma warning disable
   memcpy(&version, request_data, sizeof(control_version_t));
 
   if (ret != CONTROL_SUCCESS) {
@@ -46,7 +44,6 @@ void test_i2c(client interface control i[1])
     CONTROL_GET_VERSION, data, sizeof(control_version_t));
   ret = CONTROL_SUCCESS;
 
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
   ret |= control_process_i2c_write_start(i);
   for (j = 0; j < len; j++) {
     ret |= control_process_i2c_write_data(buf[j], i);
@@ -58,7 +55,6 @@ void test_i2c(client interface control i[1])
 
   memcpy(&version, data, sizeof(control_version_t));
   ret |= control_process_i2c_stop(i);
-#pragma warning enable
 
   if (ret != CONTROL_SUCCESS) {
     printf("ERROR - I2C processing functions returned %d\n", ret);
@@ -85,7 +81,6 @@ void test_spi(client interface control i[1])
   len = control_build_spi_data(buf, CONTROL_SPECIAL_RESID,
     CONTROL_GET_VERSION, (uint8_t*) data, sizeof(control_version_t));
 
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
   // Send message information in a write transaction
   for (j = 0; j < len; j++) {
     ret |= control_process_spi_master_supplied_data(buf[j], SPI_TRANSFER_SIZE_BITS, i);
@@ -102,7 +97,6 @@ void test_spi(client interface control i[1])
   memcpy(&version, data, sizeof(control_version_t));
 
   ret |= control_process_spi_master_ends_transaction(i);
-#pragma warning disable
 
   if (ret != CONTROL_SUCCESS) {
     printf("ERROR - SPI processing functions returned %d\n", ret);
@@ -125,9 +119,7 @@ void test_xscope(client interface control i[1])
   len = control_xscope_create_upload_buffer(buf,
     CONTROL_GET_VERSION, CONTROL_SPECIAL_RESID,
     NULL, sizeof(control_version_t));
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
   ret = control_process_xscope_upload((uint8_t*)buf, sizeof(buf), len, len2, i);
-#pragma warning enable
   resp = (struct control_xscope_response*)buf;
   version = *(control_version_t*)(resp + 1);
 

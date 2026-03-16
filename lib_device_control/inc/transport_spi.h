@@ -14,6 +14,6 @@
  * \param i_control Control interface array
  * 
  */
-void spi_control_client(SERVER_INTERFACE(spi_slave_callback_if, i_spi), CLIENT_INTERFACE(control, i_control[]));
+void spi_control_client(SERVER_INTERFACE(spi_slave_callback_if, i_spi), CLIENT_INTERFACE(control, i_control[CONTROL_INTERFACES_NUM]));
 
 #endif // TRANSPORT_SPI_H

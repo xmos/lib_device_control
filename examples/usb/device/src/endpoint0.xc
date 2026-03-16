@@ -106,9 +106,7 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
                     break;
 
                 case USB_BMREQ_H2D_VENDOR_DEV:
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                     result = USB_H2D_VendorRequest(ep0_out, ep0_in, &sp, i_control);
-#pragma warning enable
                     break;
 
                 case USB_BMREQ_D2H_VENDOR_DEV:
@@ -116,9 +114,7 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
                         result = XUD_GetMsosDescriptor(ep0_out, ep0_in, &sp);
 
                     } else {
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                         result = USB_D2H_VendorRequest(ep0_out, ep0_in, &sp, i_control);
-#pragma warning enable
                     }
                     break;
             }

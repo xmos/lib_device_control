@@ -34,7 +34,7 @@ static XUD_Result_t USB_EP0_Receive(XUD_ep ep0_out, USB_SetupPacket_t *sp, uint8
 }
 
 // case USB_BMREQ_H2D_VENDOR_DEV:
-XUD_Result_t USB_H2D_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, client interface control i_control[]) {
+XUD_Result_t USB_H2D_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, client interface control i_control[CONTROL_INTERFACES_NUM]) {
     XUD_Result_t result = XUD_RES_ERR;
     if ((sp->bRequest == CONTROL_VENDOR_REQUEST) && (sp->wLength <= EP0_MAX_REQUEST_SIZE)) {
         result = USB_EP0_Receive(ep0_out, sp, request_data);
@@ -53,7 +53,7 @@ XUD_Result_t USB_H2D_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacke
 }
 
 // case USB_BMREQ_D2H_VENDOR_DEV:
-XUD_Result_t USB_D2H_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, client interface control i_control[]) {
+XUD_Result_t USB_D2H_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, client interface control i_control[CONTROL_INTERFACES_NUM]) {
     XUD_Result_t result = XUD_RES_ERR;
     if ((sp->bRequest == CONTROL_VENDOR_REQUEST) && (sp->wLength <= EP0_MAX_REQUEST_SIZE)) {
         control_ret_t ctrl = control_process_usb_get_request(sp->wIndex, sp->wValue, sp->wLength, request_data, i_control);

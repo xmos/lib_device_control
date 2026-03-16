@@ -14,6 +14,6 @@
  * \param i_control Control interface array
  * 
  */
-void xscope_control_client(chanend c_xscope, CLIENT_INTERFACE(control, i_control[]));
+void xscope_control_client(chanend c_xscope, CLIENT_INTERFACE(control, i_control[CONTROL_INTERFACES_NUM]));
 
 #endif // TRANSPORT_XSCOPE_H

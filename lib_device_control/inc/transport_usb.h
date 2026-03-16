@@ -17,7 +17,7 @@
  * 
  * \return XUD_Result_t Result of the operation
  */
-XUD_Result_t USB_H2D_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, CLIENT_INTERFACE(control, i_control[]));
+XUD_Result_t USB_H2D_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, CLIENT_INTERFACE(control, i_control[CONTROL_INTERFACES_NUM]));
 
 /** USB transport host read (Get) processing function
  * \param ep0_out  Endpoint 0 OUT endpoint
@@ -27,6 +27,6 @@ XUD_Result_t USB_H2D_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacke
  * 
  * \return XUD_Result_t Result of the operation
  */
-XUD_Result_t USB_D2H_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, CLIENT_INTERFACE(control, i_control[]));
+XUD_Result_t USB_D2H_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, CLIENT_INTERFACE(control, i_control[CONTROL_INTERFACES_NUM]));
 
 #endif // TRANSPORT_USB_H

@@ -14,6 +14,7 @@
  * \param i_control Control interface array
  * 
  */
-void i2c_control_client(SERVER_INTERFACE(i2c_slave_callback_if, i_i2c), CLIENT_INTERFACE(control, i_control[]));
+[[distributable]]
+void i2c_control_client(SERVER_INTERFACE(i2c_slave_callback_if, i_i2c), CLIENT_INTERFACE(control, i_control[CONTROL_INTERFACES_NUM]));
 
 #endif // TRANSPORT_I2C_H

@@ -125,7 +125,7 @@ control_register_resources(CLIENT_INTERFACE_ARRAY(control, i, n), unsigned n);
    *  \returns          Whether the write start was successful or not
    */
 control_ret_t
-control_process_i2c_write_start(CLIENT_INTERFACE(control, i[]));
+control_process_i2c_write_start(CLIENT_INTERFACE(control, i[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that an I2C slave read has started. Called from I2C callback API.
    *
@@ -134,7 +134,7 @@ control_process_i2c_write_start(CLIENT_INTERFACE(control, i[]));
    *  \returns          Whether the read start was successful or not
    */
 control_ret_t
-control_process_i2c_read_start(CLIENT_INTERFACE(control, i[]));
+control_process_i2c_read_start(CLIENT_INTERFACE(control, i[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that an I2C slave write has occurred. Called from I2C callback API.
    *
@@ -145,7 +145,7 @@ control_process_i2c_read_start(CLIENT_INTERFACE(control, i[]));
    */
 control_ret_t
 control_process_i2c_write_data(const uint8_t data,
-                               CLIENT_INTERFACE(control, i[]));
+                               CLIENT_INTERFACE(control, i[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that an I2C slave read has occurred. Called from I2C callback API.
    *
@@ -156,7 +156,7 @@ control_process_i2c_write_data(const uint8_t data,
    */
 control_ret_t
 control_process_i2c_read_data(REFERENCE_PARAM(uint8_t, data),
-                              CLIENT_INTERFACE(control, i[]));
+                              CLIENT_INTERFACE(control, i[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that an I2C transaction has stopped. Called from I2C callback API.
    *
@@ -165,7 +165,7 @@ control_process_i2c_read_data(REFERENCE_PARAM(uint8_t, data),
    *  \returns          Whether the stop was successful or not
    */
 control_ret_t
-control_process_i2c_stop(CLIENT_INTERFACE(control, i[]));
+control_process_i2c_stop(CLIENT_INTERFACE(control, i[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that a USB set (write) has occurred. Called from USB EP0 handler.
    *
@@ -180,7 +180,7 @@ control_process_i2c_stop(CLIENT_INTERFACE(control, i[]));
 control_ret_t
 control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 const uint8_t request_data[],
-                                CLIENT_INTERFACE(control, i[]));
+                                CLIENT_INTERFACE(control, i[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that a USB get (read) has occurred. Called from USB EP0 handler.
    *
@@ -195,7 +195,7 @@ control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 control_ret_t
 control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 uint8_t request_data[],
-                                CLIENT_INTERFACE(control, i[]));
+                                CLIENT_INTERFACE(control, i[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that an xscope transfer has occurred. Called from xscope handler.
    *  This function both reads and writes data in a single call.
@@ -213,7 +213,7 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 control_ret_t
 control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
                               unsigned length_in, REFERENCE_PARAM(unsigned, length_out),
-                              CLIENT_INTERFACE(control, i[]));
+                              CLIENT_INTERFACE(control, i[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that the SPI master has ended the transaction. If the command
    *  was a write, this is the point that a write command is emitted on the i_ctl interface.
@@ -223,7 +223,7 @@ control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
    *  \returns                Whether the transfer was successful or not
    */
 control_ret_t
-control_process_spi_master_ends_transaction(CLIENT_INTERFACE(control, i_ctl[]));
+control_process_spi_master_ends_transaction(CLIENT_INTERFACE(control, i_ctl[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that the SPI master requires data. If the command
    *  was a read, then this is the point that a read command is emitted on the i_ctl interface.
@@ -236,7 +236,7 @@ control_process_spi_master_ends_transaction(CLIENT_INTERFACE(control, i_ctl[]));
    *  \returns                Whether the transfer was successful or not
    */
 control_ret_t
-control_process_spi_master_requires_data(REFERENCE_PARAM(uint32_t, data), CLIENT_INTERFACE(control, i_ctl[]));
+control_process_spi_master_requires_data(REFERENCE_PARAM(uint32_t, data), CLIENT_INTERFACE(control, i_ctl[CONTROL_INTERFACES_NUM]));
 
   /** Inform the control library that the SPI master supplied data.
    *  NOTE: It is assumed that the datum is 8 bits wide, i.e. spi_slave(...) is set up with
@@ -249,6 +249,6 @@ control_process_spi_master_requires_data(REFERENCE_PARAM(uint32_t, data), CLIENT
    *  \returns                Whether the transfer was successful or not
    */
 control_ret_t
-control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, CLIENT_INTERFACE(control, i_ctl[]));
+control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, CLIENT_INTERFACE(control, i_ctl[CONTROL_INTERFACES_NUM]));
 
 #endif // CONTROL_H

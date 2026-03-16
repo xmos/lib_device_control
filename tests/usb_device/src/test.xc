@@ -10,7 +10,7 @@
 #include "support_inline.h"
 #include "user_task.h"
 
-void test_client(client interface control i[3], chanend c_user_task[3])
+void test_client(client interface control i[CONTROL_INTERFACES_NUM], chanend c_user_task[CONTROL_INTERFACES_NUM])
 {
   uint16_t windex, wvalue, wlength;
   struct command c1, c2;
@@ -31,8 +31,8 @@ void test_client(client interface control i[3], chanend c_user_task[3])
 
   /* trigger a registration call, catch it and supply resource IDs to register */
   par {
-    control_register_resources(i, 3);
-    drive_user_task_registration(c_user_task, 3);
+    control_register_resources(i, CONTROL_INTERFACES_NUM);
+    drive_user_task_registration(c_user_task, CONTROL_INTERFACES_NUM);
   }
 
   fails = 0;
@@ -59,7 +59,6 @@ void test_client(client interface control i[3], chanend c_user_task[3])
               tmr :> t;
               timeout = 0;
               par {
-#pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
                 { if (o.read_cmd) {
                     d <: control_process_usb_get_request(windex, wvalue, wlength,
                       (uint8_t*)payload_ptr, i);
@@ -74,7 +73,6 @@ void test_client(client interface control i[3], chanend c_user_task[3])
                     d <: payload_ptr[0];
                   }
                 }
-#pragma warning enable
                 { select {
                     case drive_user_task_commands(c2, c1, c_user_task, o.read_cmd);
                     case tmr when timerafter(t + 500) :> void:
@@ -104,13 +102,13 @@ void test_client(client interface control i[3], chanend c_user_task[3])
 
 int main(void)
 {
-  interface control i[3];
-  chan c_user_task[3];
+  interface control i[CONTROL_INTERFACES_NUM];
+  chan c_user_task[CONTROL_INTERFACES_NUM];
   par {
     test_client(i, c_user_task);
-    user_task(i[0], c_user_task[0]);
-    user_task(i[1], c_user_task[1]);
-    user_task(i[2], c_user_task[2]);
+    par(int t=0; t < CONTROL_INTERFACES_NUM; t++) {
+      user_task(i[t], c_user_task[t]);
+    }
     { delay_microseconds(5000);
       printf("ERROR - test timeout\n");
       exit(1);

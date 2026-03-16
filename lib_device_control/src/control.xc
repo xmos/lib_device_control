@@ -2,7 +2,6 @@
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <stdint.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <xscope.h>
 #include "control.h"
 #include "control_transport_shared.h"
@@ -109,7 +108,7 @@ special_read_command(control_cmd_t cmd, uint8_t payload[], unsigned payload_len)
 }
 
 static control_ret_t
-write_command(client interface control i[],
+write_command(client interface control i[CONTROL_INTERFACES_NUM],
               unsigned char ifnum, control_resid_t resid, control_cmd_t cmd,
               const uint8_t payload[], unsigned payload_len)
 {
@@ -130,7 +129,7 @@ write_command(client interface control i[],
 }
 
 static control_ret_t
-read_command(client interface control i[],
+read_command(client interface control i[CONTROL_INTERFACES_NUM],
              unsigned char ifnum, control_resid_t resid, control_cmd_t cmd,
              uint8_t payload[], unsigned payload_len)
 {
@@ -148,7 +147,7 @@ read_command(client interface control i[],
 }
 
 control_ret_t
-control_process_i2c_write_start(client interface control i[])
+control_process_i2c_write_start(client interface control i[CONTROL_INTERFACES_NUM])
 {
   UNUSED_RES(i);
   // always start a new command
@@ -158,7 +157,7 @@ control_process_i2c_write_start(client interface control i[])
 }
 
 control_ret_t
-control_process_i2c_write_data(const uint8_t data, client interface control i[])
+control_process_i2c_write_data(const uint8_t data, client interface control i[CONTROL_INTERFACES_NUM])
 {
   unsigned char ifnum;
   control_ret_t ret = CONTROL_ERROR;
@@ -250,7 +249,7 @@ control_process_i2c_write_data(const uint8_t data, client interface control i[])
 }
 
 control_ret_t
-control_process_i2c_read_start(client interface control i[])
+control_process_i2c_read_start(client interface control i[CONTROL_INTERFACES_NUM])
 {
   control_ret_t ret;
 
@@ -284,7 +283,7 @@ control_process_i2c_read_start(client interface control i[])
 }
 
 control_ret_t
-control_process_i2c_read_data(uint8_t &data, client interface control i[])
+control_process_i2c_read_data(uint8_t &data, client interface control i[CONTROL_INTERFACES_NUM])
 {
   UNUSED_RES(i);
 
@@ -313,7 +312,7 @@ control_process_i2c_read_data(uint8_t &data, client interface control i[])
 }
 
 control_ret_t
-control_process_i2c_stop(client interface control i[])
+control_process_i2c_stop(client interface control i[CONTROL_INTERFACES_NUM])
 {
   UNUSED_RES(i);
 
@@ -369,7 +368,7 @@ control_process_i2c_stop(client interface control i[])
 control_ret_t
 control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 const uint8_t request_data[],
-                                client interface control i[])
+                                client interface control i[CONTROL_INTERFACES_NUM])
 {
   unsigned payload_len;
   control_resid_t resid;
@@ -400,7 +399,7 @@ control_process_usb_set_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 control_ret_t
 control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wlength,
                                 uint8_t request_data[],
-                                client interface control i[])
+                                client interface control i[CONTROL_INTERFACES_NUM])
 {
   unsigned payload_len;
   control_resid_t resid;
@@ -427,7 +426,7 @@ control_process_usb_get_request(uint16_t windex, uint16_t wvalue, uint16_t wleng
 control_ret_t
 control_process_xscope_upload(uint8_t buf[], unsigned buf_size,
                               unsigned length_in, unsigned &length_out,
-                              client interface control i[])
+                              client interface control i[CONTROL_INTERFACES_NUM])
 {
   (void)buf_size;
   (void)length_in;
@@ -490,7 +489,7 @@ static struct {
 /************/
 
 control_ret_t
-control_process_spi_master_ends_transaction(client interface control i_ctl[])
+control_process_spi_master_ends_transaction(client interface control i_ctl[CONTROL_INTERFACES_NUM])
 {
   /* Debugging */
   // debug_printf("Recieved: ");
@@ -541,7 +540,7 @@ control_process_spi_master_ends_transaction(client interface control i_ctl[])
 }
 
 control_ret_t
-control_process_spi_master_requires_data(uint32_t &data, client interface control i_ctl[])
+control_process_spi_master_requires_data(uint32_t &data, client interface control i_ctl[CONTROL_INTERFACES_NUM])
 {
   control_ret_t ret = CONTROL_SUCCESS;
   data = 0;
@@ -566,7 +565,7 @@ control_process_spi_master_requires_data(uint32_t &data, client interface contro
 }
 
 control_ret_t
-control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, client interface control i_ctl[])
+control_process_spi_master_supplied_data(uint32_t datum, uint32_t valid_bits, client interface control i_ctl[CONTROL_INTERFACES_NUM])
 {
   /* Debugging */
   // buffer[buffer_length] = (unsigned char) datum;
