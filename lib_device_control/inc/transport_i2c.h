@@ -10,6 +10,10 @@
 #include "i2c.h"
 
 /** I2C transport client processing function, this passes I2C data to the control interface.
+ * 
+ * This function handles I2C requests from the host.
+ * It should be called from ``main()`` and the interface linked to the I2C slave, in the case where CONTROL_USE_I2C is defined as 1.
+ * 
  * \param i_i2c     I2C slave callback interface
  * \param i_control Control interface array
  * 

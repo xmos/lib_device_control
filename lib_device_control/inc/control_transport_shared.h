@@ -18,29 +18,32 @@
  *
  * \param[in] c The command code to check
  *
- * \returns true if the read bit in the command is set
- * \returns false if the read bit is not set
+ * \retval true if the read bit in the command is set
+ * \retval false if the read bit is not set
  */
 #define IS_CONTROL_CMD_READ(c) ((c) & 0x80)
 
 /**
- * Returns the command value with the read/write bit cleared.
+ * Returns the application command value with the read/write bit cleared.
  *
- * \param[in,out] c The transport command code converted to an application command code.
+ * \param c The transport command code.
+ * \return The application command code, the read/write bit is cleared.
  */
 #define CONTROL_CMD_VALUE(c) ((c) & (control_cmd_t)~0x80)
 
 /**
  * Sets the read bit on a command code
  *
- * \param[in,out] c The command code to set the read bit on.
+ * \param c The application command code to set the read bit on.
+ * \return The transport command code, the read/write bit is set.
  */
 #define CONTROL_CMD_SET_READ(c) ((c) | 0x80)
 
 /**
  * Clears the read bit on a command code
  *
- * \param[in,out] c The command code to clear the read bit on.
+ * \param c The application command code to clear the read bit on.
+ * \return The transport command code, the read/write bit is cleared.
  */
 #define CONTROL_CMD_SET_WRITE(c) ((c) & (control_cmd_t)~0x80)
 

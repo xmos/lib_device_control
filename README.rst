@@ -16,8 +16,9 @@ lib_device_control: Device Control Library
 Summary
 *******
 
-The Device Control Library provides the ability to configure and control an XMOS device 
-from a host over a number of transport layers.
+The Device Control Library is a protocol layer that handles the routing of control messages between a host and one or
+many controllable resources within the controlled device. The library is transport agnostic and can be used with
+physical transports such as I2C, SPI, USB or XSCOPE.
 
 ********
 Features
@@ -25,7 +26,7 @@ Features
 
 * Simple read/write API
 * Fully acknowledged protocol
-* Includes different transports including I2C slave, USB requests, xSCOPE over xCONNECT and SPI slave
+* Includes different transports including I2C slave, USB requests, XSCOPE over xCONNECT and SPI slave
 * Supports multiple resources per task
 
 The table below shows combinations of host and transport mechanisms that are currently supported. 
@@ -37,7 +38,7 @@ Adding new transport layers and/or hosts is straightforward where the hardware s
  * - Host
    - I2C
    - USB
-   - xSCOPE
+   - XSCOPE
    - SPI
  * - PC / Windows
    - 
@@ -51,28 +52,28 @@ Adding new transport layers and/or hosts is straightforward where the hardware s
    -
  * - Raspberry Pi / Linux
    - Yes
-   - TBD
-   -
    - Yes
- * - xCORE
+   -
+   - Yes*
+ * - XCORE
    - Yes
    - 
    - 
    - 
 
 Typical resource usage
-......................
+======================
 
 Less than 1KB of code space is needed for the target device, plus whatever the chosen transport
 layer library requires. The API is in the form of function calls,
-so no additional logical cores are consumed. I/O requirements also depend on which transport
+so no additional logical threads are consumed. I/O requirements also depend on which transport
 layer is used.
 
 ************
 Known issues
 ************
 
-* None
+* No support for SPI on recent Raspberry Pi OS versions due to library compatibility issues.
 
 ****************
 Development repo

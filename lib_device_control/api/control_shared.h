@@ -42,12 +42,16 @@ enum control_ret_values { /*This looks odd but helps us force byte enum */
     CONTROL_ERROR
 };
 
-/* Expected USB Vendor request value */
+/** Expected USB Vendor request value on the control interface */
 #ifndef CONTROL_VENDOR_REQUEST
 #define CONTROL_VENDOR_REQUEST (0)
 #endif
 
-/* UNUSED_RES() works for resource: ports, interfaces, clocks, channels/chanends  */
+/** end doxygen group
+ * @}
+ */
+
+/** UNUSED_RES() marks resources as unused, where (void) would be used for integer types. It works for resource: ports, interfaces, clocks, channels/chanends  */
 #ifndef UNUSED_RES
 #ifdef __XC__
 #define UNUSED_RES(x) do { unsafe { (void)(unsigned)(x); }  } while(0);
@@ -56,5 +60,4 @@ enum control_ret_values { /*This looks odd but helps us force byte enum */
 #endif
 #endif // UNUSED_RES
 
-/**@}*/
 #endif // CONTROL_SHARED_H
