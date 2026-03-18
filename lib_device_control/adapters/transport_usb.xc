@@ -11,8 +11,10 @@
 
 #define B_MAX_PACKET_SIZE0          64
 #define EP0_MAX_REQUEST_SIZE        256 // max allowed USB recv size
+#define EP0_MAX_REQUEST_WORDS       (EP0_MAX_REQUEST_SIZE / sizeof(unsigned int))
 
-static unsigned char request_data[EP0_MAX_REQUEST_SIZE] = {0};
+// Note: the lib_xud USB API expects that the buffers will be word aligned, hence int not char used here.
+static unsigned int request_data[EP0_MAX_REQUEST_WORDS] = {0};
 
 // USB Transport device processing function, this passes USB vendor requests to the control interface.
 //
@@ -37,14 +39,14 @@ static XUD_Result_t USB_EP0_Receive(XUD_ep ep0_out, USB_SetupPacket_t *sp, uint8
 XUD_Result_t USB_H2D_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, client interface control i_control[]) {
     XUD_Result_t result = XUD_RES_ERR;
     if ((sp->bRequest == CONTROL_VENDOR_REQUEST) && (sp->wLength <= EP0_MAX_REQUEST_SIZE)) {
-        result = USB_EP0_Receive(ep0_out, sp, request_data);
+        result = USB_EP0_Receive(ep0_out, sp, (request_data, unsigned char []));
 
     } else {
         result = XUD_RES_ERR;
     }
 
     if (result == XUD_RES_OKAY) {
-        control_ret_t ctrl = control_process_usb_set_request(sp->wIndex, sp->wValue, sp->wLength, request_data, i_control);
+        control_ret_t ctrl = control_process_usb_set_request(sp->wIndex, sp->wValue, sp->wLength, (request_data, unsigned char []), i_control);
         if (ctrl == CONTROL_SUCCESS) {
             result = XUD_DoSetRequestStatus(ep0_in);
         }
@@ -56,9 +58,9 @@ XUD_Result_t USB_H2D_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacke
 XUD_Result_t USB_D2H_VendorRequest(XUD_ep ep0_out, XUD_ep ep0_in, USB_SetupPacket_t *sp, client interface control i_control[]) {
     XUD_Result_t result = XUD_RES_ERR;
     if ((sp->bRequest == CONTROL_VENDOR_REQUEST) && (sp->wLength <= EP0_MAX_REQUEST_SIZE)) {
-        control_ret_t ctrl = control_process_usb_get_request(sp->wIndex, sp->wValue, sp->wLength, request_data, i_control);
+        control_ret_t ctrl = control_process_usb_get_request(sp->wIndex, sp->wValue, sp->wLength, (request_data, unsigned char []), i_control);
         if (ctrl == CONTROL_SUCCESS) {
-            result = XUD_DoGetRequest(ep0_out, ep0_in, request_data, sp->wLength, sp->wLength);
+            result = XUD_DoGetRequest(ep0_out, ep0_in, (request_data, unsigned char []), sp->wLength, sp->wLength);
         }
     }
     return result;
