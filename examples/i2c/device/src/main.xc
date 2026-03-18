@@ -9,11 +9,10 @@
 #include "i2c.h"
 #include "control.h"
 #include "app.h"
+#include "resource.h"
 
 on tile[PORT_I2C_SCL_TILE_NUM]: port p_scl = PORT_I2C_SCL;
 on tile[PORT_I2C_SDA_TILE_NUM]: port p_sda = PORT_I2C_SDA;
-
-const char i2c_device_addr = 0x2C;
 
 int main(void)
 {
@@ -33,7 +32,7 @@ int main(void)
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
         i2c_control_client(i_i2c, i_control);
 #pragma warning enable
-        i2c_slave(i_i2c, p_scl, p_sda, i2c_device_addr);
+        i2c_slave(i_i2c, p_scl, p_sda, DEVICE_I2C_ADDRESS);
       }
     }
   }

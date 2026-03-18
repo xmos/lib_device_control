@@ -26,7 +26,7 @@ int main(void)
       unsigned char payload[4];
       int i;
 
-      if (control_init_i2c(0x2C) != CONTROL_SUCCESS) {
+      if (control_init_i2c(DEVICE_I2C_ADDRESS) != CONTROL_SUCCESS) {
         printf("control init failed\n");
         exit(1);
       }
