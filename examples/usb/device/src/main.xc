@@ -12,9 +12,6 @@
 #include "app.h"
 #include "xud_device.h"
 
-#define DEBUG_UNIT DEVICE
-#include "debug_print.h"
-
 /* USB Endpoint Defines */
 #define XUD_EP_COUNT_OUT   1    //Includes EP0 (1 OUT EP0)
 #define XUD_EP_COUNT_IN    1    //Includes EP0 (1 IN EP0)

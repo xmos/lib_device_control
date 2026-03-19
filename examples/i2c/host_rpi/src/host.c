@@ -8,11 +8,13 @@
 
 #define INVALID_VERSION 0xFF
 
+// Payload size can be from 1 to 253 bytes
+#define PAYLOAD_SIZE 1
+
 int main(void)
 {
   control_version_t version = INVALID_VERSION;
-  unsigned char payload[4];
-  uint8_t i;
+  unsigned char payload[PAYLOAD_SIZE];
 
   if (control_init_i2c(DEVICE_I2C_ADDRESS) != CONTROL_SUCCESS) {
     printf("control init failed\n");
@@ -30,17 +32,20 @@ int main(void)
   }
 
   printf("started\n");
+  for (uint8_t i = 0; i < sizeof(payload); i++) {
+    payload[i] = (uint8_t)(i + 1);
+  }
 
-  for (i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < 4; i++) {
     payload[0] = i;
-    if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 1) != CONTROL_SUCCESS) {
+    if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, sizeof(payload)) != CONTROL_SUCCESS) {
       printf("control write command failed\n");
       exit(1);
     }
 
     pause_short();
 
-    if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, 1) != CONTROL_SUCCESS) {
+    if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, sizeof(payload)) != CONTROL_SUCCESS) {
       printf("control read command failed\n");
       exit(1);
     }

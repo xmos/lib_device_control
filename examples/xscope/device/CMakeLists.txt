@@ -4,12 +4,8 @@ project(xscope)
 
 # target: choose the target platform
 set(APP_HW_TARGET src/XK_VOICE_L71.xn)
-# set(APP_HW_TARGET src/XK-EVK-XU316-AIV.xn)
 
 set(APP_INCLUDES src ../shared)
-
-# To enable XSCOPE transport in the library, this application must build 'xscope' configuration
-set(TRANSPORT_CONFIG  "XSCOPE")
 
 set(APP_COMPILER_FLAGS
   -O2
@@ -17,7 +13,6 @@ set(APP_COMPILER_FLAGS
   -report
   -Wall
   -fxscope
-  -DDEBUG_PRINT_ENABLE_TRANSPORT=1
 )
 
 set(APP_DEPENDENT_MODULES lib_device_control)

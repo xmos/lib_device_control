@@ -45,7 +45,11 @@ void app(server interface control i_control)
           ret = CONTROL_ERROR;
           break;
         }
-        test_value = payload[0];
+        if (payload_len > 0) {
+          test_value = payload[0];
+        } else {
+          test_value = 0;
+        }
         ret = CONTROL_SUCCESS;
         break;
 
