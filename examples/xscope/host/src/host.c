@@ -9,18 +9,19 @@
 
 #define INVALID_CONTROL_VERSION 0xFF
 
+// Payload size can be from 1 to 252 bytes
+#define PAYLOAD_SIZE 1
+
 static void exit_error(void)
 {
   control_cleanup_xscope();
   exit(1);
 }
 
-
 int main(void)
 {
   control_version_t version = INVALID_CONTROL_VERSION;
-  unsigned char payload[4];
-  uint8_t i;
+  unsigned char payload[PAYLOAD_SIZE];
 
   if (control_init_xscope("localhost", "10101") != CONTROL_SUCCESS) {
     printf("control init failed\n");
@@ -38,17 +39,20 @@ int main(void)
   }
 
   printf("[HOST] started\n");
+  for (size_t i = 0; i < sizeof(payload); i++) {
+    payload[i] = (uint8_t)(i + 1);
+  }
 
-  for (i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < 4; i++) {
     payload[0] = i;
-    if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, 1) != CONTROL_SUCCESS) {
+    if (control_write_command(RESOURCE_ID, CONTROL_CMD_SET_WRITE(0), payload, sizeof(payload)) != CONTROL_SUCCESS) {
       printf("[HOST] control write command failed\n");
       exit_error();
     }
 
     pause_short();
 
-    if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, 1) != CONTROL_SUCCESS) {
+    if (control_read_command(RESOURCE_ID, CONTROL_CMD_SET_READ(0), payload, sizeof(payload)) != CONTROL_SUCCESS) {
       printf("[HOST] control read command failed\n");
       exit_error();
     }

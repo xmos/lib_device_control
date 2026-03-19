@@ -4,13 +4,8 @@ project(spi)
 
 # target: choose the target platform
 set(APP_HW_TARGET src/XK_VOICE_L71.xn)
-# set(APP_HW_TARGET src/XK-EVK-XU316-AIV.xn)
 
 set(APP_INCLUDES src ../shared)
-
-# To enable SPI transport in the library, this application must build 'spi' configuration
-set(TRANSPORT_CONFIG  "SPI")
-
 
 set(APP_COMPILER_FLAGS
   -O2

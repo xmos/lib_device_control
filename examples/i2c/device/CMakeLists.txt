@@ -4,7 +4,6 @@ project(i2c)
 
 # target: choose the target platform
 set(APP_HW_TARGET src/XK_VOICE_L71.xn)
-# set(APP_HW_TARGET src/XK-EVK-XU316-AIV_i2c.xn)
 
 # Includes and flags
 set(APP_INCLUDES src ../shared)
