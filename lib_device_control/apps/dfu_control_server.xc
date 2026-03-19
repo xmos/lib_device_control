@@ -110,7 +110,7 @@ void dfu_control_server(server interface control dfu_control_interface) {
 
                 if (dfu_response.deferred_request == DFU_DEFERRED_ACTION_REBOOT_TO_DFU) {
                     /* This is USB DFU mode entry mechanism, for non-USB ignore. */
-                } else if (dfu_response.deferred_request == DFU_DEFERRED_ACTION_FLASH_CONNECT) {
+                } else if (dfu_response.deferred_request != 0) {
                     dfu_deferred_action = dfu_response.deferred_request;
                 }
 
