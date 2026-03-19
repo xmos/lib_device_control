@@ -26,7 +26,7 @@ Features
 
 * Simple read/write API
 * Fully acknowledged protocol
-* Includes different transports including I2C slave, USB requests, XSCOPE over xCONNECT and SPI slave
+* Includes different transports including I2C slave, USB requests, XSCOPE over XCONNECT and SPI slave
 * Supports multiple resources per task
 
 The table below shows combinations of host and transport mechanisms that are currently supported. 
@@ -66,7 +66,7 @@ Typical resource usage
 
 Less than 1KB of code space is needed for the target device, plus whatever the chosen transport
 layer library requires. The API is in the form of function calls,
-so no additional logical threads are consumed. I/O requirements also depend on which transport
+so no additional threads are consumed. I/O requirements also depend on which transport
 layer is used.
 
 ************

@@ -2,16 +2,19 @@
 lib_device_control: Device Control for XCORE
 ############################################
 
+|newpage|
+
 ************
 Introduction
 ************
 
 The Device Control Library is a protocol layer that handles the routing of control messages between a host and one or
 many controllable resources within the controlled device as shown in :numref:`control_logical_view`.
-The library is transport agnostic and can be used with physical transports such as I2C, SPI, USB or XSCOPE.
+The library is transport agnostic and can be used with physical transports such as I2C, SPI, USB or
+`XSCOPE <https://www.xmos.com/documentation/XM-014363-PC/html/tools-guide/tools-ref/xscope/index.html#xscope>`_.
 
 .. figure:: ../images/control_logical_view.pdf
-   :width: 80%
+   :width: 70%
    :name: control_logical_view
 
    Logical view of lib_device_control
@@ -101,13 +104,15 @@ The ``libusb-1.0-0-dev`` package must be installed for USB transport, and the th
 
 For OSX hosts, the supported compiler is `Clang`. The ``libusb`` library is available via the ``host_build_usb.cmake`` file.
 
+|newpage|
+
 *********
 Operation
 *********
 
 The `Host` communicates with resources on an XCORE device by sending `commands` to it over a
 physical `transport`, as shown in :numref:`control_packet`. Resources are identified by an 8-bit identifier and exist in
-tasks that run on logical threads of the device. There can be multiple resources in a task.
+tasks that run on threads of the device. There can be multiple resources in a task.
 
 The command code is 8 bits and is a `write` command when bit 7 is not set or a `read` command when bit 7 is set.
 It is an application design decision whether the commands are common across all resources or
@@ -143,7 +148,7 @@ to the appropriate task based on the resource ID, as shown in the figure
    :width: 80%
    :name: resource_mapping
 
-   Mapping between resource IDs and xC interfaces
+   Mapping between resource IDs and XC interfaces
 
 This means multiple tasks residing in different threads or even tiles on the device can be easily
 controlled using a single instance of the Device Control library and a single API from the host.
@@ -153,10 +158,11 @@ the host can indicate whether an error occurred to the user.
 
 The control library supports USB (device is USB device), I2C (device is I2C slave), SPI (device is SPI slave)
 and XSCOPE (device is target connected via XTAG debug adapter) as physical layers. The maximum data packet size for
-each of the transport types is as follows:
+each of the transport types is as shown in :numref:`transport_data_length`.
 
 .. list-table:: Maximum Data Length for Device Control Library Transports
  :header-rows: 1
+ :name: transport_data_length
 
  * - Transport
    - Data length
@@ -177,20 +183,22 @@ each of the transport types is as follows:
 It would be straightforward to add support for additional physical layers such as UART or
 TCP/UDP over Ethernet or add additional control hosts where the hardware and operating system supports it.
 
+|newpage|
+
 *********
 Transport
 *********
 
 The transport task receives its natural unit of data, such as I2C transaction, or USB request, and
-calls a processing function on it from the library. At the same time it passes in the whole array of xC interfaces
+calls a processing function on it from the library. At the same time it passes in the whole array of XC interfaces
 which connect to all of the controlled tasks.
 
 The library's logic happens inside the function that is called and once a command is complete, an
-xC interface call is made to pass the command over to the appropriate controlled resource.
+XC interface call is made to pass the command over to the appropriate controlled resource.
 
-The receiving task then receives a write or read command over the xC interface.
+The receiving task then receives a write or read command over the XC interface.
 
-To ensure compatibility, a special command is provided to query the version of control xC interface. This
+To ensure compatibility, a special command is provided to query the version of control XC interface. This
 allows the host to query the device and check that it is running the same version, which will ensure
 command compatibility.
 
@@ -199,13 +207,13 @@ Please see `Device side Transport`_, `Device side`_ and `Host side`_ sections fo
 I2C, SPI and XSCOPE Transports
 ==============================
 
-The I2C, SPI and XSCOPE Transports are very similar in concept, so the I2C is given here as an example.
+I2C, SPI and XSCOPE Transports are very similar in concept, so the I2C is given here as an example.
 
 Allocating hardware resources
 -----------------------------
 
 Allocating the necessary pins for the transport is the responsibility of the application.
-For example, for an I2C slave application, two ports must be allocated for SCL and SDA lines and passed to the I2C slave function in the transport thread, for example:
+For example, for an I2C slave application, two ports must be allocated for SCL and SDA lines and passed to the I2C slave function in the transport task, for example:
 
 .. literalinclude:: ../../examples/i2c/device/src/main.xc
    :language: c
@@ -240,20 +248,20 @@ The application side of the registration process is handled by populating a tabl
    :start-at: case i_control.register_resources
    :end-at: break;
 
-Transport Threads
------------------
+Transport Tasks
+---------------
 
-The transport thread must be called in main and provided the control interface, the control client must be called, ``i2c_control_client`` in this example:
+The transport task must be called in main and provided the control interface, the control client must be called, ``i2c_control_client`` in this example:
 
 .. literalinclude:: ../../examples/i2c/device/src/main.xc
    :language: c
    :start-after: /* Transport and control tasks */
    :end-at: }
 
-Application Thread
-------------------
+Application Task
+----------------
 
-The application thread must be called in main and provided the control interface, for example:
+The application task must be called in main and provided the control interface, for example:
 
 .. literalinclude:: ../../examples/i2c/device/src/main.xc
    :language: c
@@ -301,8 +309,8 @@ USB Descriptors
 ---------------
 
 USB requires descriptors to describe the devices capabilities. The example provides only a single interface with only the control endpoint (0)
-and so the device descriptor and configuration descriptor are very simple. The device descriptor indicates that the device is a vendor class device,
-which means it will use vendor requests for communication between the host and device, which are handled by the Device Control library.
+and so the device descriptor and configuration descriptor are very simple. The device descriptor indicates that the device is a Vendor Class device,
+which means it will use Vendor requests for communication between the host and device, which are handled by the Device Control library.
 The USB device descriptor:
 
 .. literalinclude:: ../../examples/usb/device/src/endpoint0.xc
@@ -328,7 +336,7 @@ The descriptors are requested by the host during enumeration and are handled in 
 Reading over Device Control
 ---------------------------
 
-When the host requests a read from a controlled resource, endpoint 0 receives a device-to-host vendor request.
+When the host requests a read from a controlled resource, endpoint 0 receives a device-to-host Vendor request.
 
 .. literalinclude:: ../../examples/usb/device/src/endpoint0.xc
    :language: c
@@ -340,7 +348,7 @@ along with the control interface and wraps the USB data transaction that is tran
 A call to the ``read_command()`` method is subsequently made on the server side control interface which is
 then handled by the application. Once the application has filled the buffer with data, the data buffer reference
 is returned to ``lib_xud`` by EP0 and the USB control transaction is completed.
-The vendor request transaction is stalled to indicate failure to the host.
+The Vendor request transaction is stalled to indicate failure to the host.
 
 .. literalinclude:: ../../examples/usb/device/src/app.xc
    :language: c
@@ -350,7 +358,7 @@ The vendor request transaction is stalled to indicate failure to the host.
 Writing over Device Control
 ---------------------------
 
-When the host requests a write to a controlled resource, endpoint 0 receives a host-to-device vendor request.
+When the host requests a write to a controlled resource, endpoint 0 receives a host-to-device Vendor request.
 
 .. literalinclude:: ../../examples/usb/device/src/endpoint0.xc
    :language: c
@@ -381,12 +389,14 @@ standard device request:
    :start-at: case USB_BMREQ_D2H_STANDARD_DEV:
    :end-at: break;
 
-The MSOS descriptor is requested by the host as a vendor request:
+The MSOS descriptor is requested by the host as a Vendor request:
 
 .. literalinclude:: ../../examples/usb/device/src/endpoint0.xc
    :language: c
    :start-at: case USB_BMREQ_D2H_VENDOR_DEV:
    :end-at: } else {
+ 
+|newpage|
 
 *******************************************
 Device Firmware Upgrade over Device Control
@@ -403,6 +413,7 @@ To use enable the required configuration setting in ``control_conf.h``:
 
    #define CONTROL_APP_DFU 1
 
+|newpage|
 
 *******************
 Example application
@@ -418,7 +429,7 @@ The following instructions are for the USB example, but the process is very simi
 This section assumes that the `XMOS XTC Tools <https://www.xmos.com/software-tools/>`_ have been
 downloaded and installed. The required version is specified in the accompanying ``README``.
 
-Installation instructions can be found `here <https://xmos.com/xtc-install-guide>`_.
+Installation instructions can be found `here <https://www.xmos.com/xtc-install-guide>`_.
 
 Special attention should be paid to the section on
 `Installation of Required Third-Party Tools <https://www.xmos.com/documentation/XM-014363-PC/html/installation/install-configure/install-tools/install_prerequisites.html>`_.
@@ -451,6 +462,9 @@ For subsequent builds, the ``cmake`` step may be omitted.
 If ``CMakeLists.txt`` or other build files are modified, ``cmake`` will be re-run automatically
 by ``xmake`` as needed.
 
+Running the example
+===================
+
 From an XTC command prompt, the following command should be run from the ``examples/usb/device``
 directory:
 
@@ -467,21 +481,24 @@ Alternatively, the application can be programmed into flash memory for standalon
 Building the example host app
 =============================
 
-This is very similar to building the device example, except the host example is in the ``examples/usb/host`` directory, and the host compiler must be in the path.
-The host app can be built from a command terminal with the following commands:
+This is very similar to building the device example, except the host example is in the ``examples/usb/host`` directory,
+and the host compiler must be in the path. The host app can be built from a command terminal with the commands shown in :numref:`build_host_linux`.
 
 .. code-block:: console
    :caption: Building the host app on Linux or Mac hosts
+   :name: build_host_linux
 
    cd lib_device_control/examples/usb/host
    cmake -G "Unix Makefiles" -B build
    xmake -j -C build
    ./bin/usb_host_app
 
-For Windows hosts the process is the same except the Ninja generator is recommended to be used with CMake and the executable will have a ``.exe`` extension:
+For Windows hosts the process is the same except the Ninja generator is recommended to be used with CMake and the executable will have a ``.exe`` extension.
+The commands are shown in :numref:`build_host_windows`.
 
 .. code-block:: console
    :caption: Building the host app on Windows hosts
+   :name: build_host_windows
 
    cd lib_device_control\examples\usb\host
    cmake -G "Ninja" -B build
@@ -491,36 +508,38 @@ For Windows hosts the process is the same except the Ninja generator is recommen
 Example Hardware Setup
 ======================
 
-To run the example, connect a USB cable to power the `L71` board as shown in :numref:`board_l71_hw_setup`,
+To run the example, connect a USB cable to power the `XK-VOICE-L71` board as shown in :numref:`board_l71_hw_setup`,
 and plug the XTAG to the board and connect the XTAG USB cable to your development machine.
 
 .. figure:: ../images/board_l71_hw_setup.png
-   :width: 80%
+   :width: 60%
    :name: board_l71_hw_setup
 
-   L71 USB Hardware setup
+   XK-VOICE-L71 USB Hardware setup
 
 Raspberry Pi Hardware Setup
 ---------------------------
 
-For the examples with the Raspberry Pi as a host, the I2C, SPI and USB examples, the `L71` board can be stacked on top
+For the examples with the Raspberry Pi as a host, the I2C, SPI and USB examples, the `XK-VOICE-L71` board can be stacked on top
 of a Raspberry Pi as shown in :numref:`board_l71_rpi_stacked`, and the I2C and SPI lines are connected between the two boards.
-For the USB example a USB cable should be connected between the Raspberry Pi and the `L71`.
-The XTAG should be connected to the `L71` as normal and the host app can be run from the Raspberry Pi terminal.
+For the USB example a USB cable should be connected between the Raspberry Pi and the `XK-VOICE-L71`.
+The XTAG should be connected to the `XK-VOICE-L71` as normal and the host app can be run from the Raspberry Pi terminal.
 
 .. figure:: ../images/board_l71_rpi_stacked.png
-   :width: 80%
+   :width: 70%
    :name: board_l71_rpi_stacked
 
-   L71 Raspberry Pi Hardware setup
+   XK-VOICE-L71 Raspberry Pi Hardware setup
 
 Output from the example applications
 ------------------------------------
 
 When run, the host app will attempt to connect and communicate with the device over USB.
+The outputs listings are shown in :numref:`device_app_output` and :numref:`host_app_output` for the device and host applications respectively.
 
 .. code-block:: console
    :caption: Example device app output
+   :name: device_app_output
 
    > xrun --xscope .\bin\usb.xe
    started
@@ -535,6 +554,7 @@ When run, the host app will attempt to connect and communicate with the device o
 
 .. code-block:: console
    :caption: Example host app output
+   :name: host_app_output
 
    $ sudo ./bin/usb_host_app
    device found
@@ -568,17 +588,20 @@ directory, please note the use of the ``--xscope-port`` option to specify the po
 
    xrun --xscope-port localhost:10101 .\bin\xscope.xe
 
-When run, the host app will attempt to connect and communicate with the device over XSCOPE. As shown below, the
+When run, the host app will attempt to connect and communicate with the device over XSCOPE.
+As shown in :numref:`xscope_device_output` and :numref:`xscope_host_output`, the
 device prints out very little, but the host app prints out the commands sent and responses received over XSCOPE.
 
 .. code-block:: console
    :caption: Example XSCOPE device app output
+   :name: xscope_device_output
 
    > xrun --xscope-port localhost:10101 .\bin\xscope.xe
    New (non-blocking) xscope_server_socket connection made
 
 .. code-block:: console
-   :caption: Example host app output
+   :caption: Example XSCOPE host app output
+   :name: xscope_host_output
 
    >bin\xscope_host_app.exe
    [HOST] connected to server at port 10101
@@ -604,6 +627,8 @@ device prints out very little, but the host app prints out the commands sent and
    [HOST] read response: length 5: 12 80 01 00 03 
    [HOST] Written and read back command with payload: 0x03
    [HOST] done
+
+|newpage|
 
 **********
 References
@@ -631,7 +656,9 @@ USB
 XSCOPE
 ======
 
-* https://www.xmos.com/documentation/XM-014363-PC/html/tools-guide/tools-ref/xscope/index.html
+* `XSCOPE <https://www.xmos.com/documentation/XM-014363-PC/html/tools-guide/tools-ref/xscope/index.html#xscope>`_ (https://www.xmos.com/documentation/XM-014363-PC/html/tools-guide/tools-ref/xscope/index.html#xscope)
+
+|newpage|
 
 *************
 API Reference

@@ -6,7 +6,8 @@ UNRELEASED
 
   * CHANGED:  Fixed USB buffer alignment issue.
   * CHANGED:  Examples' behaviour is now consistent with each other.
-  * CHANGED:  Fixed legacy xcommon support
+  * CHANGED:  Fixed legacy xcommon support.
+  * CHANGED:  Documentation update.
 
 5.0.0
 -----
