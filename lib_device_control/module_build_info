@@ -3,16 +3,13 @@ VERSION = 5.0.0
 DEPENDENT_MODULES = lib_xassert(>=4.3.2) \
                     lib_logging(>=3.4.0)
 
-MODULE_XCC_FLAGS = $(XCC_FLAGS) \
-                   -Os
+MODULE_XCC_FLAGS = $(XCC_FLAGS) -Os -Wall -Wextra -Wshadow -Wconversion 
 
-OPTIONAL_HEADERS +=
+OPTIONAL_HEADERS = control_conf.h
 
-EXPORT_INCLUDE_DIRS = api
+INCLUDE_DIRS = api \
+               inc \
+               ../host/api \
+               ../host/inc \
 
-INCLUDE_DIRS = $(EXPORT_INCLUDE_DIRS) \
-               inc
-               ../host/api
-               ../host/inc
-
-SOURCE_DIRS = src
+SOURCE_DIRS = src adapters apps
