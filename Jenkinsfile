@@ -89,6 +89,11 @@ pipeline {
                     withTools(params.TOOLS_VERSION) {
                       dir("tests") {
                         runPytest("--dist worksteal")
+                        
+                        // Build the legacy project is the test for xcommon support
+                        dir("legacy_build_test") {
+                          sh "xmake -j"
+                        }
                       }
                     }
                   }
