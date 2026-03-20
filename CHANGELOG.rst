@@ -1,6 +1,13 @@
 lib_device_control change log
 =============================
 
+UNRELEASED
+----------
+
+  * CHANGED:  Fixed USB buffer alignment issue.
+  * CHANGED:  Examples' behaviour is now consistent with each other.
+  * CHANGED:  Fixed legacy xcommon support
+
 5.0.0
 -----
 
