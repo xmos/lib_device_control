@@ -34,7 +34,7 @@
 
 static timer dfu_timer;
 static unsigned dfu_time;
-static enum dfu_request dfu_deferred_action = 0;
+static enum dfu_cmd_request dfu_deferred_action = 0;
 
 /* Profiling */
 static unsigned profile_dfu_start_time;
