@@ -1,13 +1,14 @@
 lib_device_control change log
 =============================
 
-UNRELEASED
-----------
+5.0.1
+-----
 
+  * CHANGED:  Documentation update.
   * CHANGED:  Fixed USB buffer alignment issue.
   * CHANGED:  Examples' behaviour is now consistent with each other.
+  * CHANGED:  Moved file dfu_control_server.xc to lib_dfu.
   * CHANGED:  Fixed legacy xcommon support.
-  * CHANGED:  Documentation update.
 
 5.0.0
 -----
