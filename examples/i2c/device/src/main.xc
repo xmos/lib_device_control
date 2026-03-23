@@ -27,7 +27,7 @@ int main(void)
       control_init();
       control_register_resources(i_control, CONTROL_INTERFACES_NUM);
 
-      /* bug 17317 - [[combine]] */
+      /* Transport and control tasks */
       par {
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
         i2c_control_client(i_i2c, i_control);

@@ -10,6 +10,10 @@
 #include "control.h"
 
 /** XSCOPE transport client processing function, this passes XSCOPE data to the control interface.
+ * 
+ * This function handles XSCOPE requests from the host.
+ * It should be called from ``main()`` and the interface linked to the XSCOPE channel, in the case where CONTROL_USE_XSCOPE is defined as 1.
+ * 
  * \param c_xscope  XSCOPE channel end
  * \param i_control Control interface array
  * 

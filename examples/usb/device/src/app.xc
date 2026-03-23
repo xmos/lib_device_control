@@ -40,6 +40,7 @@ void app(server interface control i_control)
           printf(" %02x", payload[i]);
         }
         printf("\n");
+        /* DOC-TAG: WRITE */
         if (resid != RESOURCE_ID) {
           printf("unrecognised resource ID %d\n", resid);
           ret = CONTROL_ERROR;
@@ -52,6 +53,7 @@ void app(server interface control i_control)
         }
         ret = CONTROL_SUCCESS;
         break;
+        /* DOC-TAG: WRITE_END */
 
       case i_control.read_command(control_resid_t resid, control_cmd_t cmd,
                                   uint8_t payload[payload_len], unsigned payload_len) -> control_ret_t ret:
@@ -61,6 +63,7 @@ void app(server interface control i_control)
           resid += 1;
 #endif
         printf("%u: R %d %d %d\n", num_commands, resid, cmd, payload_len);
+        /* DOC-TAG: READ */
         if (resid != RESOURCE_ID) {
           printf("unrecognised resource ID %d\n", resid);
           ret = CONTROL_ERROR;
@@ -72,6 +75,7 @@ void app(server interface control i_control)
         }
         ret = CONTROL_SUCCESS;
         break;
+        /* DOC-TAG: READ_END */
     }
   }
 }
