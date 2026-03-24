@@ -13,8 +13,7 @@ set(LIB_XC_SRCS         src/control.xc
                         adapters/transport_usb.xc
                         adapters/transport_spi.xc
                         adapters/transport_i2c.xc
-                        adapters/transport_xscope.xc
-                        apps/dfu_control_server.xc)
+                        adapters/transport_xscope.xc)
 
 set(LIB_OPTIONAL_HEADERS    control_conf.h)
 

@@ -395,23 +395,6 @@ The MSOS descriptor is requested by the host as a Vendor request:
    :language: c
    :start-at: case USB_BMREQ_D2H_VENDOR_DEV:
    :end-at: } else {
- 
-|newpage|
-
-*******************************************
-Device Firmware Upgrade over Device Control
-*******************************************
-
-The Device Control library can be used to implement a simple device firmware upgrade (DFU) mechanism over USB, I2C or XSCOPE
-by using the control read and write commands to send firmware data from the host to the device and then writing that data to
-flash memory on the device. This is demonstrated in the DFU example application in `lib_dfu <https://www.xmos.com/libraries/lib_dfu>`_
-(https://www.xmos.com/libraries/lib_dfu).
-
-To use enable the required configuration setting in ``control_conf.h``:
-
-.. code-block:: C
-
-   #define CONTROL_APP_DFU 1
 
 |newpage|
 
@@ -715,11 +698,6 @@ Device side Transport
 .. doxygenfunction:: USB_H2D_VendorRequest
 
 .. doxygenfunction:: USB_D2H_VendorRequest
-
-DFU Support
-===========
-
-.. doxygenfunction:: dfu_control_server
 
 Host side
 =========

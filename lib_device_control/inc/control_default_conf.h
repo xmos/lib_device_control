@@ -45,11 +45,6 @@
 #define RESOURCE_ID_DFU 0xD0
 #endif
 
-/** When enabled, will include the control DFU application server in the build. Add a call to \ref dfu_control_server in ``main()`` */
-#ifndef CONTROL_APP_DFU
-#define CONTROL_APP_DFU 0
-#endif
-
 /** @} */
 
 #if CONTROL_INTERFACES_NUM <= 0
