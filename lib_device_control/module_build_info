@@ -12,4 +12,4 @@ INCLUDE_DIRS = api \
                ../host/api \
                ../host/inc \
 
-SOURCE_DIRS = src adapters apps
+SOURCE_DIRS = src adapters
