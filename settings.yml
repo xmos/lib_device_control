@@ -3,7 +3,7 @@
 lib_name: lib_device_control
 project: '{{lib_name}}'
 title: '{{lib_name}}: Device Control for xcore'
-version: 5.0.0
+version: 5.0.1
 
 documentation:
   exclude_patterns_path: doc/exclude_patterns.inc

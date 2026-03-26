@@ -5,7 +5,7 @@ lib_device_control: Device Control Library
 ##########################################
 
 :vendor: XMOS
-:version: 5.0.0
+:version: 5.0.1
 :scope: General Use
 :description: A library to control XMOS devices from a host
 :category: General Purpose
