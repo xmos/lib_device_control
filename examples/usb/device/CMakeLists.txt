@@ -12,9 +12,14 @@ set(APP_COMPILER_FLAGS
   -g
   -report
   -Wall
+  -Wextra
+  -Wconversion
+  -Wdiv-by-zero
+  -Wfloat-equal
+  -Wsign-compare
 )
 
-set(APP_DEPENDENT_MODULES lib_device_control "lib_xud(4.0.1)")
+set(APP_DEPENDENT_MODULES lib_device_control "humphrey-xmos/lib_xud(feature/composite-desc)")
 
 set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../../..)
 

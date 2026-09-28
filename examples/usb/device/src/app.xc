@@ -70,7 +70,7 @@ void app(server interface control i_control)
           break;
         }
         // Simple test: fill the payload with the last written value
-        for (int i = 0; i < payload_len; i++) {
+        for (unsigned i = 0; i < payload_len; i++) {
           payload[i] = test_value;
         }
         ret = CONTROL_SUCCESS;
