@@ -12,7 +12,7 @@
 #include "control.h"
 #include "endpoint0.h"
 #include "msos_helpers.h"
-#include "simple_ep0_msos_descriptors.h"
+#include "xud_ep0_msos_descriptors.h"
 #include "transport_usb.h"
 
 #include "xccompat.h"
@@ -82,7 +82,7 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
     XUD_ep ep0_out = XUD_InitEp(chan_ep0_out);
     XUD_ep ep0_in  = XUD_InitEp(chan_ep0_in);
 
-    XUD_Init_Simple_Ep0_Msos_Descriptors();
+    XUD_Init_Ep0_Msos_Descriptors();
 
     control_init();
     control_register_resources(i_control, 1);
@@ -101,7 +101,7 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
             {
                 case USB_BMREQ_D2H_STANDARD_DEV:
                     if (sp.bRequest == USB_GET_DESCRIPTOR) {
-                        result = XUD_GetBosDescriptor(ep0_out, ep0_in, &sp);
+                        result = XUD_GetBosDescriptor(1, ep0_out, ep0_in, &sp);
                     }
                     break;
 
@@ -113,7 +113,7 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
 
                 case USB_BMREQ_D2H_VENDOR_DEV:
                     if (sp.bRequest == XUD_REQUEST_GET_MSOS_DESCRIPTOR) {
-                        result = XUD_GetMsosDescriptor(ep0_out, ep0_in, &sp);
+                        result = XUD_GetMsosDescriptor(1, ep0_out, ep0_in, &sp);
 
                     } else {
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)
