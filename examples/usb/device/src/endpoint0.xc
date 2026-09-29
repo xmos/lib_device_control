@@ -12,7 +12,7 @@
 #include "control.h"
 #include "endpoint0.h"
 #include "msos_helpers.h"
-#include "simple_ep0_msos_descriptors.h"
+#include "xud_ep0_msos_descriptors.h"
 #include "transport_usb.h"
 
 #include "xccompat.h"
@@ -23,8 +23,8 @@ static unsigned char devDesc[] =
 {
     0x12,                     /* 0  bLength */
     USB_DESCTYPE_DEVICE,      /* 1  bdescriptorType */
-    (BCD_USB & 0xFF),         /* 2  bcdUSB */
-    (BCD_USB >> 8),           /* 3  bcdUSB */
+    (XUD_BCD_USB & 0xFF),     /* 2  bcdUSB */
+    (XUD_BCD_USB >> 8),       /* 3  bcdUSB */
     VENDOR_SPECIFIC_CLASS,    /* 4  bDeviceClass (from xud_std_descriptors.h) */
     0,                        /* 5  bDeviceSubClass */
     0,                        /* 6  bDeviceProtocol */
@@ -50,8 +50,8 @@ static unsigned char cfgDesc[] =
     0x01,                           /* 4  bNumInterfaces */
     0x01,                           /* 5  bConfigurationValue */
     0x00,                           /* 6  iConfiguration */
-    0x80,                           /* 7  bmAttributes */
-    0xFA,                           /* 8  bMaxPower */
+    XUD_GET_BMATTR_POWERMODE(),     /* 7  bmAttributes */
+    XUD_BMAX_POWER,                 /* 8  bMaxPower */
 
     0x09,                           /* 0  bLength */
     USB_DESCTYPE_INTERFACE,         /* 1  bDescriptorType */
@@ -82,7 +82,7 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
     XUD_ep ep0_out = XUD_InitEp(chan_ep0_out);
     XUD_ep ep0_in  = XUD_InitEp(chan_ep0_in);
 
-    XUD_Init_Simple_Ep0_Msos_Descriptors();
+    XUD_Init_Ep0_Msos_Descriptors();
 
     control_init();
     control_register_resources(i_control, 1);
@@ -101,7 +101,7 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
             {
                 case USB_BMREQ_D2H_STANDARD_DEV:
                     if (sp.bRequest == USB_GET_DESCRIPTOR) {
-                        result = XUD_GetBosDescriptor(ep0_out, ep0_in, &sp);
+                        result = XUD_GetBosDescriptor(1, ep0_out, ep0_in, &sp);
                     }
                     break;
 
@@ -113,7 +113,7 @@ void Endpoint0(chanend chan_ep0_out, chanend chan_ep0_in, client interface contr
 
                 case USB_BMREQ_D2H_VENDOR_DEV:
                     if (sp.bRequest == XUD_REQUEST_GET_MSOS_DESCRIPTOR) {
-                        result = XUD_GetMsosDescriptor(ep0_out, ep0_in, &sp);
+                        result = XUD_GetMsosDescriptor(1, ep0_out, ep0_in, &sp);
 
                     } else {
 #pragma warning disable unusual-code // Suppress slice interface warning (no array size passed)

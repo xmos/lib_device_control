@@ -13,6 +13,11 @@ set(APP_COMPILER_FLAGS
   -g
   -report
   -Wall
+  -Wextra
+  -Wconversion
+  -Wdiv-by-zero
+  -Wfloat-equal
+  -Wsign-compare
 )
 
 set(APP_DEPENDENT_MODULES lib_device_control "lib_i2c(6.4.1)")

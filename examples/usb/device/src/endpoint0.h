@@ -11,7 +11,6 @@
 #define EP0_MAX_PACKET_SIZE     64
 
 #define BCD_DEVICE              0x0100
-#define BCD_USB                 0x0201 // USB 2.01 needed for MSOS 2.0 support
 
 #define MANUFACTURER_STR_INDEX  0x01
 #define PRODUCT_STR_INDEX       0x02
