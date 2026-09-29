@@ -1,6 +1,12 @@
 lib_device_control change log
 =============================
 
+UNRELEASED
+----------
+
+  * CHANGED:  Updated USB example, using latest ``lib_xud`` MSOS API, and added
+    xud_conf.h to enable MSOS control descriptors.
+
 5.0.1
 -----
 

@@ -23,8 +23,8 @@ static unsigned char devDesc[] =
 {
     0x12,                     /* 0  bLength */
     USB_DESCTYPE_DEVICE,      /* 1  bdescriptorType */
-    (BCD_USB & 0xFF),         /* 2  bcdUSB */
-    (BCD_USB >> 8),           /* 3  bcdUSB */
+    (XUD_BCD_USB & 0xFF),     /* 2  bcdUSB */
+    (XUD_BCD_USB >> 8),       /* 3  bcdUSB */
     VENDOR_SPECIFIC_CLASS,    /* 4  bDeviceClass (from xud_std_descriptors.h) */
     0,                        /* 5  bDeviceSubClass */
     0,                        /* 6  bDeviceProtocol */
@@ -50,8 +50,8 @@ static unsigned char cfgDesc[] =
     0x01,                           /* 4  bNumInterfaces */
     0x01,                           /* 5  bConfigurationValue */
     0x00,                           /* 6  iConfiguration */
-    0x80,                           /* 7  bmAttributes */
-    0xFA,                           /* 8  bMaxPower */
+    XUD_GET_BMATTR_POWERMODE(),     /* 7  bmAttributes */
+    XUD_BMAX_POWER,                 /* 8  bMaxPower */
 
     0x09,                           /* 0  bLength */
     USB_DESCTYPE_INTERFACE,         /* 1  bDescriptorType */
